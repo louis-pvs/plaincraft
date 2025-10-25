@@ -4,6 +4,7 @@ import { expect, within, userEvent } from "storybook/test";
 import { InlineEditLabel, type InlineEditLabelProps } from "./InlineEditLabel";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const TYPE_SPEED = { delay: 40 };
 
 const meta: Meta<typeof InlineEditLabel> = {
   title: "Snippets/InlineEditLabel",
@@ -45,7 +46,7 @@ export const Interaction: Story = {
     await userEvent.click(canvas.getByRole("button", { name: /edit label/i }));
     const input = await canvas.findByRole("textbox", { name: /edit label/i });
     await userEvent.clear(input);
-    await userEvent.type(input, "Product strategy");
+    await userEvent.type(input, "Product strategy", TYPE_SPEED);
     await userEvent.keyboard("{Enter}");
     await canvas.findByText("Saved");
     await expect(
@@ -64,7 +65,8 @@ export const RejectsOverLimit: Story = {
     await userEvent.click(canvas.getByRole("button", { name: /edit label/i }));
     await canvas.findByRole("textbox", { name: /edit label/i });
     await userEvent.keyboard("{Enter}");
-    await canvas.findByText(/keep it under 8 characters/i);
+    const alert = await canvas.findByRole("alert");
+    await expect(alert).toHaveTextContent(/keep it under 8 characters/i);
   },
 };
 
@@ -73,7 +75,6 @@ export const RetryOnError: Story = {
     value: "Launch plan",
     maxLength: 16,
     errorLabel: "Save failed. Retry to continue.",
-    ariaLabel: "Edit launch plan label",
   },
   render: (args) => {
     const [value, setValue] = useState(args.value);
@@ -97,20 +98,23 @@ export const RetryOnError: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const launchButton = await canvas.findByRole("button", {
-      name: /edit launch plan label/i,
+      name: /edit label/i,
     });
     await userEvent.click(launchButton);
     const input = await canvas.findByRole("textbox", {
-      name: /edit launch plan/i,
+      name: /edit label/i,
     });
     await userEvent.clear(input);
-    await userEvent.type(input, "Launch update");
+    await userEvent.type(input, "Launch update", TYPE_SPEED);
     await userEvent.keyboard("{Enter}");
     await canvas.findByText("Save failed. Retry to continue.");
+    await userEvent.clear(input);
+    await userEvent.type(input, "Launch retry", TYPE_SPEED);
     await userEvent.keyboard("{Enter}");
+    await canvas.findByText("Saved");
     const button = await canvas.findByRole("button", {
-      name: /edit launch plan/i,
+      name: /edit label/i,
     });
-    await expect(button).toHaveTextContent("Launch update");
+    await expect(button).toHaveTextContent(/Launch retry/);
   },
 };
