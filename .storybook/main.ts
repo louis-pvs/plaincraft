@@ -5,8 +5,6 @@ const config: StorybookConfig = {
   stories: [
     "../snippets/!(_template)/**/*.stories.@(ts|tsx)",
     "../snippets/!(_template)/**/*.mdx",
-    "../snippets/**/*.stories.@(ts|tsx)",
-    "../snippets/**/*.mdx",
   ],
   addons: ["@storybook/addon-a11y", "@storybook/addon-docs"],
 };
