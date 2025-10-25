@@ -65,6 +65,7 @@ jobs:
       - name: Build Storybook
         run: pnpm build:storybook
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm exec playwright install --with-deps
       - name: Serve Storybook static build
         run: |
