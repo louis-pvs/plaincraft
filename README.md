@@ -64,10 +64,16 @@ Build static Storybook:
 pnpm build:storybook
 ```
 
+Install Playwright browsers (once per environment):
+
+```bash
+pnpm exec playwright install --with-deps
+```
+
 Headless interaction tests:
 
 ```bash
-pnpm storybook:test
+TARGET_URL=http://127.0.0.1:6006 pnpm storybook:test
 ```
 
 ### How docs get generated
@@ -110,7 +116,7 @@ Quality gates
 
 - GitHub Actions:
   - `app-checks` installs deps once, then format, typecheck, lint, unit test, and build the app.
-  - `storybook-tests` builds Storybook, installs Playwright with browsers, serves the static bundle, waits on `http://127.0.0.1:6006`, and runs the Storybook 9 test runner with the same command we use locally.
+  - `storybook-tests` restores cached Playwright browsers, builds Storybook, installs any missing browsers, serves the static bundle, waits on `http://127.0.0.1:6006`, and runs the Storybook 9 test runner with the same command we use locally.
 
 Do not exceed these time boxes:
 

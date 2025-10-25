@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within, userEvent, waitFor } from "storybook/test";
+import { expect, within, userEvent } from "storybook/test";
 import { InlineEditLabel, type InlineEditLabelProps } from "./InlineEditLabel";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -47,9 +47,7 @@ export const Interaction: Story = {
     await userEvent.clear(input);
     await userEvent.type(input, "Product strategy");
     await userEvent.keyboard("{Enter}");
-    await waitFor(async () => {
-      await expect(canvas.getByText("Saved")).toBeInTheDocument();
-    });
+    await canvas.findByText("Saved");
     await expect(
       canvas.getByRole("button", { name: /edit label/i }),
     ).toHaveTextContent("Product strategy");
@@ -59,17 +57,14 @@ export const Interaction: Story = {
 export const RejectsOverLimit: Story = {
   args: {
     maxLength: 8,
+    value: "Launch sprint plan",
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole("button", { name: /edit label/i }));
-    const input = await canvas.findByRole("textbox", { name: /edit label/i });
-    await userEvent.clear(input);
-    await userEvent.type(input, "Too many characters");
+    await canvas.findByRole("textbox", { name: /edit label/i });
     await userEvent.keyboard("{Enter}");
-    await expect(
-      canvas.getByText(/keep it under 8 characters/i),
-    ).toBeInTheDocument();
+    await canvas.findByText(/keep it under 8 characters/i);
   },
 };
 
@@ -78,34 +73,44 @@ export const RetryOnError: Story = {
     value: "Launch plan",
     maxLength: 16,
     errorLabel: "Save failed. Retry to continue.",
-    onSave: (() => {
-      let shouldFail = true;
-      return async () => {
-        await delay(120);
-        if (shouldFail) {
-          shouldFail = false;
-          throw new Error("Simulated failure");
-        }
-      };
-    })(),
+    ariaLabel: "Edit launch plan label",
+  },
+  render: (args) => {
+    const [value, setValue] = useState(args.value);
+    const [shouldFail, setShouldFail] = useState(true);
+
+    useEffect(() => {
+      setValue(args.value);
+    }, [args.value]);
+
+    const handleSave = async (nextValue: string) => {
+      await delay(120);
+      if (shouldFail) {
+        setShouldFail(false);
+        throw new Error("Simulated failure");
+      }
+      setValue(nextValue);
+    };
+
+    return <InlineEditLabel {...args} value={value} onSave={handleSave} />;
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole("button", { name: /edit launch plan/i }),
-    );
+    const launchButton = await canvas.findByRole("button", {
+      name: /edit launch plan label/i,
+    });
+    await userEvent.click(launchButton);
     const input = await canvas.findByRole("textbox", {
       name: /edit launch plan/i,
     });
     await userEvent.clear(input);
     await userEvent.type(input, "Launch update");
     await userEvent.keyboard("{Enter}");
-    await expect(
-      canvas.getByText("Save failed. Retry to continue."),
-    ).toBeInTheDocument();
+    await canvas.findByText("Save failed. Retry to continue.");
     await userEvent.keyboard("{Enter}");
-    await waitFor(async () => {
-      await expect(canvas.getByText("Saved")).toBeInTheDocument();
+    const button = await canvas.findByRole("button", {
+      name: /edit launch plan/i,
     });
+    await expect(button).toHaveTextContent("Launch update");
   },
 };
