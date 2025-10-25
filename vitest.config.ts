@@ -5,9 +5,8 @@ export default defineConfig({
   plugins: [react()],
   test: {
     pool: "forks",
-    threads: false,
     environment: "jsdom",
     globals: true,
-    include: ["snippets/**/*.spec.{ts,tsx}"]
-  }
+    include: ["snippets/**/*.spec.{ts,tsx}"],
+  },
 });

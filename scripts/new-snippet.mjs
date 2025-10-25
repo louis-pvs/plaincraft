@@ -26,7 +26,9 @@ fs.cpSync(src, dst, { recursive: true });
 // Replace contents and file names
 for (const file of fs.readdirSync(dst)) {
   const srcPath = path.join(dst, file);
-  const contents = fs.readFileSync(srcPath, "utf8").replaceAll("TemplateSnippet", name);
+  const contents = fs
+    .readFileSync(srcPath, "utf8")
+    .replaceAll("TemplateSnippet", name);
   const renamed = srcPath.replaceAll("TemplateSnippet", name);
   fs.writeFileSync(renamed, contents);
   if (renamed !== srcPath) fs.rmSync(srcPath);

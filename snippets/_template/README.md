@@ -4,20 +4,20 @@ One file UX snippet template.
 
 ## Props
 
-* `label?: string`
-* `onAction?: () => void | Promise<void>`
-* `max?: number`
+- `label?: string`
+- `onAction?: () => void | Promise<void>`
+- `max?: number`
 
 ## Behaviors
 
-* Input enforces a soft max
-* Button triggers `onAction`
+- Input enforces a soft max
+- Button triggers `onAction`
 
 ## Accessibility
 
-* Labeled input
-* Hint text via `aria-describedby`
-* Focus rings and keyboard path
+- Labeled input
+- Hint text via `aria-describedby`
+- Focus rings and keyboard path
 
 ## 10 minute acceptance test
 

@@ -2,5 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root { height: 100%; }
-body { @apply bg-white text-slate-950; }
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  @apply bg-white text-slate-950;
+}

@@ -19,7 +19,6 @@ export function TemplateSnippet(props: TemplateSnippetProps) {
 
   if (import.meta.env.DEV && max < 1) {
     // Invariant guard in dev only
-    // eslint-disable-next-line no-console
     console.warn("TemplateSnippet: max should be >= 1");
   }
 
@@ -30,11 +29,13 @@ export function TemplateSnippet(props: TemplateSnippetProps) {
   async function handleClick() {
     try {
       await onAction?.();
-      // eslint-disable-next-line no-console
-      if (import.meta.env.DEV) console.log("Action complete");
+      if (import.meta.env.DEV) {
+        console.info("Action complete");
+      }
     } catch {
-      // eslint-disable-next-line no-console
-      if (import.meta.env.DEV) console.log("Action failed, ignore for template");
+      if (import.meta.env.DEV) {
+        console.warn("Action failed, ignore for template");
+      }
     }
   }
 
