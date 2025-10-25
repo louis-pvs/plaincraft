@@ -1,4 +1,5 @@
 import React from "react";
+import { Demo as InlineEditLabelDemo } from "../../snippets/InlineEditLabel/InlineEditLabel";
 
 // Import demos by referencing the Demo export in each snippet file
 // Example import below remains commented until a real snippet exists
@@ -17,9 +18,9 @@ export function App() {
         </p>
       </header>
       <section className="grid gap-4 sm:grid-cols-2">
-        {/* <DemoCard title="CopyToClipboard">
-          <CopyToClipboardDemo />
-        </DemoCard> */}
+        <DemoCard title="InlineEditLabel">
+          <InlineEditLabelDemo />
+        </DemoCard>
         <DemoCard title="Getting Started" className="border-dashed bg-slate-50">
           <EmptyState />
         </DemoCard>
