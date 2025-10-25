@@ -22,5 +22,18 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
-      - run: pnpm build:storybook
-      - run: pnpm storybook:test
+      - name: Build Storybook
+        run: pnpm build:storybook
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+      - name: Serve Storybook static build
+        run: |
+          pnpm dlx http-server storybook-static --port 6006 --host 127.0.0.1 --silent &
+          echo "STORYBOOK_SERVER_PID=$!" >> $GITHUB_ENV
+      - name: Wait for Storybook
+        run: pnpm dlx wait-on http://127.0.0.1:6006
+      - name: Run Storybook tests
+        run: pnpm storybook:test -- --url http://127.0.0.1:6006
+      - name: Stop Storybook server
+        if: always()
+        run: kill $STORYBOOK_SERVER_PID
