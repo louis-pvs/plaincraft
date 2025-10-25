@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  app-checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -16,12 +16,26 @@ jobs:
           node-version-file: ".nvmrc"
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+
+  storybook-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Build Storybook
         run: pnpm build:storybook
       - name: Install Playwright browsers
@@ -36,4 +50,7 @@ jobs:
         run: pnpm storybook:test -- --url http://127.0.0.1:6006
       - name: Stop Storybook server
         if: always()
-        run: kill $STORYBOOK_SERVER_PID
+        run: |
+          if [ -n "${STORYBOOK_SERVER_PID:-}" ]; then
+            kill $STORYBOOK_SERVER_PID
+          fi

@@ -105,10 +105,12 @@ Quality gates
 
 - From a clean clone:
   - `pnpm i && pnpm storybook` starts Storybook successfully.
-  - `pnpm storybook:test` runs and passes.
+  - `pnpm storybook:test` runs (Storybook test runner against the static build) and passes.
   - Creating a new snippet via `pnpm new:snippet <Name>` yields working docs and stories without manual edits.
 
-- CI runs `build:storybook` and `storybook:test` after existing checks.
+- GitHub Actions:
+  - `app-checks` installs deps once, then format, typecheck, lint, unit test, and build the app.
+  - `storybook-tests` builds Storybook, installs Playwright with browsers, serves the static bundle, waits on `http://127.0.0.1:6006`, and runs the Storybook 9 test runner with the same command we use locally.
 
 Do not exceed these time boxes:
 
