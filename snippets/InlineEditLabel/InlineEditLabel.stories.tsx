@@ -59,20 +59,25 @@ export const Interaction: Story = {
   },
 };
 
-export const RejectsOverLimit: Story = {
+export const CancelsWithEscape: Story = {
   args: {
-    maxLength: 8,
-    value: "Short",
+    maxLength: 32,
+    value: "Original value",
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole("button", { name: /edit label/i }));
     const input = await canvas.findByRole("textbox", { name: /edit label/i });
     await userEvent.clear(input);
-    await userEvent.type(input, "This is way too long", TYPE_SPEED);
-    await userEvent.keyboard("{Enter}");
-    const alert = await canvas.findByRole("alert");
-    await expect(alert).toHaveTextContent(/keep it under 8 characters/i);
+    await userEvent.type(input, "Changed value", TYPE_SPEED);
+    await userEvent.keyboard("{Escape}");
+    // Should show "Changes discarded" message
+    await canvas.findByText("Changes discarded.");
+    // And the button should still show original value
+    const button = await canvas.findByRole("button", {
+      name: /edit label/i,
+    });
+    await expect(button).toHaveTextContent("Original value");
   },
 };
 
