@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { within, userEvent, expect } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { within, userEvent, expect } from "storybook/test";
 import { TemplateSnippet, type TemplateSnippetProps } from "./TemplateSnippet";
 
 const meta: Meta<typeof TemplateSnippet> = {
@@ -12,7 +12,6 @@ const meta: Meta<typeof TemplateSnippet> = {
   parameters: {
     a11y: { disable: false },
   },
-  tags: ["autodocs"],
 };
 export default meta;
 

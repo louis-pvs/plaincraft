@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import type { Meta, StoryObj } from "@storybook/react";
-import { expect, within, userEvent, waitFor } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within, userEvent, waitFor } from "storybook/test";
 import { InlineEditLabel, type InlineEditLabelProps } from "./InlineEditLabel";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -32,7 +32,6 @@ const meta: Meta<typeof InlineEditLabel> = {
   parameters: {
     a11y: { disable: false },
   },
-  tags: ["autodocs"],
 };
 export default meta;
 

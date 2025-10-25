@@ -8,10 +8,6 @@ const config: StorybookConfig = {
     "../snippets/**/*.stories.@(ts|tsx)",
     "../snippets/**/*.mdx",
   ],
-  addons: [
-    "@storybook/addon-essentials", // docs, controls, actions, etc.
-    "@storybook/addon-a11y",
-    "@storybook/addon-interactions",
-  ],
+  addons: ["@storybook/addon-a11y", "@storybook/addon-docs"],
 };
 export default config;
