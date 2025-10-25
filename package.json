@@ -14,7 +14,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run --reporter=dot",
     "new:snippet": "node scripts/new-snippet.mjs",
-    "prepare": "simple-git-hooks"
+    "prepare": "simple-git-hooks",
+    "lint:staged": "lint-staged"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
@@ -28,6 +29,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-unused-imports": "^4.0.0",
+    "lint-staged": "^15.2.10",
     "simple-git-hooks": "^2.9.0",
     "jsdom": "^24.1.1",
     "postcss": "^8.4.47",
@@ -47,6 +49,15 @@
     "npm": ">=10.0.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm format && pnpm lint"
+    "pre-commit": "pnpm lint:staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "pnpm exec prettier --cache --write",
+      "pnpm exec eslint --fix"
+    ],
+    "*.{json,md,css,scss,html,yml,yaml}": [
+      "pnpm exec prettier --cache --write"
+    ]
   }
 }
