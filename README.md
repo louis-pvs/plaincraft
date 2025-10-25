@@ -6,6 +6,8 @@ One file UX snippets for React and TypeScript. Each snippet is a single TSX file
 
 Seams via props. Invariants guarded at the top. A11y first. Runnable in under 10 minutes from a clean clone.
 
+> **For Contributors:** See [guides/DEVELOPMENT.md](./guides/DEVELOPMENT.md) for detailed architecture patterns, SOLID principles, testing standards, and code review checklists.
+
 ## Use this template
 
 - GitHub: Use this template then create your repo, run `pnpm i` and `pnpm dev`
@@ -28,14 +30,22 @@ pnpm dev
 
 Each snippet lives in `snippets/<Name>/<Name>.tsx` and exports both the component and `Demo`.
 
+**Architecture:** All snippets follow a headless controller + view pattern. See [guides/DEVELOPMENT.md](./guides/DEVELOPMENT.md) for the standard architecture, testing strategy, and SOLID principles.
+
 ## Repo layout
 
 ```
 demo/           Vite app that imports snippet Demos
 snippets/       Snippets and the _template
-docs/           Optional docs landing
+guides/         Development standards and architecture patterns
 scripts/        Helper scripts
 ```
+
+## Documentation
+
+- **[guides/DEVELOPMENT.md](./guides/DEVELOPMENT.md)** - Architecture patterns, SOLID principles, testing standards, and code review checklists for contributors
+- **snippets/[Name]/README.md** - Per-snippet API documentation, props, behavior, and accessibility guidelines
+- **snippets/[Name]/ADOPTION.md** - Integration guides and adoption strategies for each snippet
 
 ## 10 minute runnable contract
 
