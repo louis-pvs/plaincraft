@@ -26,8 +26,6 @@ jobs:
 
   storybook-tests:
     runs-on: ubuntu-latest
-    env:
-      PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -43,11 +41,18 @@ jobs:
         run: |
           PLAYWRIGHT_VERSION=$(node -p "require('@playwright/test/package.json').version")
           echo "version=${PLAYWRIGHT_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Configure Playwright cache path
+        id: playwright-path
+        run: |
+          PLAYWRIGHT_CACHE="$HOME/.cache/ms-playwright"
+          mkdir -p "$PLAYWRIGHT_CACHE"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$PLAYWRIGHT_CACHE" >> "$GITHUB_ENV"
+          echo "path=$PLAYWRIGHT_CACHE" >> "$GITHUB_OUTPUT"
       - name: Restore Playwright browsers
         id: playwright-cache
         uses: actions/cache/restore@v4
         with:
-          path: ~/.cache/ms-playwright
+          path: ${{ steps.playwright-path.outputs.path }}
           key: playwright-browsers-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-version.outputs.version }}
           restore-keys: |
             playwright-browsers-${{ runner.os }}-${{ runner.arch }}-
@@ -76,5 +81,5 @@ jobs:
         if: ${{ always() && steps.playwright-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
-          path: ~/.cache/ms-playwright
+          path: ${{ steps.playwright-path.outputs.path }}
           key: playwright-browsers-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-version.outputs.version }}
