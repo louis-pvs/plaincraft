@@ -65,6 +65,7 @@ export const RejectsOverLimit: Story = {
     await userEvent.click(canvas.getByRole("button", { name: /edit label/i }));
     await canvas.findByRole("textbox", { name: /edit label/i });
     await userEvent.keyboard("{Enter}");
+    (await canvas.findByRole("textbox", { name: /edit label/i })).blur();
     const alert = await canvas.findByRole("alert");
     await expect(alert).toHaveTextContent(/keep it under 8 characters/i);
   },
