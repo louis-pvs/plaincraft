@@ -1,0 +1,22 @@
+import { Meta, Canvas, Story, ArgsTable, Markdown } from "@storybook/blocks";
+import * as Stories from "./TemplateSnippet.stories";
+import ReadmeSource from "./README.md?raw";
+
+<Meta of={Stories} />
+
+# TemplateSnippet
+
+<Markdown>{ReadmeSource}</Markdown>
+
+## Interactive
+<Canvas>
+  <Story of={Stories.Basic} />
+</Canvas>
+
+## Interaction test
+<Canvas>
+  <Story of={Stories.Interaction} />
+</Canvas>
+
+## Props
+<ArgsTable of={Stories} />

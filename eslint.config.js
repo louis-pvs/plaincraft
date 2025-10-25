@@ -15,7 +15,7 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ["dist"],
+    ignores: ["dist", "**/*.mdx"],
   },
   ...compat.config({
     root: true,
@@ -44,7 +44,11 @@ export default [
     },
     overrides: [
       {
-        files: ["*.config.*", "scripts/**/*.*"],
+        files: ["*.config.*", "scripts/**/*.*", ".storybook/**/*.*"],
+        rules: { "import/no-default-export": "off" },
+      },
+      {
+        files: ["**/*.stories.ts", "**/*.stories.tsx"],
         rules: { "import/no-default-export": "off" },
       },
     ],

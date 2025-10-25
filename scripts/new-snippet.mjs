@@ -23,16 +23,32 @@ if (fs.existsSync(dst)) {
 
 fs.cpSync(src, dst, { recursive: true });
 
-// Replace contents and file names
+// Replace contents and file names including Storybook files
+const replacements = [
+  ["TemplateSnippet.tsx", `${name}.tsx`],
+  ["TemplateSnippet.spec.tsx", `${name}.spec.tsx`],
+  ["TemplateSnippet.stories.tsx", `${name}.stories.tsx`],
+  ["TemplateSnippet.mdx", `${name}.mdx`],
+  ["TemplateSnippet", name],
+];
+
 for (const file of fs.readdirSync(dst)) {
   const srcPath = path.join(dst, file);
-  const contents = fs
-    .readFileSync(srcPath, "utf8")
-    .replaceAll("TemplateSnippet", name);
-  const renamed = srcPath.replaceAll("TemplateSnippet", name);
-  fs.writeFileSync(renamed, contents);
-  if (renamed !== srcPath) fs.rmSync(srcPath);
+  let contents = fs.readFileSync(srcPath, "utf8");
+  for (const [from, to] of replacements) {
+    contents = contents.replaceAll(from, to);
+  }
+  let outPath = srcPath;
+  for (const [from, to] of replacements) {
+    if (outPath.endsWith(from)) outPath = outPath.replace(from, to);
+  }
+  fs.writeFileSync(outPath, contents);
+  if (outPath !== srcPath) fs.rmSync(srcPath);
 }
 
 console.log(`Created snippet at ${dst}`);
-console.log("Import its Demo in demo/src/App.tsx to render it.");
+console.log("Next steps:");
+console.log(
+  `- Import { Demo as ${name}Demo } from "../../snippets/${name}/${name}"; into demo/src/App.tsx`,
+);
+console.log(`- Run: pnpm dev or pnpm storybook`);
