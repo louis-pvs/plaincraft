@@ -12,5 +12,12 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
   },
-  "include": ["demo", "snippets", "scripts", "env.d.ts", "*.config.ts"]
+  "include": [
+    ".storybook/**/*",
+    "demo",
+    "snippets",
+    "scripts",
+    "env.d.ts",
+    "*.config.ts"
+  ]
 }

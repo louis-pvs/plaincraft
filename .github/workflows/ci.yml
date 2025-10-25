@@ -4,9 +4,14 @@ on:
   push:
     branches: ["main"]
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
+  app-checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -16,9 +21,71 @@ jobs:
           node-version-file: ".nvmrc"
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+
+  storybook-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Determine Playwright version
+        id: playwright-version
+        run: |
+          PLAYWRIGHT_VERSION=$(node -p "require('@playwright/test/package.json').version")
+          echo "version=${PLAYWRIGHT_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Configure Playwright cache path
+        id: playwright-path
+        run: |
+          PLAYWRIGHT_CACHE="$HOME/.cache/ms-playwright"
+          mkdir -p "$PLAYWRIGHT_CACHE"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$PLAYWRIGHT_CACHE" >> "$GITHUB_ENV"
+          echo "path=$PLAYWRIGHT_CACHE" >> "$GITHUB_OUTPUT"
+      - name: Restore Playwright browsers
+        id: playwright-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.playwright-path.outputs.path }}
+          key: playwright-browsers-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-version.outputs.version }}
+          restore-keys: |
+            playwright-browsers-${{ runner.os }}-${{ runner.arch }}-
+            playwright-browsers-${{ runner.os }}-
+      - name: Build Storybook
+        run: pnpm build:storybook
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps
+      - name: Serve Storybook static build
+        run: |
+          pnpm dlx http-server storybook-static --port 6006 --host 127.0.0.1 --silent &
+          echo "STORYBOOK_SERVER_PID=$!" >> $GITHUB_ENV
+      - name: Wait for Storybook
+        run: pnpm dlx wait-on http://127.0.0.1:6006
+      - name: Run Storybook tests
+        env:
+          TARGET_URL: http://127.0.0.1:6006
+        run: pnpm storybook:test
+      - name: Stop Storybook server
+        if: always()
+        run: |
+          if [ -n "${STORYBOOK_SERVER_PID:-}" ]; then
+            kill $STORYBOOK_SERVER_PID
+          fi
+      - name: Save Playwright browsers
+        if: ${{ always() && steps.playwright-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.playwright-path.outputs.path }}
+          key: playwright-browsers-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-version.outputs.version }}

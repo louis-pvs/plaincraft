@@ -2,6 +2,10 @@
 
 One file UX snippet template.
 
+## Use case
+
+Short description of what this snippet solves.
+
 ## Props
 
 - `label?: string`

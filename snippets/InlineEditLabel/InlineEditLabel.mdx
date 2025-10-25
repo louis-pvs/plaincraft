@@ -1,0 +1,25 @@
+import { Meta, Markdown, ArgTypes, Canvas, Story } from "@storybook/addon-docs/blocks";
+import * as Stories from "./InlineEditLabel.stories";
+import ReadmeSource from "./README.md?raw";
+
+<Meta of={Stories} />
+
+<Markdown>{ReadmeSource}</Markdown>
+
+## Interactive
+<Canvas>
+  <Story of={Stories.Basic} />
+</Canvas>
+
+## Interaction test
+<Canvas>
+  <Story of={Stories.Interaction} />
+</Canvas>
+
+## Error path
+<Canvas>
+  <Story of={Stories.RetryOnError} />
+</Canvas>
+
+## Props
+<ArgTypes of={Stories} />
