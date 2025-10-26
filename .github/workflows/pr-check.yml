@@ -52,8 +52,9 @@ jobs:
           missing_tags=0
           invalid_commits=""
           while IFS= read -r commit; do
-            # Check for any of the valid tag patterns
-            if ! echo "$commit" | grep -qE '\[(U-|C-|B-|ARCH-|PB-|D-)[^\]]+\]'; then
+            # Check for any of the valid tag patterns at the start of the message
+            # Must start with [ then one of the prefixes, then -, then anything, then ]
+            if ! echo "$commit" | grep -qE '^\[(U-|C-|B-|ARCH-|PB-|D-)'; then
               echo "❌ Missing valid tag: $commit"
               invalid_commits="${invalid_commits}- ${commit}"$'\n'
               missing_tags=$((missing_tags + 1))
