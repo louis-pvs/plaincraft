@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
+import { access, readdir } from "node:fs/promises";
 
 const execAsync = promisify(exec);
 
@@ -20,6 +21,88 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = join(__dirname, "..");
 const CHANGELOG = join(ROOT, "CHANGELOG.md");
+const IDEAS_DIR = join(ROOT, "ideas");
+
+/**
+ * Find idea file corresponding to an issue
+ */
+async function findIdeaFileForIssue(issueNumber) {
+  try {
+    const { stdout } = await execAsync(
+      `gh issue view ${issueNumber} --json title -q .title`,
+    );
+    const title = stdout.trim();
+
+    // Extract tag from title
+    const tagMatch = title.match(/^\[?([A-Z]+-[a-z-]+)\]?/i);
+    if (!tagMatch) {
+      return null;
+    }
+
+    const tag = tagMatch[1];
+    const ideaFileName = `${tag}.md`;
+    const ideaFilePath = join(IDEAS_DIR, ideaFileName);
+
+    try {
+      await access(ideaFilePath);
+      return ideaFilePath;
+    } catch {
+      return null;
+    }
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Parse idea file and extract metadata
+ */
+async function parseIdeaFile(filePath) {
+  try {
+    const content = await readFile(filePath, "utf-8");
+
+    // Extract title
+    const titleMatch = content.match(/^#\s+(.+)$/m);
+    const title = titleMatch ? titleMatch[1] : "";
+
+    // Extract Purpose
+    const purposeMatch = content.match(/Purpose:\s*(.+?)(?:\n|$)/i);
+    const purpose = purposeMatch ? purposeMatch[1].trim() : "";
+
+    // Extract Problem section
+    const problemRegex = /## Problem\s*([\s\S]*?)(?=\n##|$)/;
+    const problemMatch = content.match(problemRegex);
+    const problem = problemMatch ? problemMatch[1].trim() : "";
+
+    // Extract Proposal section
+    const proposalRegex = /## Proposal\s*([\s\S]*?)(?=\n##|$)/;
+    const proposalMatch = content.match(proposalRegex);
+    const proposal = proposalMatch ? proposalMatch[1].trim() : "";
+
+    // Extract acceptance checklist
+    const checklistRegex = /## Acceptance Checklist\s*([\s\S]*?)(?=\n##|\n$)/;
+    const checklistMatch = content.match(checklistRegex);
+    let acceptance = [];
+
+    if (checklistMatch) {
+      acceptance = checklistMatch[1]
+        .split("\n")
+        .filter((line) => line.trim().startsWith("- [ ]"))
+        .map((line) => line.trim());
+    }
+
+    return {
+      title,
+      purpose,
+      problem,
+      proposal,
+      acceptance,
+      filename: filePath.split("/").pop(),
+    };
+  } catch (error) {
+    return null;
+  }
+}
 
 /**
  * Extract ticket ID from tag (e.g., [B-pr-template-enforcement] -> B-pr-template-enforcement)
@@ -388,6 +471,58 @@ function setOutput(key, value) {
  */
 async function main() {
   try {
+    // Try to get current PR number or issue number from environment
+    const prNumber = process.env.PR_NUMBER || process.env.ISSUE_NUMBER;
+
+    // Try to find idea file first if we have an issue/PR number
+    if (prNumber) {
+      console.log(`🔍 Looking for idea file for issue/PR #${prNumber}...`);
+      const ideaFilePath = await findIdeaFileForIssue(prNumber);
+
+      if (ideaFilePath) {
+        console.log(`✅ Found idea file: ${ideaFilePath.split("/").pop()}`);
+        const ideaMetadata = await parseIdeaFile(ideaFilePath);
+
+        if (ideaMetadata) {
+          // Generate PR content from idea file
+          const title = ideaMetadata.title;
+          const body = `Closes #${prNumber}
+
+**Purpose:** ${ideaMetadata.purpose}
+
+## Problem
+
+${ideaMetadata.problem}
+
+## Proposal
+
+${ideaMetadata.proposal}
+
+## Acceptance Checklist
+
+${ideaMetadata.acceptance.join("\n")}
+
+---
+
+**Source:** \`/ideas/${ideaMetadata.filename}\`
+`;
+
+          console.log("\n📝 Generated PR content from idea file:");
+          console.log(`Title: ${title}`);
+          console.log(`Body length: ${body.length} characters`);
+
+          setOutput("title", title);
+          setOutput("body", body);
+
+          console.log("\n✅ PR content generated from idea file");
+          return;
+        }
+      } else {
+        console.log("ℹ️  No idea file found, falling back to CHANGELOG.md");
+      }
+    }
+
+    // Fallback to CHANGELOG.md
     if (!existsSync(CHANGELOG)) {
       console.log("ℹ️ No CHANGELOG.md found");
       setOutput("title", "");
