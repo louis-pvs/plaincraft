@@ -2,6 +2,7 @@
 
 Lane: C
 Purpose: Make `/ideas` cards the single source of truth for Issues/PRs/changelog entries and automate lifecycle management.
+
 Issue: #26
 
 ## Problem
