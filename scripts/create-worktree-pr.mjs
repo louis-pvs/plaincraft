@@ -21,7 +21,7 @@ import { exec } from "node:child_process";
 import { promisify } from "node:util";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { access } from "node:fs/promises";
+import { access, writeFile } from "node:fs/promises";
 
 const execAsync = promisify(exec);
 
@@ -225,6 +225,21 @@ ${issue.title}
 }
 
 /**
+ * Check if there are commits to create a PR
+ */
+async function hasCommitsForPR(branchName, baseBranch = "main") {
+  try {
+    const { stdout } = await execAsync(
+      `git rev-list --count ${baseBranch}..${branchName}`,
+      { cwd: ROOT_DIR },
+    );
+    return parseInt(stdout.trim(), 10) > 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Create draft PR
  */
 async function createPR(issueNumber, branchName, worktreePath, isDraft = true) {
@@ -242,7 +257,11 @@ async function createPR(issueNumber, branchName, worktreePath, isDraft = true) {
 
     const draftFlag = isDraft ? "--draft" : "";
 
-    const cmd = `gh pr create --title "${issue.title}" --body "${prBody.replace(/"/g, '\\"')}" ${labelArgs} ${draftFlag} --head "${branchName}"`;
+    // Use body-file to avoid escaping issues
+    const bodyFile = `/tmp/pr-body-${Date.now()}.md`;
+    await writeFile(bodyFile, prBody);
+
+    const cmd = `gh pr create --title "${issue.title}" --body-file "${bodyFile}" ${labelArgs} ${draftFlag} --head "${branchName}"`;
 
     const { stdout } = await execAsync(cmd, { cwd: worktreePath });
     console.log(stdout);
@@ -374,6 +393,21 @@ Examples:
     }
 
     console.log("✅ Branch verified on remote");
+
+    // Check if there are commits to create PR from
+    console.log("\n🔍 Checking for commits...");
+    const hasCommits = await hasCommitsForPR(branchName, baseBranch);
+
+    if (!hasCommits) {
+      console.log("⚠️  No commits on branch yet. Skipping PR creation.");
+      console.log("\n✅ Worktree and branch created successfully!");
+      console.log(`\n📂 Worktree: ${worktreePath}`);
+      console.log(`\nTo create a PR after making commits:`);
+      console.log(`   cd ${worktreePath}`);
+      console.log(`   # Make your changes and commit`);
+      console.log(`   gh pr create --fill --draft`);
+      return;
+    }
 
     // Create PR
     console.log("\n📤 Creating PR...");
