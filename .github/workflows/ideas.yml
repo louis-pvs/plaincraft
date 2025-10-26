@@ -20,13 +20,85 @@ permissions:
   issues: write
 
 jobs:
+  ensure-project:
+    name: Ensure Project Exists
+    runs-on: ubuntu-latest
+    if: github.event.inputs.action == 'create-issues'
+    outputs:
+      project_exists: ${{ steps.check.outputs.exists }}
+      project_number: ${{ steps.check.outputs.number }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check if project exists
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f .github/pipeline-config.json ]; then
+            PROJECT_NUMBER=$(jq -r '.project.number // empty' .github/pipeline-config.json)
+            
+            if [ -n "$PROJECT_NUMBER" ]; then
+              # Verify project still exists
+              if gh project view $PROJECT_NUMBER --owner "${{ github.repository_owner }}" > /dev/null 2>&1; then
+                echo "exists=true" >> "$GITHUB_OUTPUT"
+                echo "number=$PROJECT_NUMBER" >> "$GITHUB_OUTPUT"
+                echo "✅ Project #$PROJECT_NUMBER exists"
+                exit 0
+              fi
+            fi
+          fi
+
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+          echo "number=" >> "$GITHUB_OUTPUT"
+          echo "⚠️  No project configured or project missing"
+
+      - name: Setup Node.js
+        if: steps.check.outputs.exists == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        if: steps.check.outputs.exists == 'false'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+
+      - name: Install dependencies
+        if: steps.check.outputs.exists == 'false'
+        run: pnpm install --frozen-lockfile
+
+      - name: Create project automatically
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔨 Creating Plaincraft Roadmap project..."
+          pnpm gh:setup-labels
+          node scripts/setup-project.mjs --project-name "Plaincraft Roadmap"
+
+          # Commit the config
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ -f .github/pipeline-config.json ]; then
+            git add .github/pipeline-config.json
+            git diff --staged --quiet || git commit -m "chore: auto-create project config [skip ci]"
+            git push
+          fi
+
   create-issues-from-ideas:
     name: Create Issues from Ideas
     runs-on: ubuntu-latest
+    needs: ensure-project
     if: github.event.inputs.action == 'create-issues'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main # Get latest after potential config commit
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -46,6 +118,18 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           node scripts/ideas-to-issues.mjs ${{ github.event.inputs.idea_file }}
+
+      - name: Project info
+        run: |
+          echo "## Issues Created" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.ensure-project.outputs.project_exists }}" == "true" ]; then
+            echo "✅ Added to project #${{ needs.ensure-project.outputs.project_number }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "🆕 Created new Plaincraft Roadmap project" >> $GITHUB_STEP_SUMMARY
+            echo "Check \`.github/pipeline-config.json\` for project number" >> $GITHUB_STEP_SUMMARY
+          fi
 
   validate-ideas:
     name: Validate Ideas Structure

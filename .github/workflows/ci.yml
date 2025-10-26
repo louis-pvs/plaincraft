@@ -5,6 +5,9 @@ on:
     branches: ["main", "feat/aligned-lanes-v1"]
   pull_request:
   workflow_dispatch:
+  schedule:
+    # Nightly recording at 2 AM UTC
+    - cron: "0 2 * * *"
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -169,7 +172,122 @@ jobs:
           echo "| Build Storybook | ${{ needs.build-storybook.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Build Demo | ${{ needs.build-demo.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Artifact summary
+          echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- Unit test results (JSON)" >> $GITHUB_STEP_SUMMARY
+          echo "- Storybook test results (JSON)" >> $GITHUB_STEP_SUMMARY
+          echo "- Storybook static build (7 days)" >> $GITHUB_STEP_SUMMARY
+          echo "- Demo build (7 days)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
           if [ -f "results/test-results.json" ]; then
             echo "### Test Details" >> $GITHUB_STEP_SUMMARY
-            echo "Unit test results uploaded as artifacts." >> $GITHUB_STEP_SUMMARY
+            echo "Unit test results available in artifacts." >> $GITHUB_STEP_SUMMARY
+          fi
+
+  record-nightly:
+    name: Record Story Videos & GIFs
+    runs-on: ubuntu-latest
+    # Only run on schedule (nightly) or manual workflow_dispatch
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: build-storybook
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install system dependencies (ffmpeg)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      - name: Determine Playwright version
+        id: playwright-version
+        run: |
+          PLAYWRIGHT_VERSION=$(node -p "require('@playwright/test/package.json').version")
+          echo "version=${PLAYWRIGHT_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Configure Playwright cache path
+        id: playwright-path
+        run: |
+          PLAYWRIGHT_CACHE="$HOME/.cache/ms-playwright"
+          mkdir -p "$PLAYWRIGHT_CACHE"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$PLAYWRIGHT_CACHE" >> "$GITHUB_ENV"
+          echo "path=$PLAYWRIGHT_CACHE" >> "$GITHUB_OUTPUT"
+      - name: Restore Playwright browsers
+        id: playwright-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.playwright-path.outputs.path }}
+          key: playwright-browsers-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-version.outputs.version }}
+          restore-keys: |
+            playwright-browsers-${{ runner.os }}-${{ runner.arch }}-
+            playwright-browsers-${{ runner.os }}-
+      - name: Download Storybook build
+        uses: actions/download-artifact@v4
+        with:
+          name: storybook-static
+          path: storybook-static
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Serve Storybook static build
+        run: |
+          pnpm dlx http-server storybook-static --port 6006 --host 127.0.0.1 --silent &
+          echo "STORYBOOK_SERVER_PID=$!" >> $GITHUB_ENV
+      - name: Wait for Storybook
+        run: pnpm dlx wait-on http://127.0.0.1:6006
+      - name: Record stories with 'record' tag
+        env:
+          TARGET_URL: http://127.0.0.1:6006
+          STORIES: all
+        run: node scripts/record-stories.mjs
+        continue-on-error: true
+      - name: Stop Storybook server
+        if: always()
+        run: |
+          if [ -n "${STORYBOOK_SERVER_PID:-}" ]; then
+            kill $STORYBOOK_SERVER_PID || true
+          fi
+      - name: Upload video artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: story-videos
+          path: artifacts/video/*.webm
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Upload GIF artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: story-gifs
+          path: docs/assets/gif/*.gif
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Save Playwright browsers
+        if: ${{ always() && steps.playwright-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.playwright-path.outputs.path }}
+          key: playwright-browsers-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-version.outputs.version }}
+      - name: Generate recording summary
+        if: always()
+        run: |
+          echo "## Recording Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          VIDEO_COUNT=$(find artifacts/video -name "*.webm" 2>/dev/null | wc -l || echo 0)
+          GIF_COUNT=$(find docs/assets/gif -name "*.gif" 2>/dev/null | wc -l || echo 0)
+          echo "- Videos recorded: ${VIDEO_COUNT}" >> $GITHUB_STEP_SUMMARY
+          echo "- GIFs generated: ${GIF_COUNT}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ ${GIF_COUNT} -gt 0 ]; then
+            echo "### Generated GIFs (handoff to docs)" >> $GITHUB_STEP_SUMMARY
+            find docs/assets/gif -name "*.gif" 2>/dev/null | while read gif; do
+              echo "- \`$(basename "$gif")\`" >> $GITHUB_STEP_SUMMARY
+            done || true
           fi

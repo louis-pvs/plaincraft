@@ -53,10 +53,16 @@ async function parseIdeaFile(filePath) {
   } else if (filename.startsWith("B-")) {
     metadata.type = "bug";
     metadata.labels.push("type:bug");
+  } else if (filename.startsWith("ARCH-")) {
+    metadata.type = "architecture";
+    metadata.labels.push("type:architecture");
+  } else if (filename.startsWith("PB-")) {
+    metadata.type = "playbook";
+    metadata.labels.push("type:playbook");
   }
 
-  // Extract lane
-  const laneMatch = content.match(/Lane:\s*([A-D])/i);
+  // Extract lane (supports both "Lane:" and "**Lane**:" formats)
+  const laneMatch = content.match(/\*?\*?Lane\*?\*?:\s*([A-D])/i);
   if (laneMatch) {
     metadata.lane = laneMatch[1].toUpperCase();
     metadata.labels.push(`lane:${metadata.lane}`);
@@ -123,7 +129,11 @@ async function getIdeaFiles(filter = null) {
     const ideaFiles = files.filter(
       (f) =>
         f.endsWith(".md") &&
-        (f.startsWith("U-") || f.startsWith("C-") || f.startsWith("B-")),
+        (f.startsWith("U-") ||
+          f.startsWith("C-") ||
+          f.startsWith("B-") ||
+          f.startsWith("ARCH-") ||
+          f.startsWith("PB-")),
     );
 
     if (filter) {

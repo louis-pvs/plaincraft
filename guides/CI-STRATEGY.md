@@ -9,9 +9,8 @@ Comprehensive CI/CD automation with parallel jobs, headless Storybook testing, a
 ```mermaid
 graph TB
     subgraph CI/CD Pipeline
-        A[ci.yml<br/>5 parallel/sequential jobs]
+        A[ci.yml<br/>6 jobs + optional record]
         B[version.yml<br/>auto version bump]
-        C[record.yml<br/>nightly video/gif]
     end
 
     subgraph PR Automation
@@ -30,39 +29,50 @@ graph TB
     I --> E
     J[Issue opened] --> F
     K[Ideas changed] --> G
-    L[Schedule 2AM UTC] --> C
+    L[Schedule 2AM UTC] --> A
+    M[Manual dispatch] --> A
 ```
 
 ## Workflows
 
 ### Main CI (`.github/workflows/ci.yml`)
 
-Runs on push to `main` and `feat/ci-strategy`, plus all PRs.
+Runs on push to `main` and `feat/aligned-lanes-v1`, all PRs, scheduled nightly at 2AM UTC, and manual workflow dispatch.
 
 **Jobs:**
 
 1. **check** - Typecheck, lint, unit tests
    - Runs format check, TypeScript, ESLint
-   - Executes vitest unit tests
-   - Uploads test results as JSON artifact
+   - Executes vitest unit tests with JSON reporter
+   - Uploads test results as JSON artifact (30 days)
 
 2. **build-storybook** - Build Storybook static site
    - Compiles Storybook to `storybook-static/`
-   - Uploads build artifact for reuse
+   - Uploads build artifact for reuse (7 days)
 
 3. **storybook-test** - Headless interaction & a11y tests
    - Downloads pre-built Storybook
    - Runs Playwright-based test-runner
    - Validates interactions and accessibility
-   - Uploads test results
+   - Uploads test results as JSON artifact (30 days)
 
 4. **build-demo** - Build demo application
    - Compiles Vite demo to `dist/`
-   - Uploads artifact
+   - Uploads artifact (7 days)
 
 5. **summary** - PR summary generation
    - Aggregates all job results
-   - Posts markdown summary to PR
+   - Posts markdown summary with job status table
+   - Lists all artifacts with retention info
+
+6. **record-nightly** - Optional video/GIF recording
+   - Only runs on schedule (nightly 2AM UTC) or manual dispatch
+   - Downloads Storybook build
+   - Records stories with `record` tag using Playwright
+   - Converts videos to optimized GIFs with ffmpeg
+   - Outputs to `artifacts/video/` and `docs/assets/gif/`
+   - Uploads video artifacts (7 days) and GIF artifacts (30 days)
+   - Posts summary with GIF filenames (handoff contract to docs)
 
 **Artifacts:**
 
@@ -70,6 +80,12 @@ Runs on push to `main` and `feat/ci-strategy`, plus all PRs.
 - `storybook-static` (build, 7 days)
 - `storybook-test-results` (JSON, 30 days)
 - `demo-dist` (build, 7 days)
+- `story-videos` (WebM, 7 days) - nightly/manual only
+- `story-gifs` (GIF, 30 days) - nightly/manual only
+
+**CI Time Budget:**
+
+Core CI jobs (check, storybook-test, build-storybook, build-demo, summary) target ≤90s overhead over baseline. Recording job is excluded from default CI to stay within budget.
 
 ### Version Management (`.github/workflows/version.yml`)
 
@@ -178,29 +194,44 @@ Manual triggers and auto-actions for issues.
 
 ### Ideas Management (`.github/workflows/ideas.yml`)
 
-Validates and converts idea files to issues.
+Validates and converts idea files to issues with automatic project creation.
 
 **Jobs:**
 
-1. **create-issues-from-ideas** (manual)
+1. **ensure-project** - Auto-creates project if missing
+   - Checks for existing project in `pipeline-config.json`
+   - Creates "Plaincraft Roadmap" project if needed
+   - Sets up labels and initial configuration
+   - Commits config updates automatically
+
+2. **create-issues-from-ideas** (manual)
+   - Depends on `ensure-project`
    - Parses `ideas/*.md` files
    - Creates GitHub issues with checklists
    - Applies lane and type labels
+   - Automatically adds to project board
 
-2. **validate-ideas** (manual)
+3. **validate-ideas** (manual)
    - Checks required sections
    - Validates naming conventions
    - Reports errors in summary
 
-3. **sync-checklists** (manual)
+4. **sync-checklists** (manual)
    - Updates issue bodies with checklists from idea files
 
-4. **auto-validate** - Runs on push to `ideas/`
+5. **auto-validate** - Runs on push to `ideas/`
    - Validates changed idea files automatically
 
-### Recording Workflow (`.github/workflows/record.yml`)
+**Automation benefits:**
 
-Nightly at 2 AM UTC or manual trigger via workflow_dispatch.
+- Zero-config project creation on first issue generation
+- Issues automatically linked to roadmap
+- Lane labels applied immediately
+- No manual project setup required
+
+### Recording (part of `ci.yml`)
+
+**Trigger:** Nightly at 2 AM UTC (schedule) or manual workflow dispatch.
 
 **Purpose:** Generate videos and GIFs for visual documentation.
 
@@ -223,9 +254,10 @@ graph LR
 
 ```bash
 # Via GitHub UI or gh cli
-gh workflow run record.yml -f stories=component--story-id
-gh workflow run record.yml -f stories=all
+gh workflow run ci.yml
 ```
+
+The recording job is conditional and only runs on schedule or manual dispatch, keeping it outside the default CI time budget.
 
 ## Scripts
 
