@@ -16,11 +16,11 @@
  */
 
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
-import { rm } from "node:fs/promises";
-import { get } from "node:http";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { createReadStream, existsSync } from "node:fs";
+import { rm, stat } from "node:fs/promises";
+import { createServer, get } from "node:http";
+import { URL, fileURLToPath } from "node:url";
+import { dirname, extname, join, normalize } from "node:path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -39,8 +39,26 @@ const outputFile = args
   .find((arg) => arg.startsWith("--outputFile="))
   ?.split("=")[1];
 
-let serverProcess = null;
 let exitCode = 0;
+let serverInstance = null;
+
+const MIME_TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".mjs": "application/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".map": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".ttf": "font/ttf",
+};
 
 /**
  * Execute a command and return promise
@@ -100,23 +118,55 @@ async function waitForServer(url, timeout = 30000) {
 async function startServer() {
   console.log(`Starting server on ${TARGET_URL}...`);
 
-  serverProcess = spawn(
-    "pnpm",
-    [
-      "dlx",
-      "http-server",
-      STORYBOOK_DIR,
-      "--port",
-      String(PORT),
-      "--host",
-      HOST,
-      "--silent",
-    ],
-    { stdio: "ignore", shell: true },
-  );
+  serverInstance = createServer(async (req, res) => {
+    const requestUrl =
+      req.url !== undefined
+        ? new URL(req.url, TARGET_URL)
+        : new URL(TARGET_URL);
+    const decodedPath = decodeURIComponent(requestUrl.pathname);
+    const normalizedPath = normalize(decodedPath).replace(
+      /^(\.\.(\/|\\|$))+/,
+      "",
+    );
+    let filePath = join(STORYBOOK_DIR, normalizedPath);
 
-  serverProcess.on("error", (err) => {
-    console.error("Server process error:", err);
+    if (!filePath.startsWith(STORYBOOK_DIR)) {
+      res.writeHead(403, { "Content-Type": "text/plain" });
+      res.end("Forbidden");
+      return;
+    }
+
+    try {
+      let fileStats = await stat(filePath);
+
+      if (fileStats.isDirectory()) {
+        filePath = join(filePath, "index.html");
+        fileStats = await stat(filePath);
+      }
+
+      const ext = extname(filePath).toLowerCase();
+      const contentType = MIME_TYPES[ext] || "application/octet-stream";
+
+      res.writeHead(200, {
+        "Content-Type": contentType,
+        "Content-Length": fileStats.size,
+      });
+
+      const stream = createReadStream(filePath);
+      stream.on("error", () => {
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        res.end("Internal Server Error");
+      });
+      stream.pipe(res);
+    } catch {
+      res.writeHead(404, { "Content-Type": "text/plain" });
+      res.end("Not Found");
+    }
+  });
+
+  await new Promise((resolve, reject) => {
+    serverInstance.once("error", reject);
+    serverInstance.listen(PORT, HOST, resolve);
   });
 
   // Wait for server to be ready
@@ -126,11 +176,11 @@ async function startServer() {
 /**
  * Stop the server
  */
-function stopServer() {
-  if (serverProcess) {
+async function stopServer() {
+  if (serverInstance) {
     console.log("Stopping server...");
-    serverProcess.kill();
-    serverProcess = null;
+    await new Promise((resolve) => serverInstance.close(resolve));
+    serverInstance = null;
   }
 }
 
@@ -157,7 +207,7 @@ async function ensureStorybookBuild() {
 async function runTests() {
   console.log("Running Storybook tests...");
 
-  const testArgs = ["test-storybook"];
+  const testArgs = [];
 
   if (jsonOutput) {
     testArgs.push("--json");
@@ -177,14 +227,32 @@ async function runTests() {
     )
     .forEach((arg) => testArgs.push(arg));
 
+  console.log(`Command: npx test-storybook ${testArgs.join(" ")}`);
+  console.log(`Working directory: ${ROOT}`);
+  console.log(`Target URL: ${TARGET_URL}`);
+
   try {
-    await execCommand("pnpm", testArgs, {
+    // Run test-storybook directly via npx to avoid pnpm wrapping issues
+    await execCommand("npx", ["test-storybook", ...testArgs], {
       env: { ...process.env, TARGET_URL },
+      cwd: ROOT,
     });
     console.log("✓ All tests passed");
+
+    // Verify output file was created if expected
+    if (outputFile && existsSync(join(ROOT, outputFile))) {
+      console.log(`✓ Output file created: ${outputFile}`);
+    } else if (outputFile) {
+      console.warn(`⚠ Output file not found: ${outputFile}`);
+    }
   } catch {
     console.error("✗ Tests failed");
     exitCode = 1;
+
+    // Still check if output file was created
+    if (outputFile && existsSync(join(ROOT, outputFile))) {
+      console.log(`✓ Output file created despite test failures: ${outputFile}`);
+    }
   }
 }
 
@@ -209,10 +277,7 @@ async function main() {
     exitCode = 1;
   } finally {
     // Always clean up
-    stopServer();
-
-    // Wait a bit for cleanup
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await stopServer();
 
     process.exit(exitCode);
   }
@@ -221,14 +286,16 @@ async function main() {
 // Handle process termination
 process.on("SIGINT", () => {
   console.log("\nReceived SIGINT, cleaning up...");
-  stopServer();
-  process.exit(130);
+  stopServer()
+    .catch(() => {})
+    .finally(() => process.exit(130));
 });
 
 process.on("SIGTERM", () => {
   console.log("\nReceived SIGTERM, cleaning up...");
-  stopServer();
-  process.exit(143);
+  stopServer()
+    .catch(() => {})
+    .finally(() => process.exit(143));
 });
 
 main();

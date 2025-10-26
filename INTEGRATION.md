@@ -5,12 +5,19 @@ Quick reference for scheduled integration windows (:00 and :30).
 ## Pre-Push Checks (Required)
 
 ```bash
-# Run the full check suite
+# Run the full check suite (RECOMMENDED)
 pnpm typecheck && pnpm lint && pnpm test && pnpm storybook:test
 
-# Or use the shorthand
-pnpm check  # Does: typecheck + lint + test (but not storybook:test)
+# Note: pnpm check only runs unit tests, not Storybook tests
+# For complete validation, use the full command above
 ```
+
+**What each command does:**
+
+- `pnpm typecheck` - TypeScript compilation check
+- `pnpm lint` - ESLint validation
+- `pnpm test` - Unit tests (now uses threads pool by default)
+- `pnpm storybook:test` - **Automated** Storybook tests (builds, serves, tests, cleans up)
 
 ## Git Flow
 
@@ -69,14 +76,17 @@ gh run download RUN_ID
 # macOS: brew install ffmpeg
 # Linux: sudo apt-get install ffmpeg
 
-# Start Storybook
+# Build Storybook (if not already built)
+pnpm build:storybook
+
+# Start Storybook dev server in background
 pnpm storybook &
 STORYBOOK_PID=$!
 
 # Wait for server
 sleep 5
 
-# Record stories
+# Record stories (wrapper handles server connection)
 pnpm record:stories
 
 # Stop Storybook
@@ -87,16 +97,47 @@ ls -lh artifacts/video/
 ls -lh docs/assets/gif/
 ```
 
+## Automated Test Workflows
+
+### Storybook Tests (No Manual Steps!)
+
+```bash
+# Simple - everything automated
+pnpm storybook:test
+
+# What it does automatically:
+# 1. Checks for storybook-static/, builds if missing
+# 2. Starts http-server on port 6006
+# 3. Waits for server ready
+# 4. Runs test-storybook
+# 5. Cleans up server
+```
+
+### Unit Tests
+
+```bash
+# Standard run (uses threads pool)
+pnpm test
+
+# With JSON output for CI
+pnpm test:json
+```
+
 ## Troubleshooting
 
 ### CI fails on storybook-test
 
 ```bash
-# Run locally to debug
-pnpm build:storybook
-pnpm dlx http-server storybook-static --port 6006 &
-sleep 3
+# Run locally to debug (now fully automated)
 pnpm storybook:test
+
+# Force rebuild if stale
+pnpm storybook:test:rebuild
+
+# Old manual way (no longer needed):
+# pnpm build:storybook
+# pnpm dlx http-server storybook-static --port 6006 &
+# pnpm storybook:test
 ```
 
 ### Recording fails locally

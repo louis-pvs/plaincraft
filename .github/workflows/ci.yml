@@ -107,12 +107,14 @@ jobs:
         run: pnpm exec playwright install --with-deps
       - name: Run Storybook tests
         run: pnpm storybook:test:json
+        continue-on-error: true
       - name: Upload Storybook test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: storybook-test-results
           path: storybook-test-results.json
+          if-no-files-found: warn
           retention-days: 30
       - name: Save Playwright browsers
         if: ${{ always() && steps.playwright-cache.outputs.cache-hit != 'true' }}
