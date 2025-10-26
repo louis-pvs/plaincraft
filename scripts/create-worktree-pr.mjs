@@ -21,12 +21,13 @@ import { exec } from "node:child_process";
 import { promisify } from "node:util";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { access, writeFile } from "node:fs/promises";
+import { access, writeFile, readFile, readdir } from "node:fs/promises";
 
 const execAsync = promisify(exec);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, "..");
+const IDEAS_DIR = join(ROOT_DIR, "ideas");
 
 /**
  * Fetch issue details from GitHub
@@ -40,6 +41,91 @@ async function getIssueDetails(issueNumber) {
     return JSON.parse(stdout);
   } catch (error) {
     throw new Error(`Failed to fetch issue #${issueNumber}: ${error.message}`);
+  }
+}
+
+/**
+ * Find idea file corresponding to an issue
+ * Searches /ideas directory for matching file based on issue title/tag
+ */
+async function findIdeaFileForIssue(issueNumber) {
+  try {
+    // Get issue details to extract tag/title
+    const issue = await getIssueDetails(issueNumber);
+    const title = issue.title;
+
+    // Extract tag from title (e.g., "[ARCH-ideas-pr-integration]" -> "ARCH-ideas-pr-integration")
+    const tagMatch = title.match(/^\[?([A-Z]+-[a-z-]+)\]?/i);
+    if (!tagMatch) {
+      return null;
+    }
+
+    const tag = tagMatch[1];
+    const ideaFileName = `${tag}.md`;
+    const ideaFilePath = join(IDEAS_DIR, ideaFileName);
+
+    // Check if file exists
+    try {
+      await access(ideaFilePath);
+      return ideaFilePath;
+    } catch {
+      return null;
+    }
+  } catch (error) {
+    console.warn(`Could not find idea file for issue #${issueNumber}`);
+    return null;
+  }
+}
+
+/**
+ * Parse idea file and extract metadata
+ */
+async function parseIdeaFile(filePath) {
+  try {
+    const content = await readFile(filePath, "utf-8");
+
+    const metadata = {
+      purpose: "",
+      problem: "",
+      proposal: "",
+      acceptance: [],
+    };
+
+    // Extract Purpose
+    const purposeMatch = content.match(/Purpose:\s*(.+?)(?:\n|$)/i);
+    if (purposeMatch) {
+      metadata.purpose = purposeMatch[1].trim();
+    }
+
+    // Extract Problem section
+    const problemRegex = /## Problem\s*([\s\S]*?)(?=\n##|$)/;
+    const problemMatch = content.match(problemRegex);
+    if (problemMatch) {
+      metadata.problem = problemMatch[1].trim();
+    }
+
+    // Extract Proposal section
+    const proposalRegex = /## Proposal\s*([\s\S]*?)(?=\n##|$)/;
+    const proposalMatch = content.match(proposalRegex);
+    if (proposalMatch) {
+      metadata.proposal = proposalMatch[1].trim();
+    }
+
+    // Extract acceptance checklist
+    const checklistRegex = /## Acceptance Checklist\s*([\s\S]*?)(?=\n##|\n$)/;
+    const checklistMatch = content.match(checklistRegex);
+    if (checklistMatch) {
+      const items = checklistMatch[1]
+        .split("\n")
+        .filter((line) => line.trim().startsWith("- [ ]"))
+        .map((line) => line.trim());
+      metadata.acceptance = items;
+    }
+
+    return metadata;
+  } catch (error) {
+    console.warn(`Could not parse idea file: ${error.message}`);
+    return null;
   }
 }
 
@@ -203,11 +289,54 @@ async function verifyBranchOnRemote(branchName) {
 }
 
 /**
- * Generate PR body from issue
+ * Generate PR body from issue and optional idea file
  */
-function generatePRBody(issue) {
+async function generatePRBody(issue, ideaFilePath = null) {
   const labels = issue.labels.map((l) => l.name).join(", ");
 
+  // Try to use idea file content if available
+  if (ideaFilePath) {
+    const ideaMetadata = await parseIdeaFile(ideaFilePath);
+    if (ideaMetadata) {
+      const ideaFileName = ideaFilePath.split("/").pop();
+
+      let body = `Closes #${issue.number}\n\n`;
+
+      // Add Purpose
+      if (ideaMetadata.purpose) {
+        body += `**Purpose:** ${ideaMetadata.purpose}\n\n`;
+      }
+
+      // Add Problem section
+      if (ideaMetadata.problem) {
+        body += `## Problem\n\n${ideaMetadata.problem}\n\n`;
+      }
+
+      // Add Proposal section
+      if (ideaMetadata.proposal) {
+        body += `## Proposal\n\n${ideaMetadata.proposal}\n\n`;
+      }
+
+      // Add Acceptance Checklist
+      if (ideaMetadata.acceptance && ideaMetadata.acceptance.length > 0) {
+        body += `## Acceptance Checklist\n\n`;
+        ideaMetadata.acceptance.forEach((item) => {
+          body += `${item}\n`;
+        });
+        body += `\n`;
+      }
+
+      // Add footer
+      body += `---\n\n`;
+      body += `**Issue**: #${issue.number}\n`;
+      body += `**Labels**: ${labels}\n`;
+      body += `**Source**: \`/ideas/${ideaFileName}\`\n`;
+
+      return body;
+    }
+  }
+
+  // Fallback to generic template if no idea file
   return `Closes #${issue.number}
 
 ## Summary
@@ -280,8 +409,10 @@ You can safely delete this file or amend this commit once you've added your actu
       { cwd: worktreePath },
     );
 
-    // Push the commit
-    await execAsync("git push", { cwd: worktreePath });
+    // Push the commit with upstream tracking
+    await execAsync(`git push --set-upstream origin ${branchName}`, {
+      cwd: worktreePath,
+    });
 
     return true;
   } catch (error) {
@@ -299,7 +430,15 @@ async function createPR(issueNumber, branchName, worktreePath, isDraft = true) {
   try {
     // Fetch issue details again to ensure we have latest
     const issue = await getIssueDetails(issueNumber);
-    const prBody = generatePRBody(issue);
+
+    // Try to find corresponding idea file
+    const ideaFilePath = await findIdeaFileForIssue(issueNumber);
+    if (ideaFilePath) {
+      console.log(`   Found idea file: ${ideaFilePath.split("/").pop()}`);
+    }
+
+    // Generate PR body (will use idea file if found, fallback to template)
+    const prBody = await generatePRBody(issue, ideaFilePath);
 
     // Extract labels
     const labels = issue.labels.map((l) => l.name);
