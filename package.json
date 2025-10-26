@@ -18,6 +18,7 @@
     "lint:fix": "eslint . --fix",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
     "new:snippet": "node scripts/new-snippet.mjs",
+    "pr:generate": "node scripts/generate-pr-content.mjs",
     "prepare": "simple-git-hooks",
     "preview": "vite preview",
     "record:stories": "node scripts/record-stories.mjs",
@@ -70,7 +71,7 @@
     "npm": ">=10.0.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm lint:staged"
+    "pre-commit": "node scripts/pre-commit-changelog.mjs && pnpm lint:staged"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
