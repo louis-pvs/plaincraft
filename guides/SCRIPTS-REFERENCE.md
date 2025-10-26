@@ -181,6 +181,24 @@ requirements so CI jobs and helper scripts stay synchronized.
 - Future automation can parse this file to validate tickets, enforce lane
   limits, and produce status dashboards.
 
+### Roadmap Project Template (`templates/roadmap-project-template.json`)
+
+**Purpose:** Seed data for recreating the Plaincraft Roadmap via API scripts or
+manual import.
+
+**Contents:**
+
+- Project metadata (name, description).
+- Board views for lanes A–D with filters and WIP limits.
+- Field definitions mirroring the guide (`ID`, `Lane`, `Acceptance`, `Units`,
+  `Metric`).
+- Required lane/type labels and automation notes.
+
+**Usage:**
+
+- Use as input when scripting project creation (e.g., GitHub API, Octokit).
+- Update when the roadmap’s structure changes to keep API automation aligned.
+
 **Input:**
 
 ```

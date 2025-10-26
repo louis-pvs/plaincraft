@@ -199,6 +199,42 @@ async function linkToProject(issueNumber, projectId) {
 }
 
 /**
+ * Check if PR is issue-exempt
+ * Architecture, CI/DevOps, and documentation changes don't require issues
+ */
+function isIssueExempt(pr) {
+  const prTitle = pr.title || "";
+  const prBody = pr.body || "";
+
+  // Check for exempt tags in title or commits
+  const exemptTags = ["ARCH", "C-", "B-", "PB-"];
+  const hasExemptTag = pr.commits?.some((c) => {
+    const headline = c.messageHeadline || "";
+    return exemptTags.some((tag) => headline.includes(`[${tag}`));
+  });
+
+  // Check for chore/docs/ci keywords
+  const exemptKeywords = [
+    "chore:",
+    "docs:",
+    "ci:",
+    "build:",
+    "test:",
+    "refactor:",
+  ];
+  const hasExemptKeyword = exemptKeywords.some(
+    (kw) => prTitle.toLowerCase().startsWith(kw) || prBody.includes(kw),
+  );
+
+  // Check for exempt labels
+  const hasExemptLabel = pr.labels?.some((l) =>
+    ["lane:B", "lane:C", "lane:D", "type:architecture"].includes(l.name),
+  );
+
+  return hasExemptTag || hasExemptKeyword || hasExemptLabel;
+}
+
+/**
  * Verify PR requirements
  */
 async function verifyPr(prNumber) {
@@ -213,14 +249,21 @@ async function verifyPr(prNumber) {
 
     const pr = JSON.parse(stdout);
     const issues = [];
+    const warnings = [];
 
-    // Check for issue reference
+    // Check if issue reference is required
     const prBody = pr.body || "";
     const hasIssueRef = /closes\s+#\d+|fixes\s+#\d+|resolves\s+#\d+/i.test(
       prBody,
     );
-    if (!hasIssueRef) {
+    const exempt = isIssueExempt(pr);
+
+    if (!hasIssueRef && !exempt) {
       issues.push("❌ Missing issue reference (Closes #123)");
+    } else if (!hasIssueRef && exempt) {
+      warnings.push(
+        "⚠️  No issue reference (exempt: architecture/ci/docs change)",
+      );
     }
 
     // Check for lane label
@@ -238,19 +281,29 @@ async function verifyPr(prNumber) {
       issues.push(`❌ ${missingTags.length} commit(s) missing tag prefix`);
     }
 
-    // Check for acceptance checklist
+    // Check for acceptance checklist (warning only for exempt PRs)
     const hasChecklist = prBody.includes("- [ ]") || prBody.includes("- [x]");
-    if (!hasChecklist) {
+    if (!hasChecklist && !exempt) {
       issues.push("❌ Missing acceptance checklist");
+    } else if (!hasChecklist && exempt) {
+      warnings.push("⚠️  No acceptance checklist (optional for this type)");
+    }
+
+    // Display warnings
+    if (warnings.length > 0) {
+      warnings.forEach((warning) => console.log(`   ${warning}`));
     }
 
     if (issues.length === 0) {
       console.log(`✅ PR #${prNumber} meets all requirements`);
-      return { passed: true, issues: [] };
+      if (warnings.length > 0) {
+        console.log(`   (${warnings.length} optional item(s) noted)`);
+      }
+      return { passed: true, issues: [], warnings };
     } else {
       console.log(`❌ PR #${prNumber} has ${issues.length} issue(s):\n`);
       issues.forEach((issue) => console.log(`   ${issue}`));
-      return { passed: false, issues };
+      return { passed: false, issues, warnings };
     }
   } catch (error) {
     console.error("❌ Failed to verify PR:", error.message);
