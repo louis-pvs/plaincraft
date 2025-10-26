@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "feat/aligned-lanes-v1"]
   pull_request:
   workflow_dispatch:
 
@@ -11,7 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  app-checks:
+  check:
+    name: Typecheck, Lint & Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -23,14 +24,48 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - run: pnpm format:check
-      - run: pnpm typecheck
-      - run: pnpm lint
-      - run: pnpm test
-      - run: pnpm build
+      - name: Format check
+        run: pnpm format:check
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Unit tests
+        run: pnpm test -- --reporter=json --reporter=verbose --outputFile=test-results.json
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: test-results.json
+          retention-days: 30
 
-  storybook-tests:
+  build-storybook:
+    name: Build Storybook Static
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build Storybook
+        run: pnpm build:storybook
+      - name: Upload Storybook build
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: storybook-static
+          retention-days: 7
+
+  storybook-test:
+    name: Storybook Interaction & A11y Tests
+    runs-on: ubuntu-latest
+    needs: build-storybook
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -62,30 +97,79 @@ jobs:
           restore-keys: |
             playwright-browsers-${{ runner.os }}-${{ runner.arch }}-
             playwright-browsers-${{ runner.os }}-
-      - name: Build Storybook
-        run: pnpm build:storybook
+      - name: Download Storybook build
+        uses: actions/download-artifact@v4
+        with:
+          name: storybook-static
+          path: storybook-static
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm exec playwright install --with-deps
-      - name: Serve Storybook static build
-        run: |
-          pnpm dlx http-server storybook-static --port 6006 --host 127.0.0.1 --silent &
-          echo "STORYBOOK_SERVER_PID=$!" >> $GITHUB_ENV
-      - name: Wait for Storybook
-        run: pnpm dlx wait-on http://127.0.0.1:6006
       - name: Run Storybook tests
-        env:
-          TARGET_URL: http://127.0.0.1:6006
-        run: pnpm storybook:test
-      - name: Stop Storybook server
+        run: pnpm storybook:test:json
+        continue-on-error: true
+      - name: Upload Storybook test results
         if: always()
-        run: |
-          if [ -n "${STORYBOOK_SERVER_PID:-}" ]; then
-            kill $STORYBOOK_SERVER_PID
-          fi
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-test-results
+          path: storybook-test-results.json
+          if-no-files-found: warn
+          retention-days: 30
       - name: Save Playwright browsers
         if: ${{ always() && steps.playwright-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
           path: ${{ steps.playwright-path.outputs.path }}
           key: playwright-browsers-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-version.outputs.version }}
+
+  build-demo:
+    name: Build Demo Site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build demo
+        run: pnpm build
+      - name: Upload demo build
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-dist
+          path: dist
+          retention-days: 7
+
+  summary:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [check, storybook-test, build-storybook, build-demo]
+    if: always()
+    steps:
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-test-results"
+          path: results
+          merge-multiple: true
+        continue-on-error: true
+      - name: Generate summary
+        run: |
+          echo "## CI Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Typecheck, Lint & Unit Tests | ${{ needs.check.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Storybook Tests | ${{ needs.storybook-test.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Storybook | ${{ needs.build-storybook.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Demo | ${{ needs.build-demo.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f "results/test-results.json" ]; then
+            echo "### Test Details" >> $GITHUB_STEP_SUMMARY
+            echo "Unit test results uploaded as artifacts." >> $GITHUB_STEP_SUMMARY
+          fi

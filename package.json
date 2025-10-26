@@ -8,19 +8,40 @@
     "dev": "vite --open",
     "build": "vite build",
     "build:storybook": "storybook build",
+    "changelog": "node scripts/consolidate-changelog.mjs",
+    "ci:check": "node scripts/check-ci.mjs",
+    "ci:watch": "node scripts/check-ci.mjs --watch",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
+    "gh:prepare": "node scripts/prepare-gh.mjs",
+    "gh:setup-labels": "node scripts/setup-labels.mjs",
+    "gh:setup-project": "node scripts/setup-project.mjs",
+    "ideas:create": "node scripts/ideas-to-issues.mjs",
+    "ideas:sync": "node scripts/sync-ideas-checklists.mjs",
+    "ideas:validate": "node scripts/validate-ideas.mjs",
+    "issues:create": "node scripts/create-issues-from-changelog.mjs",
     "lint:staged": "lint-staged",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
     "new:snippet": "node scripts/new-snippet.mjs",
+    "pr:check": "node scripts/pr-requirements.mjs --check-pr",
+    "pr:create-issue": "node scripts/pr-requirements.mjs",
+    "pr:generate": "node scripts/generate-pr-content.mjs",
+    "pr:verify": "node scripts/pr-requirements.mjs --verify-pr",
     "prepare": "simple-git-hooks",
     "preview": "vite preview",
-    "storybook:test": "test-storybook",
+    "record:stories": "node scripts/record-stories.mjs",
+    "storybook:test": "node scripts/test-storybook.mjs",
+    "storybook:test:json": "node scripts/test-storybook.mjs --json --outputFile=storybook-test-results.json",
+    "storybook:test:rebuild": "node scripts/test-storybook.mjs --rebuild",
     "storybook": "storybook dev -p 6006",
+    "tag": "node scripts/auto-tag.mjs",
+    "tag:release": "node scripts/auto-tag.mjs --create-release --push",
     "test": "vitest run --reporter=dot",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "test:json": "vitest run --reporter=json --outputFile=test-results.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "version:bump": "node scripts/bump-version.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.2",
@@ -62,7 +83,7 @@
     "npm": ">=10.0.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm lint:staged"
+    "pre-commit": "node scripts/pre-commit-changelog.mjs && pnpm lint:staged"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

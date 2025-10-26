@@ -1,0 +1,86 @@
+{
+  "project": {
+    "name": "Plaincraft Roadmap",
+    "description": "Lane-scoped board enforcing ticket IDs, lane labels, and acceptance checklists.",
+    "views": [
+      {
+        "name": "Lane A",
+        "type": "board",
+        "filters": {
+          "labels": ["lane:A"]
+        },
+        "wip_limit": 3
+      },
+      {
+        "name": "Lane B",
+        "type": "board",
+        "filters": {
+          "labels": ["lane:B"]
+        },
+        "wip_limit": 3
+      },
+      {
+        "name": "Lane C",
+        "type": "board",
+        "filters": {
+          "labels": ["lane:C"]
+        },
+        "wip_limit": 3
+      },
+      {
+        "name": "Lane D",
+        "type": "board",
+        "filters": {
+          "labels": ["lane:D"]
+        },
+        "wip_limit": 3
+      }
+    ],
+    "fields": [
+      {
+        "name": "ID",
+        "type": "text",
+        "description": "Ticket identifier (U-, C-, B-, ARCH-, PB-)."
+      },
+      {
+        "name": "Lane",
+        "type": "single_select",
+        "options": ["A", "B", "C", "D"]
+      },
+      {
+        "name": "Acceptance",
+        "type": "text",
+        "description": "Markdown checklist copied from the Issue template."
+      },
+      {
+        "name": "Units",
+        "type": "text",
+        "description": "Composition tickets: list dependent U- tickets."
+      },
+      {
+        "name": "Metric",
+        "type": "text",
+        "description": "Composition tickets: hypothesis + measurement."
+      }
+    ]
+  },
+  "issue_templates": [
+    ".github/ISSUE_TEMPLATE/unit-ticket.yml",
+    ".github/ISSUE_TEMPLATE/composition-ticket.yml",
+    ".github/ISSUE_TEMPLATE/bug-report.yml"
+  ],
+  "labels": [
+    "lane:A",
+    "lane:B",
+    "lane:C",
+    "lane:D",
+    "lane:unit",
+    "lane:composition",
+    "lane:bug"
+  ],
+  "automation_notes": [
+    "When Issue added to project → set Lane based on lane:* label.",
+    "When Issue added to project → leave comment reminding Closes # reference.",
+    "Optional: CI workflow updates status using .github/pipeline-config.json."
+  ]
+}
