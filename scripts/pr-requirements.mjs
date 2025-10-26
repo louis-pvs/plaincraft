@@ -215,8 +215,9 @@ async function verifyPr(prNumber) {
     const issues = [];
 
     // Check for issue reference
+    const prBody = pr.body || "";
     const hasIssueRef = /closes\s+#\d+|fixes\s+#\d+|resolves\s+#\d+/i.test(
-      pr.body,
+      prBody,
     );
     if (!hasIssueRef) {
       issues.push("❌ Missing issue reference (Closes #123)");
@@ -229,16 +230,16 @@ async function verifyPr(prNumber) {
     }
 
     // Check commit tags
-    const commits = await getCommits(prNumber);
+    const commits = pr.commits || [];
     const missingTags = commits.filter(
-      (c) => !c.messageHeadline.match(/^\[[\w-]+\]/),
+      (c) => !c.messageHeadline || !c.messageHeadline.match(/^\[[\w-]+\]/),
     );
     if (missingTags.length > 0) {
       issues.push(`❌ ${missingTags.length} commit(s) missing tag prefix`);
     }
 
     // Check for acceptance checklist
-    const hasChecklist = pr.body.includes("- [ ]") || pr.body.includes("- [x]");
+    const hasChecklist = prBody.includes("- [ ]") || prBody.includes("- [x]");
     if (!hasChecklist) {
       issues.push("❌ Missing acceptance checklist");
     }
@@ -255,16 +256,6 @@ async function verifyPr(prNumber) {
     console.error("❌ Failed to verify PR:", error.message);
     throw error;
   }
-}
-
-/**
- * Get commits for a PR
- */
-async function getCommits(prNumber) {
-  const { stdout } = await execAsync(
-    `gh pr view ${prNumber} --json commits -q '.commits[]'`,
-  );
-  return JSON.parse(`[${stdout.trim().replace(/\n/g, ",")}]`);
 }
 
 /**
