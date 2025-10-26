@@ -1,0 +1,116 @@
+name: record
+
+on:
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      stories:
+        description: "Story IDs to record (comma-separated, or 'all')"
+        required: false
+        default: "all"
+
+concurrency:
+  group: record-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  record-stories:
+    name: Record Story Videos & Generate GIFs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      - name: Determine Playwright version
+        id: playwright-version
+        run: |
+          PLAYWRIGHT_VERSION=$(node -p "require('@playwright/test/package.json').version")
+          echo "version=${PLAYWRIGHT_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Configure Playwright cache path
+        id: playwright-path
+        run: |
+          PLAYWRIGHT_CACHE="$HOME/.cache/ms-playwright"
+          mkdir -p "$PLAYWRIGHT_CACHE"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$PLAYWRIGHT_CACHE" >> "$GITHUB_ENV"
+          echo "path=$PLAYWRIGHT_CACHE" >> "$GITHUB_OUTPUT"
+      - name: Restore Playwright browsers
+        id: playwright-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.playwright-path.outputs.path }}
+          key: playwright-browsers-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-version.outputs.version }}
+          restore-keys: |
+            playwright-browsers-${{ runner.os }}-${{ runner.arch }}-
+            playwright-browsers-${{ runner.os }}-
+      - name: Build Storybook
+        run: pnpm build:storybook
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Serve Storybook static build
+        run: |
+          pnpm dlx http-server storybook-static --port 6006 --host 127.0.0.1 --silent &
+          echo "STORYBOOK_SERVER_PID=$!" >> $GITHUB_ENV
+      - name: Wait for Storybook
+        run: pnpm dlx wait-on http://127.0.0.1:6006
+      - name: Record stories
+        env:
+          TARGET_URL: http://127.0.0.1:6006
+          STORIES: ${{ github.event.inputs.stories || 'all' }}
+        run: node scripts/record-stories.mjs
+      - name: Stop Storybook server
+        if: always()
+        run: |
+          if [ -n "${STORYBOOK_SERVER_PID:-}" ]; then
+            kill $STORYBOOK_SERVER_PID
+          fi
+      - name: Upload video artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: story-videos
+          path: artifacts/video/*.webm
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Upload GIF artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: story-gifs
+          path: docs/assets/gif/*.gif
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Save Playwright browsers
+        if: ${{ always() && steps.playwright-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.playwright-path.outputs.path }}
+          key: playwright-browsers-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-version.outputs.version }}
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Recording Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          VIDEO_COUNT=$(find artifacts/video -name "*.webm" 2>/dev/null | wc -l)
+          GIF_COUNT=$(find docs/assets/gif -name "*.gif" 2>/dev/null | wc -l)
+          echo "- Videos recorded: ${VIDEO_COUNT}" >> $GITHUB_STEP_SUMMARY
+          echo "- GIFs generated: ${GIF_COUNT}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ ${GIF_COUNT} -gt 0 ]; then
+            echo "### Generated GIFs" >> $GITHUB_STEP_SUMMARY
+            find docs/assets/gif -name "*.gif" 2>/dev/null | while read gif; do
+              echo "- \`$(basename "$gif")\`" >> $GITHUB_STEP_SUMMARY
+            done
+          fi
