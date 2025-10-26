@@ -310,7 +310,7 @@ async function applyLaneLabel(prNumber, lane) {
  * Parse command line arguments
  */
 function parseArgs() {
-  const args = process.argv.slice(2);
+  const args = process.argv.slice(2).filter((arg) => arg !== "--"); // Filter out npm/pnpm separator
   const options = {};
 
   for (let i = 0; i < args.length; i++) {
