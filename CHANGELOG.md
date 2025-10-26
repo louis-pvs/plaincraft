@@ -2,6 +2,69 @@
 
 All notable changes live here. Follow the [changelog guide](guides/CHANGELOG-GUIDE.md) for structure and authoring notes.
 
+## [0.3.0] - 2025-10-26
+
+### [ARCH-ideas-pipeline] Automated project creation for ideas workflow
+
+## Changes
+
+- Added `ensure-project` job to `.github/workflows/ideas.yml`
+- Auto-detects missing or invalid project configuration
+- Creates "Plaincraft Roadmap" project automatically when needed
+- Commits `pipeline-config.json` updates with `[skip ci]`
+- Updated CI-STRATEGY.md with automation documentation
+
+## Benefits
+
+- Zero-config project setup for new repos
+- Self-healing if project gets deleted
+- Eliminates manual `gh:setup-project` step
+- Issues from ideas always added to project board
+
+## Technical Details
+
+The `ensure-project` job runs before `create-issues-from-ideas` and:
+
+1. Checks for existing project in config
+2. Verifies project still exists in GitHub
+3. Runs `setup-project.mjs` if needed
+4. Outputs project existence status to dependent jobs
+
+Project creation is idempotent and reuses the same script as manual workflows.
+
+Closes #19
+
+### [ARCH-worktree-pr-fix] Fix worktree script PR creation failures
+
+## Changes
+
+- Added `hasCommitsForPR()` function to detect commits before PR creation
+- Changed PR body handling from inline escaping to file-based approach
+- Added graceful skip when branch has no commits
+- Improved error messages and user guidance
+- Added `writeFile` import to support temp file creation
+
+## Benefits
+
+- No confusing errors when creating worktrees for new issues
+- Reliable PR body handling for complex markdown content
+- Clear instructions shown when PR can't be created yet
+- Better developer experience for common workflow
+
+## Technical Details
+
+The script now:
+
+1. Creates worktree and branch successfully
+2. Checks commit count with `git rev-list --count`
+3. Skips PR creation gracefully if no commits exist
+4. Shows helpful next steps: `gh pr create --fill --draft`
+5. Uses temp file for PR body to avoid escaping issues
+
+This fixes the `GraphQL: No commits between main and <branch>` error that was misleading users when the worktree/branch creation actually succeeded.
+
+Closes #20
+
 ## [0.2.0] - 2025-10-26
 
 ### [B-pr-template-enforcement] PR template compliance gaps

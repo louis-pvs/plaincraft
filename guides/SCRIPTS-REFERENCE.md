@@ -132,12 +132,13 @@ pnpm pr:check
 - Runs `scripts/post-checkout.mjs` inside the worktree to install dependencies and push the branch upstream.
 - Verifies the branch exists on origin before attempting PR creation.
 - **Checks for commits** on the branch before creating PR; gracefully skips PR creation if no commits exist yet.
+- **Creates bootstrap commit** automatically if no commits exist (unless `--no-bootstrap` is used), ensuring PR can be created immediately.
 - Drafts a PR (unless `--no-draft`) with `Closes #<issue>` pre-filled, using temp file for body content.
 
 **Usage:**
 
 ```bash
-# Standard flow (creates worktree, branch, draft PR)
+# Standard flow (creates worktree, branch, bootstrap commit, draft PR)
 pnpm gh:worktree -- 42
 
 # Dry run preview
@@ -151,13 +152,18 @@ pnpm gh:worktree -- 99 --force
 
 # Create PR ready for review (not draft)
 pnpm gh:worktree -- 77 --no-draft
+
+# Skip bootstrap commit (manual workflow)
+pnpm gh:worktree -- 42 --no-bootstrap
 ```
 
 **Notes:**
 
 - Issue titles must retain the ticket ID prefix so the branch/tag naming is correct.
 - If the branch has not been pushed yet, the script stops and prints the exact `git push` command.
-- **If no commits exist on the branch**, PR creation is skipped with instructions to commit and re-run the script.
+- **Bootstrap commit behavior**: By default, the script creates a `.worktree-bootstrap.md` file with metadata and commits it with `[skip ci]` to ensure PR creation succeeds immediately. You can amend or delete this commit once you add your actual changes.
+- Use `--no-bootstrap` to skip the automatic commit if you prefer the manual workflow.
+- **If no commits exist** and bootstrap is disabled, PR creation is skipped with instructions to commit and re-run the script.
 - Replace the TODO sections in the generated PR body before requesting review.
 - Default worktree path is `../plaincraft-<branch-name>`; override with `--dir` whenever needed.
 
