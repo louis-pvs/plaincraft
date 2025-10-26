@@ -55,14 +55,16 @@ jobs:
             # Check for any of the valid tag patterns
             if ! echo "$commit" | grep -qE '\[(U-|C-|B-|ARCH-|PB-|D-)[^\]]+\]'; then
               echo "❌ Missing valid tag: $commit"
-              invalid_commits="${invalid_commits}- ${commit}\n"
+              invalid_commits="${invalid_commits}- ${commit}"$'\n'
               missing_tags=$((missing_tags + 1))
             fi
           done <<< "$commits"
 
           if [ $missing_tags -gt 0 ]; then
             echo "::error title=Invalid Commit Tags::${missing_tags} commit(s) missing valid tag prefix: [U-*], [C-*], [B-*], [ARCH-*], [PB-*], or [D-*]"
-            echo "::notice::Invalid commits:%0A${invalid_commits}"
+            # Output invalid commits on separate lines
+            echo "Invalid commits:"
+            echo "$invalid_commits"
             exit 1
           fi
 
