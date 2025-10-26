@@ -275,8 +275,10 @@ You can safely delete this file or amend this commit once you've added your actu
       { cwd: worktreePath },
     );
 
-    // Push the commit
-    await execAsync("git push", { cwd: worktreePath });
+    // Push the commit with upstream tracking
+    await execAsync(`git push --set-upstream origin ${branchName}`, {
+      cwd: worktreePath,
+    });
 
     return true;
   } catch (error) {
