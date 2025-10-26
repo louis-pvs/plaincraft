@@ -14,6 +14,8 @@ permissions:
 jobs:
   check-requirements:
     runs-on: ubuntu-latest
+    # Skip if triggered by GitHub Actions bot to prevent infinite loops
+    if: github.actor != 'github-actions[bot]'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

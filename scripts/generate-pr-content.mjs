@@ -11,11 +11,101 @@ import { appendFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
+import { exec } from "node:child_process";
+import { promisify } from "node:util";
+
+const execAsync = promisify(exec);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = join(__dirname, "..");
 const CHANGELOG = join(ROOT, "CHANGELOG.md");
+
+/**
+ * Extract ticket ID from tag (e.g., [B-pr-template-enforcement] -> B-pr-template-enforcement)
+ */
+function extractTicketId(tag) {
+  const match = tag.match(/^\[([\w-]+)\]$/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Search for GitHub issue by ticket ID in title
+ * Returns issue number if found, null otherwise
+ */
+async function findIssueByTicketId(ticketId) {
+  try {
+    const { stdout } = await execAsync(
+      `gh issue list --search "${ticketId} in:title" --json number,title --limit 10`,
+    );
+
+    const issues = JSON.parse(stdout);
+
+    // Find exact match where title contains the ticket ID in brackets
+    const match = issues.find((issue) =>
+      issue.title.match(new RegExp(`\\[${ticketId}\\]`, "i")),
+    );
+
+    return match ? match.number : null;
+  } catch (error) {
+    console.warn(
+      `⚠️  Failed to search for issue with ticket ID ${ticketId}:`,
+      error.message,
+    );
+    return null;
+  }
+}
+
+/**
+ * Fetch acceptance checklist from GitHub issue
+ * Returns array of checklist items or default placeholder
+ */
+async function fetchAcceptanceChecklist(issueNumber) {
+  try {
+    const { stdout } = await execAsync(
+      `gh issue view ${issueNumber} --json body -q .body`,
+    );
+
+    const body = stdout.trim();
+
+    // Extract acceptance checklist section
+    const checklistRegex =
+      /## Acceptance Checklist\s*([\s\S]*?)(?=\n##|\n$|$)/i;
+    const match = body.match(checklistRegex);
+
+    if (match) {
+      // Extract checklist items (lines starting with - [ ] or - [x])
+      const checklistContent = match[1];
+      const items = checklistContent
+        .split("\n")
+        .filter((line) => line.trim().match(/^- \[[ x]\]/))
+        .map((line) => line.trim());
+
+      if (items.length > 0) {
+        return items;
+      }
+    }
+
+    // Fallback to default checklist
+    return [
+      "- [ ] All CI checks passing",
+      "- [ ] Code reviewed",
+      "- [ ] Documentation updated",
+      "- [ ] Integration window (at :00 or :30)",
+    ];
+  } catch (error) {
+    console.warn(
+      `⚠️  Failed to fetch checklist from issue #${issueNumber}:`,
+      error.message,
+    );
+    return [
+      "- [ ] All CI checks passing",
+      "- [ ] Code reviewed",
+      "- [ ] Documentation updated",
+      "- [ ] Integration window (at :00 or :30)",
+    ];
+  }
+}
 
 /**
  * Parse CHANGELOG.md and extract latest version entries
@@ -120,40 +210,131 @@ function generateTitle(sections, version) {
 }
 
 /**
+ * Extract all ticket tags from changelog sections
+ * Looks for [TAG-name] patterns in section titles first, then content bullets
+ */
+function extractAllTags(sections) {
+  const tags = new Set();
+
+  // First, check section titles (preferred format per guide)
+  for (const section of sections) {
+    const titleTagMatch = section.title.match(/\[[\w-]+\]/g);
+    if (titleTagMatch) {
+      titleTagMatch.forEach((tag) => tags.add(tag));
+    }
+  }
+
+  // If no tags in titles, fall back to content bullets (legacy format)
+  if (tags.size === 0) {
+    for (const section of sections) {
+      const contentLines = section.content.split("\n");
+      for (const line of contentLines) {
+        const tagMatch = line.match(/\[[\w-]+\]/g);
+        if (tagMatch) {
+          tagMatch.forEach((tag) => tags.add(tag));
+        }
+      }
+    }
+  }
+
+  return Array.from(tags);
+}
+
+/**
  * Generate PR body from changelog sections
  * Integrates with PR template structure
  */
-function generateBody(sections, version) {
+async function generateBody(sections, version) {
   if (sections.length === 0) {
     return version
       ? `## Release v${version}\n\nSee CHANGELOG.md for details.`
       : "";
   }
 
-  // Extract commit tag from first section for lane identification
-  const firstTitle = sections[0].title;
-  const tagMatch = firstTitle.match(/^\[[\w-]+\]/);
-  const tag = tagMatch ? tagMatch[0] : "";
+  // Extract all tags from content bullets
+  const allTags = extractAllTags(sections);
+  const firstTag = allTags.length > 0 ? allTags[0] : "";
+  const ticketId = firstTag ? extractTicketId(firstTag) : null;
 
-  // Determine lane from tag
+  // Determine lane from first tag
   let lane = "";
-  if (tag.startsWith("[U-")) lane = "lane:A";
-  else if (tag.startsWith("[B-")) lane = "lane:B";
-  else if (tag.startsWith("[C-") || tag.startsWith("[ARCH-")) lane = "lane:C";
-  else if (tag.startsWith("[D-") || tag.startsWith("[PB-")) lane = "lane:D";
+  if (firstTag.startsWith("[U-")) lane = "lane:A";
+  else if (firstTag.startsWith("[B-")) lane = "lane:B";
+  else if (firstTag.startsWith("[C-") || firstTag.startsWith("[ARCH-"))
+    lane = "lane:C";
+  else if (firstTag.startsWith("[D-") || firstTag.startsWith("[PB-"))
+    lane = "lane:D";
 
-  // Generate scope summary from section titles
-  const cleanTitles = sections.map((s) =>
-    s.title.replace(/^\[[\w-]+\]\s*/, "").trim(),
-  );
-  const scopeSummary = cleanTitles.join(", ");
+  // Generate concise scope summary from first bullet point
+  const firstSection = sections[0];
+  const contentLines = firstSection.content.split("\n").filter((l) => l.trim());
+  const firstBullet = contentLines.find((l) => l.trim().startsWith("-"));
+
+  let scopeSummary = "See changes below.";
+  if (firstBullet) {
+    // Remove tag and bullet, extract content
+    const cleanLine = firstBullet
+      .replace(/^[-*]\s*/, "")
+      .replace(/\[[\w-]+\]\s*/, "")
+      .trim();
+
+    // Find first sentence end (period followed by space or end, not inside backticks)
+    const sentenceMatch = cleanLine.match(/^[^.!?]+[.!?](?:\s|$)/);
+    if (sentenceMatch) {
+      scopeSummary = sentenceMatch[0].trim();
+    } else if (cleanLine.endsWith(".")) {
+      // Line already ends with period
+      scopeSummary = cleanLine;
+    } else {
+      // No sentence terminator found, use the whole line but cap at 150 chars
+      scopeSummary =
+        cleanLine.length > 150
+          ? cleanLine.substring(0, 147) + "..."
+          : cleanLine + ".";
+    }
+  } // Try to find and fetch issue details
+  let issueNumber = null;
+  let issueReference = "";
+  let acceptanceChecklist = [
+    "- [ ] All CI checks passing",
+    "- [ ] Code reviewed",
+    "- [ ] Documentation updated",
+    "- [ ] Integration window (at :00 or :30)",
+  ];
+
+  if (ticketId) {
+    console.log(`🔍 Searching for issue with ticket ID: ${ticketId}`);
+    issueNumber = await findIssueByTicketId(ticketId);
+
+    if (issueNumber) {
+      console.log(`✅ Found issue #${issueNumber}`);
+      issueReference = `Closes #${issueNumber}`;
+
+      // Fetch acceptance checklist from issue
+      console.log(
+        `📋 Fetching acceptance checklist from issue #${issueNumber}...`,
+      );
+      acceptanceChecklist = await fetchAcceptanceChecklist(issueNumber);
+      console.log(`✅ Found ${acceptanceChecklist.length} checklist items`);
+    } else {
+      console.warn(
+        `⚠️  Could not find issue for ticket ID: ${ticketId}. Manual linking required.`,
+      );
+    }
+  }
 
   // Build PR body following template structure
-  const body = `# Related Issue
+  const issueCheckbox = issueNumber
+    ? `- [x] I referenced the ticket with \`Closes #${issueNumber}\` (required for merge)`
+    : `- [ ] I referenced the ticket with \`Closes #<issue-number>\` (required for merge)`;
 
-- [ ] I referenced the ticket with \`Closes #<issue-number>\` (required for merge)
-- [ ] Every commit message begins with the ticket ID in brackets (e.g. \`${tag}\`)
-- Ticket ID: \`\`
+  const ticketIdField = ticketId ? `\`${ticketId}\`` : "``";
+
+  const body = `${issueReference ? `${issueReference}\n\n` : ""}# Related Issue
+
+${issueCheckbox}
+- [ ] Every commit message begins with the ticket ID in brackets (e.g. \`${firstTag}\`)
+- Ticket ID: ${ticketIdField}
 
 # Lane + Contracts
 
@@ -163,14 +344,7 @@ function generateBody(sections, version) {
 
 # Acceptance Checklist
 
-- [ ] Acceptance checklist copied from the ticket and updated here
-
-\`\`\`markdown
-- [ ] All CI checks passing
-- [ ] Code reviewed
-- [ ] Documentation updated
-- [ ] Integration window (at :00 or :30)
-\`\`\`
+${acceptanceChecklist.join("\n")}
 
 ---
 
@@ -186,7 +360,7 @@ ${sections
 ---
 
 **Auto-generated from CHANGELOG.md** ${version ? `(v${version})` : ""}  
-*Update the sections above with ticket reference and acceptance checklist*
+${issueNumber ? `**Linked issue**: #${issueNumber}` : "*Update with ticket reference and acceptance checklist*"}
 `;
 
   return body;
@@ -238,7 +412,7 @@ async function main() {
 
     // Generate PR content
     const title = generateTitle(sections, version);
-    const body = generateBody(sections, version);
+    const body = await generateBody(sections, version);
 
     console.log("\n📝 Generated PR content:");
     console.log(`Title: ${title}`);

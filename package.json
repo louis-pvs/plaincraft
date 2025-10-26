@@ -1,6 +1,10 @@
 {
   "name": "plaincraft",
   "version": "0.2.0",
+  "author": {
+    "name": "Louis Phang",
+    "email": "design.vincent.louis@gmail.com"
+  },
   "private": true,
   "packageManager": "pnpm@9.0.0",
   "type": "module",
@@ -16,6 +20,8 @@
     "gh:prepare": "node scripts/prepare-gh.mjs",
     "gh:setup-labels": "node scripts/setup-labels.mjs",
     "gh:setup-project": "node scripts/setup-project.mjs",
+    "gh:worktree": "node scripts/create-worktree-pr.mjs",
+    "postcheckout": "node scripts/post-checkout.mjs",
     "ideas:create": "node scripts/ideas-to-issues.mjs",
     "ideas:sync": "node scripts/sync-ideas-checklists.mjs",
     "ideas:validate": "node scripts/validate-ideas.mjs",

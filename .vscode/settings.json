@@ -1,0 +1,8 @@
+{
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": ".copilot-commit-message-instructions.md",
+      "text": "Every commit message must begin with the ticket ID in brackets: `[U-<slug>]`, `[C-<slug>]`, `[B-<slug>]`, `[ARCH-<slug>]`, `[PB-<slug>]`. The changelog and PR title should share that same tag."
+    }
+  ]
+}

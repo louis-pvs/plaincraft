@@ -1,8 +1,10 @@
 name: Update PR
 
+# Triggers only on PR open to auto-populate title/body from CHANGELOG
+# Does NOT trigger on 'synchronize' to prevent infinite loop with pr-check workflow
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened]
     branches:
       - main
 
