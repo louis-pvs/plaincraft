@@ -37,16 +37,23 @@ jobs:
             const body = process.env.PR_BODY;
 
             if (title) {
-              await github.rest.pulls.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
-                title: title,
-                body: body || undefined
-              });
-              
-              core.info(`✅ Updated PR #${context.payload.pull_request.number}`);
-              core.info(`Title: ${title}`);
+              // Only update if PR was opened (not on synchronize)
+              // This preserves manual edits on subsequent pushes
+              if (context.payload.action === 'opened') {
+                await github.rest.pulls.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number,
+                  title: title,
+                  body: body || undefined
+                });
+                
+                core.info(`✅ Updated PR #${context.payload.pull_request.number}`);
+                core.info(`Title: ${title}`);
+              } else {
+                core.info(`ℹ️ Skipping PR update on synchronize (preserves manual edits)`);
+                core.info(`Suggested title: ${title}`);
+              }
             }
         env:
           PR_TITLE: ${{ steps.generate.outputs.title }}

@@ -28,6 +28,97 @@ pnpm gh:prepare
 - ✅ All checks pass → shows available commands
 - ❌ Setup needed → shows installation/auth instructions
 
+## PR Requirements & Automation
+
+### `pnpm pr:create-issue`
+
+**Script:** `scripts/pr-requirements.mjs`  
+**Purpose:** Create GitHub issues with lane labels and acceptance checklists
+
+**What it does:**
+
+- Creates issue with proper lane label
+- Auto-detects lane from commit tag
+- Generates type-specific acceptance checklist
+- Applies additional labels and assignees
+- Returns issue number and URL
+
+**Usage:**
+
+```bash
+# Create unit issue with auto-detected lane
+pnpm pr:create-issue -- --create-issue "Add Button component" --tag U-button
+
+# Create issue with explicit lane
+pnpm pr:create-issue -- --create-issue "Add feature" --lane A --type unit
+
+# Create architecture issue
+pnpm pr:create-issue -- --create-issue "Refactor state" --lane C --type architecture
+
+# Add assignees and labels
+pnpm pr:create-issue -- --create-issue "Fix bug" --tag U-inline --assignee @me --label high-priority
+```
+
+**Options:**
+
+- `--create-issue <title>` - Issue title (required)
+- `--lane <A|B|C|D>` - Lane assignment (auto-detected from tag if omitted)
+- `--tag <tag>` - Commit tag for lane detection
+- `--type <type>` - Issue type: unit, composition, bug, architecture (default: unit)
+- `--body <text>` - Issue body text
+- `--label <label>` - Additional label (repeatable)
+- `--assignee <user>` - Assignee (repeatable)
+
+### `pnpm pr:verify`
+
+**Script:** `scripts/pr-requirements.mjs`  
+**Purpose:** Verify PR meets all requirements
+
+**What it checks:**
+
+- ✓ Issue reference (Closes #123)
+- ✓ Lane label present
+- ✓ All commits have tag prefix
+- ✓ Acceptance checklist included
+
+**Usage:**
+
+```bash
+# Verify specific PR
+pnpm pr:verify -- 123
+
+# Verify current branch's PR
+pnpm pr:verify
+```
+
+**Output:**
+
+- ✅ All requirements met
+- ❌ Lists missing requirements
+
+### `pnpm pr:check`
+
+**Script:** `scripts/pr-requirements.mjs`  
+**Purpose:** Check PR requirements (CI mode - exits with error code)
+
+**What it does:**
+
+- Same checks as `pr:verify`
+- Exits with code 0 if passed
+- Exits with code 1 if failed (blocks CI)
+
+**Usage:**
+
+```bash
+# In CI pipeline
+pnpm pr:check -- $PR_NUMBER
+
+# Check current branch (auto-detects PR)
+pnpm pr:check
+```
+
+**Use case:** Add to CI pipeline as merge blocker
+
 ## Changelog Management
 
 ### `pnpm changelog`
@@ -40,9 +131,17 @@ pnpm gh:prepare
 1. Reads all `_tmp/*.md` files (sorted alphabetically)
 2. Extracts version from `package.json`
 3. Generates `## [version] - YYYY-MM-DD` entry
-4. Adds each summary as `### <Title>` section
-5. Inserts before existing entries (latest first)
-6. Deletes `_tmp/*.md` files after success
+4. **Detects duplicate versions** and merges sections if found
+5. Adds each summary as `### <Title>` section
+6. Inserts before existing entries (latest first)
+7. Deletes `_tmp/*.md` files after success
+
+**Features:**
+
+- **Duplicate prevention:** Merges new sections into existing version instead of creating duplicate headers
+- Auto-deletes temporary files after consolidation
+- Sorts summaries alphabetically by filename
+- Creates `_tmp/` directory if missing
 
 **Usage:**
 
@@ -59,6 +158,28 @@ node scripts/consolidate-changelog.mjs
 - Automatically runs if `_tmp/*.md` files exist
 - Stages `CHANGELOG.md` for commit
 - Part of `simple-git-hooks` workflow
+
+### Pipeline Configuration (`.github/pipeline-config.json`)
+
+**Purpose:** Central template that defines Issue/Project metadata and PR
+requirements so CI jobs and helper scripts stay synchronized.
+
+**Sections:**
+
+- `project` – Project ID, lane-specific views (WIP limit 3), required labels,
+  and canonical field mapping.
+- `tickets` – Ticket type definitions mapping prefixes (`U-`, `C-`, `B-`) to
+  their Issue templates, default labels, and Project fields.
+- `pull_requests` – Required merge rules (`Closes #…`, lane labels, acceptance
+  checklist) plus template expectations for enforcement.
+
+**Usage:**
+
+- Reference when updating Issue templates, adding new ticket types, or changing
+  roadmap fields; keeping this JSON up to date lets CI read the requirements
+  without hard-coding them.
+- Future automation can parse this file to validate tickets, enforce lane
+  limits, and produce status dashboards.
 
 **Input:**
 

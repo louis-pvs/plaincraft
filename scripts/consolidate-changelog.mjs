@@ -107,10 +107,52 @@ function generateChangelogEntry(version, date, summaries) {
 
 /**
  * Insert new entry into changelog
+ * Prevents duplicate version entries
  */
-function insertIntoChangelog(existingChangelog, newEntry) {
+function insertIntoChangelog(existingChangelog, newEntry, version) {
   if (!existingChangelog) {
     return `# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n${newEntry}`;
+  }
+
+  // Check if this version already exists
+  const versionPattern = new RegExp(
+    `^## \\[${version.replace(/\./g, "\\.")}\\]`,
+    "m",
+  );
+  if (versionPattern.test(existingChangelog)) {
+    console.warn(
+      `\n⚠️  Warning: Version [${version}] already exists in CHANGELOG.md`,
+    );
+    console.warn(`   Merging new sections into existing version entry...\n`);
+
+    // Extract sections from new entry (skip the version header)
+    const newSections = newEntry.split("\n").slice(2).join("\n").trim();
+
+    // Find the existing version block and insert sections there
+    const lines = existingChangelog.split("\n");
+    let versionIndex = -1;
+    let nextVersionIndex = lines.length;
+
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].match(versionPattern)) {
+        versionIndex = i;
+      } else if (versionIndex !== -1 && lines[i].startsWith("## [")) {
+        nextVersionIndex = i;
+        break;
+      }
+    }
+
+    if (versionIndex === -1) {
+      // Shouldn't happen, but fallback to append
+      return `${existingChangelog}\n\n${newEntry}`;
+    }
+
+    // Insert new sections after version header, before next version
+    const before = lines.slice(0, versionIndex + 1).join("\n");
+    const existing = lines.slice(versionIndex + 1, nextVersionIndex).join("\n");
+    const after = lines.slice(nextVersionIndex).join("\n");
+
+    return `${before}\n\n${newSections}\n${existing}${after ? "\n" + after : ""}`;
   }
 
   // Find the position after the header
@@ -173,8 +215,12 @@ async function main() {
   // Generate new entry
   const newEntry = generateChangelogEntry(version, date, summaries);
 
-  // Insert into changelog
-  const updatedChangelog = insertIntoChangelog(existingChangelog, newEntry);
+  // Insert into changelog (with duplicate detection)
+  const updatedChangelog = insertIntoChangelog(
+    existingChangelog,
+    newEntry,
+    version,
+  );
 
   // Write changelog
   await writeFile(CHANGELOG, updatedChangelog);

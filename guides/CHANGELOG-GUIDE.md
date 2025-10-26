@@ -56,6 +56,17 @@ storybook:test`) inside the integration window.
 - Use `pnpm ci:check --watch` (requires installed + authenticated `gh`) to
   monitor workflow status once the branch is pushed.
 
+### Issues & Project Tracking
+
+- File Issues using the lane-specific templates (`Unit`, `Composition`, `Bug`);
+  each requires the ticket ID, lane assignment, and an acceptance checklist so
+  automation can propagate those fields into PRs.
+- When creating or updating Issues, ensure they are linked to the Plaincraft
+  Roadmap project—lane-specific views enforce WIP limit 3, and the pipeline
+  expects that linkage when summarizing status.
+- PRs must reference their Issue with `Closes #…`; branch protection and CI
+  checks treat missing references as failures.
+
 ### Quick Checklist Before Committing
 
 - [ ] Version updated in `package.json` (if applicable).
