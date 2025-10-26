@@ -265,10 +265,34 @@ No manual server management needed!
 
 - `pnpm gh:setup-labels` - Create/update repository labels
 - `pnpm gh:setup-project` - Initialize GitHub Project with fields
+- `pnpm gh:worktree <issue#>` - Create worktree + branch + PR for an issue
 - `pnpm issues:create` - Create issues from changelog
 - `pnpm ideas:create` - Create issues from idea files
 - `pnpm ideas:validate` - Validate idea file structure
 - `pnpm ideas:sync` - Sync checklists to issues
+
+**Worktree Creation:**
+
+```bash
+# Create worktree, branch, and draft PR for issue #6
+pnpm gh:worktree 6
+
+# Preview without creating
+pnpm gh:worktree 6 --dry-run
+
+# Custom worktree location
+pnpm gh:worktree 6 --dir ../my-feature
+
+# Use different base branch and create as ready for review
+pnpm gh:worktree 6 --base develop --no-draft
+```
+
+**What it does:**
+
+1. Fetches issue details from GitHub
+2. Generates branch name from issue title (e.g., `fix/b-pr-template-enforcement`)
+3. Creates git worktree in parallel directory
+4. Creates draft PR linked to the issue with labels
 
 ### Recording Scripts
 
@@ -447,6 +471,33 @@ graph TB
 - Maintain roadmap project
 
 ## Local Development
+
+### Quick start with worktrees
+
+```bash
+# Create worktree + branch + PR for an issue (all-in-one)
+pnpm gh:worktree 6
+
+# What happens automatically:
+# 1. Creates new worktree with branch from issue title
+# 2. Installs dependencies (pnpm install)
+# 3. Sets git config from package.json author
+# 4. Publishes branch to remote
+# 5. Creates draft PR linked to issue
+```
+
+### Post-checkout automation
+
+After checking out a branch (manually or via worktree), the `post-checkout` hook automatically:
+
+1. **Installs dependencies** - Runs `pnpm install`
+2. **Sets git config** - Uses author from `package.json` for local commits
+3. **Publishes branch** - Pushes to remote if not already published (skips main/develop)
+
+```bash
+# Manual trigger if needed
+pnpm postcheckout
+```
 
 ### Run checks locally
 
