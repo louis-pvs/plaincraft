@@ -12,6 +12,8 @@
     "format": "prettier --write .",
     "lint:staged": "lint-staged",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "check": "pnpm typecheck && pnpm lint && pnpm test",
     "new:snippet": "node scripts/new-snippet.mjs",
     "prepare": "simple-git-hooks",
     "preview": "vite preview",

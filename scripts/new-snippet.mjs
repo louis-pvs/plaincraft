@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-console */
 import fs from "node:fs";
 import path from "node:path";
 
@@ -25,6 +24,9 @@ fs.cpSync(src, dst, { recursive: true });
 
 // Replace contents and file names including Storybook files
 const replacements = [
+  ["useTemplateSnippetController.ts", `use${name}Controller.ts`],
+  ["TemplateSnippetView.tsx", `${name}View.tsx`],
+  ["TemplateSnippetHeadless.tsx", `${name}Headless.tsx`],
   ["TemplateSnippet.tsx", `${name}.tsx`],
   ["TemplateSnippet.spec.tsx", `${name}.spec.tsx`],
   ["TemplateSnippet.stories.tsx", `${name}.stories.tsx`],
