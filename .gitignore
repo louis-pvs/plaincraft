@@ -4,4 +4,4 @@ dist
 .idea
 .DS_Store
 storybook-static
-summary
+_tmp

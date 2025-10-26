@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Pre-commit hook to auto-generate changelog if summary files exist
+ * Pre-commit hook to auto-generate changelog if temporary summary files exist
  *
- * Checks if summary/ folder has any .md files.
- * If yes and CHANGELOG.md not staged, prompts to run changelog consolidation.
+ * Checks if _tmp/ folder has any .md files.
+ * If yes and CHANGELOG.md not staged, runs consolidation.
  * Auto-consolidates and stages CHANGELOG.md if summary files exist.
  */
 
@@ -16,7 +16,7 @@ import { dirname } from "node:path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = join(__dirname, "..");
-const SUMMARY_DIR = join(ROOT, "summary");
+const TMP_DIR = join(ROOT, "_tmp");
 
 /**
  * Execute a shell command
@@ -71,12 +71,12 @@ function getStagedFiles() {
  * Check if summary folder has any markdown files
  */
 function hasSummaryFiles() {
-  if (!existsSync(SUMMARY_DIR)) {
+  if (!existsSync(TMP_DIR)) {
     return false;
   }
 
   try {
-    const files = readdirSync(SUMMARY_DIR);
+    const files = readdirSync(TMP_DIR);
     return files.some((file) => file.endsWith(".md"));
   } catch {
     return false;

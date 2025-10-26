@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /**
- * Consolidate summary files into CHANGELOG.md
+ * Consolidate temporary summary files into CHANGELOG.md
  *
- * Reads all markdown files from summary/ folder and consolidates them
- * into CHANGELOG.md with proper versioning and timestamps
+ * Reads all markdown files from _tmp/ folder and consolidates them
+ * into CHANGELOG.md with proper versioning and timestamps.
+ * Deletes temporary files after successful consolidation.
  *
  * Usage:
  *   node scripts/consolidate-changelog.mjs
  */
 
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, writeFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -18,7 +19,7 @@ import { dirname } from "node:path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = join(__dirname, "..");
-const SUMMARY_DIR = join(ROOT, "summary");
+const TMP_DIR = join(ROOT, "_tmp");
 const CHANGELOG = join(ROOT, "CHANGELOG.md");
 const PACKAGE_JSON = join(ROOT, "package.json");
 
@@ -53,18 +54,18 @@ async function readExistingChangelog() {
 }
 
 /**
- * Get all summary files
+ * Get all summary files from _tmp directory
  */
 async function getSummaryFiles() {
-  if (!existsSync(SUMMARY_DIR)) {
+  if (!existsSync(TMP_DIR)) {
     return [];
   }
 
-  const files = await readdir(SUMMARY_DIR);
+  const files = await readdir(TMP_DIR);
   return files
     .filter((f) => f.endsWith(".md"))
     .sort()
-    .map((f) => join(SUMMARY_DIR, f));
+    .map((f) => join(TMP_DIR, f));
 }
 
 /**
@@ -82,6 +83,7 @@ async function parseSummaryFile(filePath) {
     title,
     content: content.trim(),
     file: filePath.split("/").pop(),
+    filePath, // Keep full path for deletion
   };
 }
 
@@ -144,9 +146,9 @@ async function main() {
   const summaryFiles = await getSummaryFiles();
 
   if (summaryFiles.length === 0) {
-    console.log("⚠️  No summary files found in /summary folder");
-    console.log("   Nothing to consolidate");
-    process.exit(0);
+    console.log("⚠️  No summary files found in /_tmp folder");
+    console.log("💡 Create summary files in /_tmp to consolidate");
+    return;
   }
 
   console.log(`Found ${summaryFiles.length} summary files:`);
@@ -181,10 +183,21 @@ async function main() {
   console.log(`\n📋 Consolidated ${summaries.length} summaries:`);
   summaries.forEach((s) => console.log(`   - ${s.title}`));
 
-  console.log(`\n💡 Next steps:`);
-  console.log(`   1. Review CHANGELOG.md`);
-  console.log(`   2. Archive or delete files in /summary`);
-  console.log(`   3. Commit the changes`);
+  // Delete temporary files after successful consolidation
+  console.log(`\n�️  Cleaning up temporary files...`);
+  for (const summary of summaries) {
+    try {
+      await unlink(summary.filePath);
+      console.log(`   ✓ Deleted ${summary.filePath.split("/").pop()}`);
+    } catch (err) {
+      console.warn(
+        `   ⚠ Could not delete ${summary.filePath.split("/").pop()}: ${err.message}`,
+      );
+    }
+  }
+
+  console.log(`\n✅ Changelog consolidation complete!`);
+  console.log(`   Review ${CHANGELOG} and commit the changes`);
 }
 
 main().catch((error) => {
