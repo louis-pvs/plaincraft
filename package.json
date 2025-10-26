@@ -15,6 +15,7 @@
     "format": "prettier --write .",
     "gh:prepare": "node scripts/prepare-gh.mjs",
     "gh:setup-labels": "node scripts/setup-labels.mjs",
+    "gh:setup-project": "node scripts/setup-project.mjs",
     "issues:create": "node scripts/create-issues-from-changelog.mjs",
     "lint:staged": "lint-staged",
     "lint": "eslint .",

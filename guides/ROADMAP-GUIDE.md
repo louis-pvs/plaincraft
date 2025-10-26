@@ -4,6 +4,35 @@ This playbook shows how to bootstrap a new Plaincraft Roadmap project (or
 recreate the existing one) so CI, issue templates, and automation can rely on a
 predictable structure.
 
+## Automated Setup (Recommended)
+
+Use the automated setup script to create and configure the project:
+
+```bash
+# 1. Ensure GitHub CLI is authenticated with project permissions
+gh auth login
+gh auth refresh -s project
+
+# 2. Create labels (if not already done)
+pnpm gh:setup-labels
+
+# 3. Create project with fields
+pnpm gh:setup-project
+
+# 4. Follow the manual instructions displayed for:
+#    - Creating views (Lane A, B, C, D)
+#    - Setting WIP limits (3 per lane)
+#    - Configuring automation rules
+```
+
+See `_tmp/project-automation.md` for full automation documentation.
+
+---
+
+## Manual Setup (Alternative)
+
+If you prefer manual setup or need to recreate specific components:
+
 ## 1. Create the GitHub Project
 
 1. Navigate to the Plaincraft organization → _Projects_ → _New project_.
@@ -91,6 +120,16 @@ board.
 The repo-wide `.github/pipeline-config.json` file documents the project ID,
 tickets, and PR expectations. Any automation (CI checks, scripts, bot workflows)
 should parse that configuration instead of hard-coding project internals.
+
+### Automated Workflows
+
+The `.github/workflows/project.yml` workflow provides:
+
+- **Auto-tagging**: New issues automatically get lane/type labels based on title prefix
+- **Auto-add to project**: Issues automatically added to configured project board
+- **Manual triggers**: Workflow dispatch for setup, issue creation, and sync
+
+See `_tmp/project-automation.md` for detailed workflow documentation.
 
 ### Validation Hooks
 
