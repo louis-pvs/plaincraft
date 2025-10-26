@@ -1,30 +1,62 @@
-# [ARCH-ci] CI Pipeline Refresh (2025-10-26)
+# Changelog
 
-## Highlights
+All notable changes to this project will be documented in this file. Follow the
+[changelog convention guide](guides/CHANGELOG-COMPLIANCE.md) for structure and content.
 
-- Split `.github/workflows/ci.yml` into five focused jobs (`check`, `build-storybook`, `storybook-test`, `build-demo`, `summary`) with concurrency control and artifact reuse.
-- Introduced nightly/manual recording workflow (`record.yml`) plus `scripts/record-stories.mjs` to capture `.webm`/`.gif` assets for docs.
-- Automated Storybook verification through `scripts/test-storybook.mjs`, which builds when required, serves via an internal Node static server, and cleans up reliably.
-- Switched Vitest to the `threads` pool so `pnpm test` runs without CLI overrides.
-- Added `scripts/check-ci.mjs` to query or watch GitHub workflow runs (`node scripts/check-ci.mjs --watch`) for status dashboards.
+## [0.1.0] - 2025-10-26
 
-## Tooling & Commands
+### [ARCH-ci] Test PR Template Integration
 
-- `pnpm typecheck && pnpm lint && pnpm test && pnpm storybook:test` — pre-push suite (storybook script handles build/serve/test).
-- `pnpm storybook:test:json` — JSON artifacts for CI summary.
-- `pnpm record:stories` / `STORIES=component--story pnpm record:stories` — generate media for docs.
-- `node scripts/check-ci.mjs [--watch|--run-id=<id>]` — monitor workflow progress from the CLI.
+This tests that the PR generation respects the template structure.
 
-## Local Timing Snapshot (Node 22.15.1, pnpm 9.0.0)
+## Features
+
+- Integrates with PR template sections
+- Auto-fills lane label based on commit tag
+- Preserves template structure for manual completion
+
+## [0.1.0] - 2025-10-26
+
+### Highlights
+
+- Split `.github/workflows/ci.yml` into parallel jobs (`check`, `build-storybook`,
+  `storybook-test`, `build-demo`, `summary`) with concurrency control and shared
+  artifacts to tighten feedback loops.
+- Added nightly/manual recording workflow (`record.yml`) plus
+  `scripts/record-stories.mjs` so lanes can capture `.webm`/`.gif` Storybook
+  assets for documentation.
+- Automated Storybook verification via `scripts/test-storybook.mjs`, which
+  builds when required, serves with an internal Node static server, waits for
+  readiness, and cleans up reliably.
+
+### Tooling & Commands
+
+- Switched Vitest to the `threads` pool; `pnpm test` no longer needs manual
+  `--pool` overrides.
+- Introduced a workflow status helper: `pnpm ci:check` /
+  `node scripts/check-ci.mjs [--watch|--run-id=<id>]`.
+- Updated package scripts for pre-push checks:
+  `pnpm typecheck && pnpm lint && pnpm test && pnpm storybook:test`.
+- Documented Storybook testing shortcuts:
+  - `pnpm storybook:test` — build, serve, test, and clean automatically.
+  - `pnpm storybook:test:json` — emit JSON artifacts for CI summaries.
+  - `pnpm record:stories` / `STORIES=component--story pnpm record:stories` —
+    generate media for docs.
+
+### Local Timing Snapshot (Node 22.15.1, pnpm 9.0.0)
 
 - `pnpm typecheck`: 7.3 s
 - `pnpm lint`: 3.3 s
-- `pnpm test`: 1.5 s (18 tests)
-- `pnpm storybook:test`: 6.9 s with cached `storybook-static/`
-- Fresh Storybook build (`pnpm build:storybook`): 20.4 s → inherited by `storybook:test --rebuild`
+- `pnpm test`: 1.5 s (18 tests with Vitest `threads` pool)
+- `pnpm storybook:test`: 6.9 s (reuses cached `storybook-static/`)
+- Fresh Storybook build (`pnpm build:storybook`): 20.4 s — inherited by
+  `storybook:test --rebuild`
 
-## Rollout Notes
+### Rollout Notes
 
-- Monitor first CI run to record actual job durations and replace the local snapshot above.
-- Use `node scripts/check-ci.mjs --watch` during integration windows to track job completion and surface failures quickly.
-- Nightly recording stays opt-in; trigger manually (`gh workflow run record.yml -f stories=all`) to validate GIF output before documentation updates.
+- Capture actual job durations from the first CI run and replace the local timing
+  snapshot above.
+- Use `pnpm ci:check --watch` during integration windows to monitor job status
+  and surface failures quickly.
+- Nightly recording remains opt-in; trigger manually (`gh workflow run record.yml -f stories=all`)
+  to validate GIF output before updating docs.

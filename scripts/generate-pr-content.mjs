@@ -92,28 +92,36 @@ async function parseChangelog() {
 
 /**
  * Generate PR title from changelog sections
- * Format: "[ARCH-ci] <section1>, <section2>"
+ * Extracts commit tag prefix from section titles and uses it for PR title
+ * Format: "[TAG] <title1>, <title2>"
  */
 function generateTitle(sections, version) {
   if (sections.length === 0) {
-    return version ? `[ARCH-ci] Release v${version}` : "";
+    return version ? `Release v${version}` : "";
   }
 
   const titles = sections.map((s) => s.title);
 
-  // Remove common prefixes like [ARCH-ci] from individual titles
+  // Extract commit tag prefix (e.g., [ARCH-ci], [U-inline-edit]) from first section
+  const firstTitle = titles[0];
+  const tagMatch = firstTitle.match(/^\[[\w-]+\]/);
+  const tag = tagMatch ? tagMatch[0] : null;
+
+  // Remove tag prefixes from all titles
   const cleanTitles = titles.map((t) => t.replace(/^\[[\w-]+\]\s*/, "").trim());
 
   if (cleanTitles.length === 1) {
-    return `[ARCH-ci] ${cleanTitles[0]}`;
+    return tag ? `${tag} ${cleanTitles[0]}` : cleanTitles[0];
   }
 
-  // For multiple sections, list them
-  return `[ARCH-ci] ${cleanTitles.join(", ")}`;
+  // For multiple sections, list them with shared tag
+  const titleList = cleanTitles.join(", ");
+  return tag ? `${tag} ${titleList}` : titleList;
 }
 
 /**
  * Generate PR body from changelog sections
+ * Integrates with PR template structure
  */
 function generateBody(sections, version) {
   if (sections.length === 0) {
@@ -122,32 +130,66 @@ function generateBody(sections, version) {
       : "";
   }
 
-  const sectionContent = sections
-    .map((section, index) => {
-      const separator = index > 0 ? "\n\n---\n" : "";
-      return `${separator}\n## ${section.title}\n\n${section.content}`;
-    })
-    .join("\n");
+  // Extract commit tag from first section for lane identification
+  const firstTitle = sections[0].title;
+  const tagMatch = firstTitle.match(/^\[[\w-]+\]/);
+  const tag = tagMatch ? tagMatch[0] : "";
 
-  // Add footer
-  const footer = `
+  // Determine lane from tag
+  let lane = "";
+  if (tag.startsWith("[U-")) lane = "lane:A";
+  else if (tag.startsWith("[B-")) lane = "lane:B";
+  else if (tag.startsWith("[C-") || tag.startsWith("[ARCH-")) lane = "lane:C";
+  else if (tag.startsWith("[D-") || tag.startsWith("[PB-")) lane = "lane:D";
 
----
+  // Generate scope summary from section titles
+  const cleanTitles = sections.map((s) =>
+    s.title.replace(/^\[[\w-]+\]\s*/, "").trim(),
+  );
+  const scopeSummary = cleanTitles.join(", ");
 
-**Auto-generated from CHANGELOG.md** ${version ? `(v${version})` : ""}
+  // Build PR body following template structure
+  const body = `# Related Issue
 
-<details>
-<summary>📋 Integration Checklist</summary>
+- [ ] I referenced the ticket with \`Closes #<issue-number>\` (required for merge)
+- [ ] Every commit message begins with the ticket ID in brackets (e.g. \`${tag}\`)
+- Ticket ID: \`\`
 
+# Lane + Contracts
+
+- Lane label applied: \`${lane}\`
+- Scope summary: ${scopeSummary}
+- Rollout notes: ${version ? `Release v${version}` : "See details below"}
+
+# Acceptance Checklist
+
+- [ ] Acceptance checklist copied from the ticket and updated here
+
+\`\`\`markdown
 - [ ] All CI checks passing
 - [ ] Code reviewed
 - [ ] Documentation updated
 - [ ] Integration window (at :00 or :30)
+\`\`\`
 
-</details>
+---
+
+# Changes (from CHANGELOG.md v${version || "latest"})
+
+${sections
+  .map((section, index) => {
+    const separator = index > 0 ? "\n---\n" : "";
+    return `${separator}\n## ${section.title}\n\n${section.content}`;
+  })
+  .join("\n")}
+
+---
+
+**Auto-generated from CHANGELOG.md** ${version ? `(v${version})` : ""}  
+*Update the sections above with ticket reference and acceptance checklist*
 `;
 
-  return sectionContent + footer;
+  return body;
 }
 
 /**

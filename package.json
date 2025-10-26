@@ -13,6 +13,7 @@
     "ci:watch": "node scripts/check-ci.mjs --watch",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
+    "gh:prepare": "node scripts/prepare-gh.mjs",
     "lint:staged": "lint-staged",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
