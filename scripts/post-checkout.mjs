@@ -91,14 +91,21 @@ async function setGitConfig(author) {
 
   try {
     // Set local (repository-specific) git config
-    await execAsync(`git config user.name --local "${author.name}"`, {
-      cwd: ROOT_DIR,
-    });
+    // Use --replace-all to handle multiple values
+    await execAsync(
+      `git config --local --replace-all user.name "${author.name}"`,
+      {
+        cwd: ROOT_DIR,
+      },
+    );
     console.log(`   user.name: ${author.name}`);
 
-    await execAsync(`git config user.email --local "${author.email}"`, {
-      cwd: ROOT_DIR,
-    });
+    await execAsync(
+      `git config --local --replace-all user.email "${author.email}"`,
+      {
+        cwd: ROOT_DIR,
+      },
+    );
     console.log(`   user.email: ${author.email}`);
 
     console.log("✅ Git config set");
