@@ -58,12 +58,39 @@ docs/assets/gif/     # GIF outputs (.gif, gitignored)
 
 Both include `.gitignore` to prevent accidental commits of generated media.
 
-### 5. Package Scripts
+### 5. Package Scripts & Test Improvements
 
-Added to `package.json`:
+**Vitest Configuration (`vitest.config.ts`):**
 
+- Changed from `pool: "forks"` to `pool: "threads"` with proper configuration
+- No more need for manual `--pool=threads` override
+- Optimized for parallel test execution
+
+**Storybook Test Automation (`scripts/test-storybook.mjs`):**
+
+New wrapper script that handles complete test lifecycle:
+
+1. Checks for/builds Storybook static
+2. Starts an internal Node HTTP static server (no external dependency)
+3. Waits for server ready (http polling)
+4. Runs test-storybook
+5. Cleans up server on exit/error
+
+**Benefits:**
+
+- No manual server spin-up needed
+- Built-in static server keeps the run fully offline (no `pnpm dlx http-server`)
+- Automatic cleanup on success, failure, or interruption
+- Supports `--rebuild`, `--json`, `--outputFile` flags
+- Works locally and in CI
+
+**Package.json scripts:**
+
+- `test` - Unit tests (now uses threads pool by default)
 - `test:json` - Unit tests with JSON output
-- `storybook:test:json` - Storybook tests with JSON output
+- `storybook:test` - **Now fully automated** (uses wrapper)
+- `storybook:test:json` - Automated with JSON output
+- `storybook:test:rebuild` - Force rebuild before testing
 - `record:stories` - Record and convert stories to GIFs
 
 ### 6. Storybook Test Runner Config (`.storybook/test-runner.ts`)
@@ -98,6 +125,18 @@ Comprehensive guide covering:
 **Wall time:** ~60s (parallel phase) + 45s (sequential) = **~105s**
 
 Within acceptable limits. Recording workflow excluded from default CI.
+
+## Local Validation Snapshot (2025-10-26)
+
+Approximate wall-clock timings from local verification (Node 22.15.1, pnpm 9.0.0):
+
+- `pnpm typecheck`: 7.3s
+- `pnpm lint`: 3.3s
+- `pnpm test`: 1.5s (Vitest `threads` pool; 18 tests)
+- `pnpm storybook:test`: 6.9s (reuses cached `storybook-static/`)
+- Fresh static build (`pnpm build:storybook`): 20.4s — `storybook:test --rebuild` will inherit this cost
+
+Actual CI timing to be captured after the first full pipeline run.
 
 ## Invariants Maintained
 
@@ -137,11 +176,23 @@ Within acceptable limits. Recording workflow excluded from default CI.
 ## Commands Added
 
 ```bash
-# Run full check suite
+# Run full check suite (unit tests only)
 pnpm check
 
-# Test Storybook with JSON output
+# Full pre-push validation
+pnpm typecheck && pnpm lint && pnpm test && pnpm storybook:test
+
+# Unit tests with JSON output
+pnpm test:json
+
+# Automated Storybook tests (handles build, serve, test, cleanup)
+pnpm storybook:test
+
+# Storybook tests with JSON output
 pnpm storybook:test:json
+
+# Force rebuild before Storybook tests
+pnpm storybook:test:rebuild
 
 # Record stories locally (requires ffmpeg)
 pnpm record:stories
@@ -154,12 +205,15 @@ STORIES=inline-edit-label--default pnpm record:stories
 
 **Modified:**
 
-- `.github/workflows/ci.yml` - Split into 5 jobs
-- `package.json` - Added test:json, storybook:test:json, record:stories
+- `.github/workflows/ci.yml` - Split into 5 jobs, simplified storybook-test
+- `vitest.config.ts` - Changed to threads pool for better performance
+- `package.json` - Updated scripts to use automated wrappers
 
 **Created:**
 
 - `.github/workflows/record.yml` - Nightly recording workflow
+- `scripts/test-storybook.mjs` - **Automated test wrapper** (build, serve, test, cleanup)
+- `scripts/record-stories.mjs` - Video/GIF generation script
 - `scripts/record-stories.mjs` - Video/GIF generation script
 - `.storybook/test-runner.ts` - Test runner configuration
 - `guides/CI-STRATEGY.md` - Comprehensive documentation

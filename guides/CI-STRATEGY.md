@@ -99,6 +99,27 @@ No manual server management needed!
 - `pnpm build:storybook` - Build Storybook static
 - `pnpm build` - Build demo site
 
+### CI Monitoring Scripts
+
+- `pnpm ci:check` - Check latest workflow run status with formatted report
+- `pnpm ci:watch` - Watch workflow status in real-time (updates every 5s)
+
+**CI Check Features:**
+
+```bash
+# Quick status check
+pnpm ci:check
+
+# Output includes:
+# - Run number, branch, and title
+# - Job-by-job status table with durations
+# - Summary statistics (completed, failed, in progress)
+# - Direct URL to workflow
+
+# Watch mode for active runs
+pnpm ci:watch  # Auto-exits when workflow completes
+```
+
 ## Time Budget
 
 **Target:** Total CI time ≤ baseline + 90 seconds

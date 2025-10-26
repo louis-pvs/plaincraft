@@ -1,0 +1,73 @@
+name: version
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: "Version bump type"
+        required: false
+        type: choice
+        options:
+          - auto
+          - major
+          - minor
+          - patch
+        default: auto
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    name: Bump Version & Update Changelog
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'chore: bump version')"
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version
+        id: bump
+        run: |
+          if [ "${{ github.event.inputs.bump_type }}" = "auto" ] || [ -z "${{ github.event.inputs.bump_type }}" ]; then
+            pnpm version:bump
+          else
+            pnpm version:bump ${{ github.event.inputs.bump_type }}
+          fi
+
+      - name: Consolidate changelog
+        run: pnpm changelog
+
+      - name: Commit changes
+        run: |
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          git add package.json CHANGELOG.md
+          git commit -m "chore: bump version to ${NEW_VERSION} [skip ci]" || echo "No changes to commit"
+          git tag "v${NEW_VERSION}" || echo "Tag already exists"
+
+      - name: Push changes
+        run: |
+          git push origin ${{ github.ref_name }}
+          git push origin --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
