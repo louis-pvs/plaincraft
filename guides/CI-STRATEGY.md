@@ -73,10 +73,21 @@ gh workflow run record.yml -f stories=all
 
 ### Test Scripts
 
-- `pnpm test` - Unit tests (dot reporter)
+- `pnpm test` - Unit tests (dot reporter, uses threads pool)
 - `pnpm test:json` - Unit tests with JSON output
-- `pnpm storybook:test` - Storybook interaction tests
+- `pnpm storybook:test` - **Automated Storybook tests** (builds, serves, tests, cleans up)
 - `pnpm storybook:test:json` - Storybook tests with JSON output
+- `pnpm storybook:test:rebuild` - Force rebuild of Storybook before testing
+
+**Note:** `storybook:test` now handles the complete lifecycle:
+
+1. Checks for existing `storybook-static/` build (or rebuilds with `--rebuild`)
+2. Starts http-server automatically
+3. Waits for server to be ready
+4. Runs test-storybook
+5. Cleans up server process
+
+No manual server management needed!
 
 ### Recording Scripts
 
@@ -149,12 +160,35 @@ Total wall time: ~60s (parallel) + 40s (sequential) = **~100s** (within budget)
 ### Run checks locally
 
 ```bash
-pnpm check  # Runs typecheck, lint, test
+pnpm check  # Runs typecheck, lint, test (unit tests only)
+pnpm typecheck && pnpm lint && pnpm test && pnpm storybook:test  # Full pre-push
 ```
 
 ### Test Storybook locally
 
 ```bash
+# Simple - wrapper handles everything
+pnpm storybook:test
+
+# Force rebuild before testing
+pnpm storybook:test:rebuild
+
+# With JSON output
+pnpm storybook:test:json
+```
+
+The `test-storybook.mjs` wrapper automatically:
+
+- Uses existing build or builds Storybook if needed
+- Starts http-server
+- Waits for server ready
+- Runs tests
+- Cleans up server
+
+**Old manual way (no longer needed):**
+
+```bash
+# This is now handled automatically by pnpm storybook:test
 pnpm build:storybook
 pnpm dlx http-server storybook-static --port 6006 &
 pnpm storybook:test

@@ -105,22 +105,8 @@ jobs:
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm exec playwright install --with-deps
-      - name: Serve Storybook static build
-        run: |
-          pnpm dlx http-server storybook-static --port 6006 --host 127.0.0.1 --silent &
-          echo "STORYBOOK_SERVER_PID=$!" >> $GITHUB_ENV
-      - name: Wait for Storybook
-        run: pnpm dlx wait-on http://127.0.0.1:6006
       - name: Run Storybook tests
-        env:
-          TARGET_URL: http://127.0.0.1:6006
-        run: pnpm storybook:test --json --outputFile=storybook-test-results.json || true
-      - name: Stop Storybook server
-        if: always()
-        run: |
-          if [ -n "${STORYBOOK_SERVER_PID:-}" ]; then
-            kill $STORYBOOK_SERVER_PID
-          fi
+        run: pnpm storybook:test:json
       - name: Upload Storybook test results
         if: always()
         uses: actions/upload-artifact@v4
