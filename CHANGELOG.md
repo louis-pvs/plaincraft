@@ -2,6 +2,17 @@
 
 All notable changes live here. Follow the [changelog guide](guides/CHANGELOG-GUIDE.md) for structure and authoring notes.
 
+## [0.2.0] - 2025-10-26
+
+### [B-pr-template-enforcement] PR template compliance gaps
+
+- Auto-extract ticket ID from changelog bullet tags and auto-generate `Closes #N` by searching GitHub issues
+- Fetch and copy acceptance checklist from linked issue to pre-populate PR body
+- Generate concise scope summary showing complete first sentence instead of truncated text
+- Pre-check "Closes #N" checkbox and populate ticket ID field when issue is found
+- Detect lane label from tag prefix (U→A, B→B, C/ARCH→C, D/PB→D)
+- Add unit tests for ticket ID extraction, lane detection, and scope summary generation
+
 ## [0.1.0] - 2025-10-26
 
 ### Highlights

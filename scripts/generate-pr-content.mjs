@@ -210,6 +210,37 @@ function generateTitle(sections, version) {
 }
 
 /**
+ * Extract all ticket tags from changelog sections
+ * Looks for [TAG-name] patterns in section titles first, then content bullets
+ */
+function extractAllTags(sections) {
+  const tags = new Set();
+
+  // First, check section titles (preferred format per guide)
+  for (const section of sections) {
+    const titleTagMatch = section.title.match(/\[[\w-]+\]/g);
+    if (titleTagMatch) {
+      titleTagMatch.forEach((tag) => tags.add(tag));
+    }
+  }
+
+  // If no tags in titles, fall back to content bullets (legacy format)
+  if (tags.size === 0) {
+    for (const section of sections) {
+      const contentLines = section.content.split("\n");
+      for (const line of contentLines) {
+        const tagMatch = line.match(/\[[\w-]+\]/g);
+        if (tagMatch) {
+          tagMatch.forEach((tag) => tags.add(tag));
+        }
+      }
+    }
+  }
+
+  return Array.from(tags);
+}
+
+/**
  * Generate PR body from changelog sections
  * Integrates with PR template structure
  */
@@ -220,27 +251,48 @@ async function generateBody(sections, version) {
       : "";
   }
 
-  // Extract commit tag from first section for lane identification
-  const firstTitle = sections[0].title;
-  const tagMatch = firstTitle.match(/^\[[\w-]+\]/);
-  const tag = tagMatch ? tagMatch[0] : "";
-  const ticketId = extractTicketId(tag);
+  // Extract all tags from content bullets
+  const allTags = extractAllTags(sections);
+  const firstTag = allTags.length > 0 ? allTags[0] : "";
+  const ticketId = firstTag ? extractTicketId(firstTag) : null;
 
-  // Determine lane from tag
+  // Determine lane from first tag
   let lane = "";
-  if (tag.startsWith("[U-")) lane = "lane:A";
-  else if (tag.startsWith("[B-")) lane = "lane:B";
-  else if (tag.startsWith("[C-") || tag.startsWith("[ARCH-")) lane = "lane:C";
-  else if (tag.startsWith("[D-") || tag.startsWith("[PB-")) lane = "lane:D";
+  if (firstTag.startsWith("[U-")) lane = "lane:A";
+  else if (firstTag.startsWith("[B-")) lane = "lane:B";
+  else if (firstTag.startsWith("[C-") || firstTag.startsWith("[ARCH-"))
+    lane = "lane:C";
+  else if (firstTag.startsWith("[D-") || firstTag.startsWith("[PB-"))
+    lane = "lane:D";
 
-  // Generate concise scope summary (first sentence or short phrase)
+  // Generate concise scope summary from first bullet point
   const firstSection = sections[0];
-  const firstContent = firstSection.content.split("\n")[0].trim();
-  // Extract first sentence or take first line, remove leading dashes/bullets
-  const scopeSummary =
-    firstContent.replace(/^[-*]\s*/, "").split(/[.!?]/)[0] + ".";
+  const contentLines = firstSection.content.split("\n").filter((l) => l.trim());
+  const firstBullet = contentLines.find((l) => l.trim().startsWith("-"));
 
-  // Try to find and fetch issue details
+  let scopeSummary = "See changes below.";
+  if (firstBullet) {
+    // Remove tag and bullet, extract content
+    const cleanLine = firstBullet
+      .replace(/^[-*]\s*/, "")
+      .replace(/\[[\w-]+\]\s*/, "")
+      .trim();
+
+    // Find first sentence end (period followed by space or end, not inside backticks)
+    const sentenceMatch = cleanLine.match(/^[^.!?]+[.!?](?:\s|$)/);
+    if (sentenceMatch) {
+      scopeSummary = sentenceMatch[0].trim();
+    } else if (cleanLine.endsWith(".")) {
+      // Line already ends with period
+      scopeSummary = cleanLine;
+    } else {
+      // No sentence terminator found, use the whole line but cap at 150 chars
+      scopeSummary =
+        cleanLine.length > 150
+          ? cleanLine.substring(0, 147) + "..."
+          : cleanLine + ".";
+    }
+  } // Try to find and fetch issue details
   let issueNumber = null;
   let issueReference = "";
   let acceptanceChecklist = [
@@ -281,7 +333,7 @@ async function generateBody(sections, version) {
   const body = `${issueReference ? `${issueReference}\n\n` : ""}# Related Issue
 
 ${issueCheckbox}
-- [ ] Every commit message begins with the ticket ID in brackets (e.g. \`${tag}\`)
+- [ ] Every commit message begins with the ticket ID in brackets (e.g. \`${firstTag}\`)
 - Ticket ID: ${ticketIdField}
 
 # Lane + Contracts
