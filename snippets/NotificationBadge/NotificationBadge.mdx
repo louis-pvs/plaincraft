@@ -1,0 +1,20 @@
+import { Meta, Markdown, ArgTypes, Canvas, Story } from "@storybook/addon-docs/blocks";
+import * as Stories from "./NotificationBadge.stories";
+import ReadmeSource from "./README.md?raw";
+
+<Meta of={Stories} />
+
+<Markdown>{ReadmeSource}</Markdown>
+
+## Interactive
+<Canvas>
+  <Story of={Stories.Basic} />
+</Canvas>
+
+## Interaction test
+<Canvas>
+  <Story of={Stories.Interaction} />
+</Canvas>
+
+## Props
+<ArgTypes of={Stories} />
