@@ -41,43 +41,22 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Verify all commits have tag prefix
+          # Verify all commits have tag prefix [U-*], [C-*], [B-*], [ARCH-*], [PB-*], or [D-*]
           commits=$(gh pr view ${{ github.event.pull_request.number }} --json commits -q '.commits[].messageHeadline')
 
           missing_tags=0
           while IFS= read -r commit; do
-            if ! echo "$commit" | grep -qE '^\[[\w-]+\]'; then
-              echo "❌ Missing tag: $commit"
+            # Check for any of the valid tag patterns
+            if ! echo "$commit" | grep -qE '\[(U-|C-|B-|ARCH-|PB-|D-)[^\]]+\]'; then
+              echo "❌ Missing valid tag: $commit"
               missing_tags=$((missing_tags + 1))
             fi
           done <<< "$commits"
 
           if [ $missing_tags -gt 0 ]; then
-            echo "❌ $missing_tags commit(s) missing tag prefix"
+            echo "❌ $missing_tags commit(s) missing valid tag prefix"
+            echo "Valid tags: [U-*], [C-*], [B-*], [ARCH-*], [PB-*], [D-*]"
             exit 1
           fi
 
-          echo "✅ All commits have tag prefix"
-
-      - name: Comment on PR (failure)
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const message = `## ❌ PR Requirements Not Met
-
-            This PR does not meet all requirements. Please ensure:
-
-            - [ ] Issue reference present (\`Closes #123\`)
-            - [ ] Lane label applied (\`lane:A\`, \`lane:B\`, \`lane:C\`, or \`lane:D\`)
-            - [ ] All commits have tag prefix (\`[TAG-name]\`)
-            - [ ] Acceptance checklist included
-
-            See [PR template](.github/pull_request_template.md) for details.`;
-
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: message
-            });
+          echo "✅ All commits have valid tag prefix"
