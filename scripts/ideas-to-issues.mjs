@@ -55,8 +55,8 @@ async function parseIdeaFile(filePath) {
     metadata.labels.push("type:bug");
   }
 
-  // Extract lane
-  const laneMatch = content.match(/Lane:\s*([A-D])/i);
+  // Extract lane (supports both "Lane:" and "**Lane**:" formats)
+  const laneMatch = content.match(/\*?\*?Lane\*?\*?:\s*([A-D])/i);
   if (laneMatch) {
     metadata.lane = laneMatch[1].toUpperCase();
     metadata.labels.push(`lane:${metadata.lane}`);
