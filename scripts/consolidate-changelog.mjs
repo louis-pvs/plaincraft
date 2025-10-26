@@ -105,6 +105,114 @@ function generateChangelogEntry(version, date, summaries) {
   return entry;
 }
 
+function splitSections(entry) {
+  const lines = entry.split("\n");
+  const header = lines[0];
+  const body = lines.slice(1).join("\n");
+  const sections = body
+    .split(/\n(?=###\s+)/)
+    .map((section) => section.trim())
+    .filter(Boolean);
+  return { header, sections };
+}
+
+function combineSection(existingSection, incomingSection) {
+  const [existingHeading, ...existingBodyLines] = existingSection.split("\n");
+  const existingBody = existingBodyLines.join("\n").trim();
+
+  const incomingLines = incomingSection.split("\n");
+  incomingLines.shift();
+  const incomingBody = incomingLines.join("\n").trim();
+
+  if (!incomingBody) {
+    return existingSection.trim();
+  }
+
+  if (!existingBody) {
+    return `${existingHeading}\n\n${incomingBody}`.trim();
+  }
+
+  if (existingBody.includes(incomingBody)) {
+    return existingSection.trim();
+  }
+
+  return `${existingHeading}\n\n${existingBody}\n\n${incomingBody}`.trim();
+}
+
+function mergeVersionEntries(existingEntry, incomingEntry) {
+  const { header, sections: existingSections } = splitSections(existingEntry);
+  const { sections: incomingSections } = splitSections(incomingEntry);
+
+  const sectionMap = new Map();
+
+  existingSections.forEach((section) => {
+    const heading = section.split("\n")[0];
+    sectionMap.set(heading, section);
+  });
+
+  incomingSections.forEach((section) => {
+    const heading = section.split("\n")[0];
+    if (sectionMap.has(heading)) {
+      const combined = combineSection(sectionMap.get(heading), section);
+      sectionMap.set(heading, combined);
+    } else {
+      sectionMap.set(heading, section.trim());
+    }
+  });
+
+  const mergedBody = Array.from(sectionMap.values())
+    .map((section) => section.trim())
+    .filter(Boolean)
+    .join("\n\n");
+
+  return mergedBody ? `${header}\n\n${mergedBody}\n` : `${header}\n`;
+}
+
+function deduplicateVersions(changelog) {
+  if (!changelog) {
+    return "";
+  }
+
+  const firstVersionIndex = changelog.indexOf("## [");
+  if (firstVersionIndex === -1) {
+    return changelog;
+  }
+
+  const header = changelog.slice(0, firstVersionIndex).trimEnd();
+  const entriesText = changelog.slice(firstVersionIndex);
+  const blocks = entriesText
+    .split(/\n(?=## \[)/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+
+  const order = [];
+  const versionMap = new Map();
+
+  blocks.forEach((block) => {
+    const match = block.match(/^## \[([^\]]+)]/);
+    if (!match) {
+      return;
+    }
+    const version = match[1];
+    if (!versionMap.has(version)) {
+      versionMap.set(version, block);
+      order.push(version);
+    } else {
+      console.warn(
+        `\n⚠️  Duplicate changelog entry detected for version [${version}] — merging sections.`,
+      );
+      const merged = mergeVersionEntries(versionMap.get(version), block);
+      versionMap.set(version, merged.trim());
+    }
+  });
+
+  const mergedEntries = order
+    .map((version) => versionMap.get(version).trim())
+    .join("\n\n");
+
+  return `${header.trim()}\n\n${mergedEntries}\n`;
+}
+
 /**
  * Insert new entry into changelog
  * Prevents duplicate version entries
@@ -114,52 +222,42 @@ function insertIntoChangelog(existingChangelog, newEntry, version) {
     return `# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n${newEntry}`;
   }
 
-  // Check if this version already exists
+  // Ensure existing changelog is deduplicated before insertion
+  let sanitizedChangelog = deduplicateVersions(existingChangelog);
+
   const versionPattern = new RegExp(
     `^## \\[${version.replace(/\./g, "\\.")}\\]`,
     "m",
   );
-  if (versionPattern.test(existingChangelog)) {
+
+  if (versionPattern.test(sanitizedChangelog)) {
     console.warn(
       `\n⚠️  Warning: Version [${version}] already exists in CHANGELOG.md`,
     );
     console.warn(`   Merging new sections into existing version entry...\n`);
 
-    // Extract sections from new entry (skip the version header)
-    const newSections = newEntry.split("\n").slice(2).join("\n").trim();
+    const blockRegex = new RegExp(
+      `## \\[${version.replace(/\./g, "\\.")}\\][\\s\\S]*?(?=\n## \\[|$)`,
+      "m",
+    );
+    const match = sanitizedChangelog.match(blockRegex);
 
-    // Find the existing version block and insert sections there
-    const lines = existingChangelog.split("\n");
-    let versionIndex = -1;
-    let nextVersionIndex = lines.length;
-
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].match(versionPattern)) {
-        versionIndex = i;
-      } else if (versionIndex !== -1 && lines[i].startsWith("## [")) {
-        nextVersionIndex = i;
-        break;
-      }
+    if (match) {
+      const mergedBlock = mergeVersionEntries(match[0], newEntry).trim();
+      const updated = sanitizedChangelog.replace(
+        blockRegex,
+        `${mergedBlock}\n`,
+      );
+      return deduplicateVersions(updated).trimEnd() + "\n";
     }
 
-    if (versionIndex === -1) {
-      // Shouldn't happen, but fallback to append
-      return `${existingChangelog}\n\n${newEntry}`;
-    }
-
-    // Insert new sections after version header, before next version
-    const before = lines.slice(0, versionIndex + 1).join("\n");
-    const existing = lines.slice(versionIndex + 1, nextVersionIndex).join("\n");
-    const after = lines.slice(nextVersionIndex).join("\n");
-
-    return `${before}\n\n${newSections}\n${existing}${after ? "\n" + after : ""}`;
+    // Fallback: append entry if block not found
+    return `${sanitizedChangelog.trimEnd()}\n\n${newEntry}`;
   }
 
-  // Find the position after the header
-  const lines = existingChangelog.split("\n");
+  const lines = sanitizedChangelog.split("\n");
   let insertIndex = 0;
 
-  // Skip past the main heading and description
   for (let i = 0; i < lines.length; i++) {
     if (lines[i].startsWith("## [")) {
       insertIndex = i;
@@ -168,14 +266,13 @@ function insertIntoChangelog(existingChangelog, newEntry, version) {
   }
 
   if (insertIndex === 0) {
-    // No existing entries, append after header
-    return `${existingChangelog}\n\n${newEntry}`;
+    return `${sanitizedChangelog.trimEnd()}\n\n${newEntry}`;
   }
 
-  // Insert before first existing entry
   const before = lines.slice(0, insertIndex).join("\n");
   const after = lines.slice(insertIndex).join("\n");
-  return `${before}\n${newEntry}\n${after}`;
+  const combined = `${before}\n${newEntry}\n${after}`;
+  return deduplicateVersions(combined).trimEnd() + "\n";
 }
 
 /**
@@ -210,7 +307,7 @@ async function main() {
   console.log(`Date: ${date}\n`);
 
   // Read existing changelog
-  const existingChangelog = await readExistingChangelog();
+  const existingChangelog = deduplicateVersions(await readExistingChangelog());
 
   // Generate new entry
   const newEntry = generateChangelogEntry(version, date, summaries);
