@@ -40,11 +40,13 @@ async function findIssueByTicketId(ticketId) {
     );
 
     const issues = JSON.parse(stdout);
+    console.log("DEBUG: ticketId", ticketId, "issues found:", issues);
 
     // Find exact match where title contains the ticket ID in brackets
     const match = issues.find((issue) =>
       issue.title.match(new RegExp(`\\[${ticketId}\\]`, "i")),
     );
+    console.log("DEBUG: match", match);
 
     return match ? match.number : null;
   } catch (error) {
