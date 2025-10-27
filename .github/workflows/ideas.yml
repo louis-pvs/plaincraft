@@ -93,7 +93,9 @@ jobs:
     name: Create Issues from Ideas
     runs-on: ubuntu-latest
     needs: ensure-project
-    if: github.event.inputs.action == 'create-issues'
+    if: |
+      github.event.inputs.action == 'create-issues' &&
+      (success() || failure())
     steps:
       - name: Checkout
         uses: actions/checkout@v4
