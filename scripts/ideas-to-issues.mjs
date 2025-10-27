@@ -103,14 +103,37 @@ async function parseIdeaFile(filePath) {
     metadata.acceptance = items;
   }
 
+  // Extract Sub-Issues section
+  const subIssuesRegex = /## Sub-Issues\s*([\s\S]*?)(?=\n##|\n$)/;
+  const subIssuesMatch = content.match(subIssuesRegex);
+  metadata.subIssues = [];
+  if (subIssuesMatch) {
+    const lines = subIssuesMatch[1].split("\n");
+    for (const line of lines) {
+      // Match: 1. **ARCH-ideas-issue-sync** - Description
+      const match = line.match(/^\s*\d+\.\s+\*\*([^*]+)\*\*\s*-\s*(.+)$/);
+      if (match) {
+        metadata.subIssues.push({
+          tag: match[1].trim(),
+          description: match[2].trim(),
+        });
+      }
+    }
+  }
+
   return metadata;
 }
 
 /**
  * Generate formatted Issue body from idea metadata
  */
-function generateIssueBody(metadata) {
+function generateIssueBody(metadata, parentIssueNumber = null) {
   const sections = [];
+
+  // Add parent reference if this is a child issue
+  if (parentIssueNumber) {
+    sections.push(`**Parent:** #${parentIssueNumber}\n`);
+  }
 
   // Add Purpose if available
   if (metadata.purpose) {
@@ -143,17 +166,20 @@ function generateIssueBody(metadata) {
 /**
  * Create GitHub issue from idea metadata
  */
-async function createIssue(metadata, dryRun = false) {
+async function createIssue(metadata, dryRun = false, parentIssueNumber = null) {
   const { title, labels } = metadata;
 
   // Generate formatted body
-  const body = generateIssueBody(metadata);
+  const body = generateIssueBody(metadata, parentIssueNumber);
 
   if (dryRun) {
     console.log("\n[DRY RUN] Would create issue:");
     console.log(`  Title: ${title}`);
     console.log(`  Labels: ${labels.join(", ")}`);
     console.log(`  Checklist items: ${metadata.acceptance.length}`);
+    if (parentIssueNumber) {
+      console.log(`  Parent: #${parentIssueNumber}`);
+    }
     console.log(`  Body preview:\n${body.substring(0, 200)}...`);
     return null;
   }
@@ -179,6 +205,55 @@ async function createIssue(metadata, dryRun = false) {
     console.error(`❌ Failed to create issue: ${title}`);
     console.error(`   Error: ${error.message}`);
     return null;
+  }
+}
+
+/**
+ * Update parent issue with task list of child issues
+ */
+async function updateParentWithChildren(
+  parentIssueNumber,
+  childIssues,
+  dryRun = false,
+) {
+  if (dryRun) {
+    console.log(`\n[DRY RUN] Would update parent issue #${parentIssueNumber}:`);
+    console.log("  Child issues task list:");
+    for (const child of childIssues) {
+      console.log(`    - [ ] #${child.number} ${child.title}`);
+    }
+    return;
+  }
+
+  try {
+    // Build task list
+    const taskList = childIssues
+      .map((child) => `- [ ] #${child.number} ${child.title}`)
+      .join("\n");
+
+    // Get current issue body
+    const { stdout } = await execAsync(
+      `gh issue view ${parentIssueNumber} --json body`,
+    );
+    const currentBody = JSON.parse(stdout).body || "";
+
+    // Append task list to body
+    const updatedBody = `${currentBody}\n\n## Sub-Issues\n\n${taskList}`;
+
+    // Write to temp file
+    const bodyFile = `/tmp/parent-issue-body-${Date.now()}.md`;
+    await writeFile(bodyFile, updatedBody);
+
+    // Update issue
+    await execAsync(
+      `gh issue edit ${parentIssueNumber} --body-file "${bodyFile}"`,
+    );
+
+    console.log(
+      `✅ Updated parent issue #${parentIssueNumber} with child task list`,
+    );
+  } catch (error) {
+    console.error(`❌ Failed to update parent issue: ${error.message}`);
   }
 }
 
@@ -285,6 +360,81 @@ async function main() {
 
       if (issueNumber) {
         results.created++;
+
+        // Process sub-issues if any
+        if (metadata.subIssues && metadata.subIssues.length > 0) {
+          console.log(
+            `\n📋 Processing ${metadata.subIssues.length} sub-issue(s)...`,
+          );
+
+          const childIssues = [];
+
+          for (const subIssue of metadata.subIssues) {
+            try {
+              // Find corresponding idea file
+              const subIssueFiles = await getIdeaFiles(subIssue.tag);
+
+              if (subIssueFiles.length === 0) {
+                console.log(
+                  `  ⚠️  No idea file found for sub-issue: ${subIssue.tag}`,
+                );
+                continue;
+              }
+
+              const subIssueFilePath = join(IDEAS_DIR, subIssueFiles[0]);
+              const subIssueMetadata = await parseIdeaFile(subIssueFilePath);
+
+              // Check if sub-issue already exists
+              if (!dryRun) {
+                try {
+                  const searchCmd = `gh issue list --search "${subIssueMetadata.title}" --json number,title --limit 1`;
+                  const { stdout } = await execAsync(searchCmd);
+                  const existing = JSON.parse(stdout);
+
+                  if (existing.length > 0) {
+                    console.log(
+                      `  ⏭️  Sub-issue already exists: #${existing[0].number} ${subIssueMetadata.title}`,
+                    );
+                    childIssues.push({
+                      number: existing[0].number,
+                      title: subIssueMetadata.title,
+                    });
+                    continue;
+                  }
+                } catch {
+                  // Ignore search errors
+                }
+              }
+
+              // Create child issue with parent reference
+              const childIssueNumber = await createIssue(
+                subIssueMetadata,
+                dryRun,
+                issueNumber,
+              );
+
+              if (childIssueNumber) {
+                childIssues.push({
+                  number: childIssueNumber,
+                  title: subIssueMetadata.title,
+                });
+                console.log(
+                  `  ✅ Created sub-issue #${childIssueNumber}: ${subIssueMetadata.title}`,
+                );
+              }
+            } catch (err) {
+              console.error(
+                `  ❌ Error processing sub-issue ${subIssue.tag}:`,
+                err.message,
+              );
+            }
+          }
+
+          // Update parent issue with child task list
+          if (childIssues.length > 0) {
+            await updateParentWithChildren(issueNumber, childIssues, dryRun);
+          }
+        }
       } else if (dryRun) {
         results.created++;
       } else {
