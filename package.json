@@ -93,16 +93,16 @@
     "npm": ">=10.0.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged",
+    "pre-commit": "npx lint-staged",
     "commit-msg": "node scripts/commit-msg-hook.mjs $1"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
-      "pnpm exec prettier --cache --write",
-      "pnpm exec eslint --fix"
+      "prettier --cache --write",
+      "eslint --fix"
     ],
     "*.{json,md,css,scss,html,yml,yaml}": [
-      "pnpm exec prettier --cache --write"
+      "prettier --cache --write"
     ]
   }
 }
