@@ -110,7 +110,7 @@ async function updateIdeaFile(filePath, issueData) {
     // Update issue number in front matter (after title/lane/purpose)
     // Pattern: Line starts with "Issue:" or insert after "Parent:" or "Purpose:" line
     const issueMetadata = `Issue: #${issueData.number}`;
-    
+
     if (/^Issue:\s*#?\d+/m.test(updatedContent)) {
       // Update existing Issue line
       updatedContent = updatedContent.replace(

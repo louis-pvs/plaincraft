@@ -21,7 +21,7 @@ import { exec } from "node:child_process";
 import { promisify } from "node:util";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { access, writeFile, readFile, readdir } from "node:fs/promises";
+import { access, writeFile, readFile } from "node:fs/promises";
 
 const execAsync = promisify(exec);
 
