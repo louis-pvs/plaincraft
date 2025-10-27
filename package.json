@@ -89,7 +89,7 @@
     "npm": ">=10.0.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "node scripts/pre-commit-changelog.mjs && pnpm lint:staged"
+    "pre-commit": "node scripts/pre-commit-changelog.mjs && pnpm exec lint-staged"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
