@@ -2,6 +2,55 @@
 
 All notable changes live here. Follow the [changelog guide](guides/CHANGELOG-GUIDE.md) for structure and authoring notes.
 
+## [0.4.0] - 2025-10-27
+
+### Changes
+
+### [ARCH-worktree-prep-commit] Bootstrap commit automation for worktree script
+
+**Type**: Architecture improvement  
+**Lane**: C  
+**Related**: Issue #23
+
+#### Summary
+
+Enhanced `pnpm gh:worktree` script to automatically create a bootstrap commit when no commits exist on the branch, ensuring PR creation succeeds immediately without manual intervention.
+
+#### Changes
+
+**Script Updates (`scripts/create-worktree-pr.mjs`)**:
+
+- Added `createBootstrapCommit()` function that creates `.worktree-bootstrap.md` with metadata
+- Automatically stages and commits bootstrap file when branch has no commits
+- Bootstrap commit includes `[skip ci]` flag to avoid unnecessary CI runs
+- Added `--no-bootstrap` flag to opt out of automatic commit behavior
+- Bootstrap file includes timestamp, issue reference, and instructions for cleanup
+
+**Documentation Updates**:
+
+- Updated `SCRIPTS-REFERENCE.md` with bootstrap commit behavior documentation
+- Added `--no-bootstrap` usage example
+- Documented cleanup/amend workflow for bootstrap commits
+
+**Script Compatibility (`scripts/ideas-to-issues.mjs`)**:
+
+- Added support for `ARCH-` and `PB-` prefixes in idea file processing
+- Enables architecture and playbook ideas to be converted to issues automatically
+
+#### Impact
+
+- **Developer Experience**: Eliminates the manual step of creating an initial commit before PR creation
+- **Workflow Efficiency**: Worktree script now completes end-to-end without interruption
+- **Flexibility**: Opt-out flag preserves manual workflow option for teams that prefer it
+- **Dogfooding**: Validates the improved script immediately for this feature implementation
+
+#### Testing
+
+- Bootstrap commit creation tested with new worktree flows
+- Graceful degradation verified when bootstrap creation fails
+- `--no-bootstrap` flag behavior confirmed
+- Linting passes for all modified scripts
+
 ## [0.3.0] - 2025-10-26
 
 ### [ARCH-ideas-pipeline] Automated project creation for ideas workflow
