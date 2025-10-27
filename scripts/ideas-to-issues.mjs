@@ -46,6 +46,18 @@ async function parseIdeaFile(filePath) {
     metadata.title = titleMatch[1];
   }
 
+  // Extract Purpose (from "Purpose: ..." line after Lane)
+  const purposeMatch = content.match(/Purpose:\s*(.+?)(?:\n|$)/i);
+  if (purposeMatch) {
+    metadata.purpose = purposeMatch[1].trim();
+  }
+
+  // Extract Parent (from "Parent: #N ..." line)
+  const parentMatch = content.match(/Parent:\s*#(\d+)/i);
+  if (parentMatch) {
+    metadata.parent = parentMatch[1];
+  }
+
   // Detect type from filename
   const filename = filePath.split("/").pop();
   if (filename.startsWith("U-")) {
@@ -70,12 +82,6 @@ async function parseIdeaFile(filePath) {
   if (laneMatch) {
     metadata.lane = laneMatch[1].toUpperCase();
     metadata.labels.push(`lane:${metadata.lane}`);
-  }
-
-  // Extract Purpose
-  const purposeMatch = content.match(/Purpose:\s*(.+?)(?:\n|$)/);
-  if (purposeMatch) {
-    metadata.purpose = purposeMatch[1].trim();
   }
 
   // Extract Problem section
@@ -127,13 +133,8 @@ async function parseIdeaFile(filePath) {
 /**
  * Generate formatted Issue body from idea metadata
  */
-function generateIssueBody(metadata, parentIssueNumber = null) {
+function generateIssueBody(metadata) {
   const sections = [];
-
-  // Add parent reference if this is a child issue
-  if (parentIssueNumber) {
-    sections.push(`**Parent:** #${parentIssueNumber}\n`);
-  }
 
   // Add Purpose if available
   if (metadata.purpose) {
@@ -166,25 +167,25 @@ function generateIssueBody(metadata, parentIssueNumber = null) {
 /**
  * Create GitHub issue from idea metadata
  */
-async function createIssue(metadata, dryRun = false, parentIssueNumber = null) {
+async function createIssue(metadata, dryRun = false) {
   const { title, labels } = metadata;
 
   // Generate formatted body
-  const body = generateIssueBody(metadata, parentIssueNumber);
+  const body = generateIssueBody(metadata);
 
   if (dryRun) {
     console.log("\n[DRY RUN] Would create issue:");
     console.log(`  Title: ${title}`);
     console.log(`  Labels: ${labels.join(", ")}`);
     console.log(`  Checklist items: ${metadata.acceptance.length}`);
-    if (parentIssueNumber) {
-      console.log(`  Parent: #${parentIssueNumber}`);
-    }
     console.log(`  Body preview:\n${body.substring(0, 200)}...`);
     return null;
   }
 
   try {
+    // Generate formatted issue body
+    const body = generateIssueBody(metadata);
+
     // Create issue with gh CLI
     const labelsArg = labels.length > 0 ? `--label "${labels.join(",")}"` : "";
     const bodyFile = `/tmp/issue-body-${Date.now()}.md`;

@@ -86,21 +86,37 @@ If automation is unavailable, manually:
 
 ## Sub-Issues Section
 
-For large architectural work, define sub-issues in the parent idea file:
+For large architectural work, define sub-issues in the parent idea file using GitHub checklist format:
 
 ```markdown
 ## Sub-Issues
 
-1. **ARCH-ideas-issue-sync** - Enhance ideas-to-issues script to populate full metadata
-2. **ARCH-ideas-pr-integration** - Update PR generation to source from idea files
-3. **ARCH-ideas-changelog-sync** - Generate changelog from idea files instead of \_tmp/
+- [ ] #29 ARCH-ideas-issue-sync - Enhance ideas-to-issues script to populate full metadata
+- [ ] #30 ARCH-ideas-pr-integration - Update PR generation to source from idea files
+- [ ] #31 ARCH-ideas-changelog-sync - Generate changelog from idea files instead of \_tmp/
 ```
 
-When creating the parent Issue, automation will:
+**Important**:
 
-- Create child Issues from corresponding idea files in `/ideas`
-- Add `Parent: #N` reference to each child Issue
-- Update parent Issue with task list: `- [ ] #N Child issue title`
+- Use GitHub checklist format (`- [ ] #N Title - Description`)
+- Issue numbers are added automatically when `scripts/ideas-to-issues.mjs` creates sub-issues
+- Initial creation uses placeholder format: `- [ ] ARCH-tag - Description`
+- After Issue creation, sync updates the card with: `- [ ] #N ARCH-tag - Description`
+
+### Sub-Issue Workflow
+
+1. **Creation** (`scripts/ideas-to-issues.mjs`):
+   - Reads Sub-Issues section from parent idea card
+   - Creates child Issues from corresponding idea files in `/ideas`
+   - Adds `Parent: #N` reference to each child Issue
+   - Updates parent Issue with checklist: `- [ ] #N Child issue title`
+
+2. **Sync** (`scripts/sync-issue-to-card.mjs`):
+   - Pulls Sub-Issues section from GitHub Issue
+   - Replaces entire Sub-Issues section in idea card
+   - Preserves checkbox state (`[ ]` or `[x]`)
+
+**Rule**: Don't manually edit Sub-Issues section in idea cards after Issue creation. Let `sync-issue-to-card.mjs` manage it.
 
 ### Sub-Issue Branching Strategy
 

@@ -66,8 +66,13 @@ async function branchExistsOnRemote(branchName) {
 async function installDependencies() {
   console.log("📦 Installing dependencies...");
   try {
+    // Pass through SKIP_SIMPLE_GIT_HOOKS to prevent hook setup issues in worktrees
+    const env = process.env.SKIP_SIMPLE_GIT_HOOKS
+      ? { ...process.env }
+      : process.env;
     const { stdout, stderr } = await execAsync("pnpm install", {
       cwd: ROOT_DIR,
+      env,
     });
     if (stdout) console.log(stdout);
     if (stderr) console.error(stderr);

@@ -1,0 +1,33 @@
+name: Idea Lifecycle Management
+
+on:
+  issues:
+    types: [closed]
+
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
+jobs:
+  archive-idea:
+    name: Archive Idea File
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Archive idea file for closed issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_STATE_REASON: ${{ github.event.issue.state_reason }}
+        run: node scripts/archive-idea-for-issue.mjs

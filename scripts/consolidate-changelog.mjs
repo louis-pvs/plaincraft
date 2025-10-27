@@ -407,10 +407,10 @@ async function main() {
   // Try to find idea files for changelog generation
   // This is the new preferred workflow
   const ideaSummaries = [];
-  
+
   // For now, we'll keep the _tmp/ workflow functional
   // Future enhancement: Query GitHub for recently merged PRs and find their idea files
-  
+
   if (summaryFiles.length === 0 && ideaSummaries.length === 0) {
     console.log("ℹ️  No summary files found in /_tmp folder");
     console.log("💡 Create summary files in /_tmp to consolidate");
