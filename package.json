@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "vite --open",
     "build": "vite build",
+    "build:playbook": "vitepress build playbook",
     "build:storybook": "storybook build",
     "changelog": "node scripts/consolidate-changelog.mjs",
     "ci:check": "node scripts/check-ci.mjs",
@@ -31,6 +32,8 @@
     "lint:fix": "eslint . --fix",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
     "new:snippet": "node scripts/new-snippet.mjs",
+    "playbook:dev": "vitepress dev playbook",
+    "playbook:preview": "vitepress preview playbook",
     "pr:check": "node scripts/pr-requirements.mjs --check-pr",
     "pr:create-issue": "node scripts/pr-requirements.mjs",
     "pr:generate": "node scripts/generate-pr-content.mjs",
@@ -78,6 +81,7 @@
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.3",
     "vite": "^5.4.8",
+    "vitepress": "^1.6.4",
     "vitest": "2.1.4"
   },
   "dependencies": {
@@ -89,7 +93,8 @@
     "npm": ">=10.0.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "node scripts/pre-commit-changelog.mjs && pnpm exec lint-staged"
+    "pre-commit": "pnpm exec lint-staged",
+    "commit-msg": "node scripts/commit-msg-hook.mjs $1"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
