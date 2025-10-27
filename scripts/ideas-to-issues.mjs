@@ -110,7 +110,7 @@ async function parseIdeaFile(filePath) {
   }
 
   // Extract Sub-Issues section
-  const subIssuesRegex = /## Sub-Issues\s*([\s\S]*?)(?=\n##|\n$)/;
+  const subIssuesRegex = /^## Sub-Issues\s*([\s\S]*)(?=\n\n##|$)/m;
   const subIssuesMatch = content.match(subIssuesRegex);
   metadata.subIssues = [];
   if (subIssuesMatch) {
