@@ -92,14 +92,33 @@ async function findIdeaFile(issueNumber, issueTitle) {
   }
 
   // Strategy 2: Match by title
+  const prefixes = ["U-", "C-", "B-", "ARCH-", "PB-"];
+
+  // First, try exact match if title starts with a known prefix
+  for (const prefix of prefixes) {
+    if (issueTitle.startsWith(prefix)) {
+      const exactPath = join(ROOT_DIR, "ideas", `${issueTitle}.md`);
+      try {
+        await access(exactPath, constants.F_OK);
+        console.log(
+          `✓ Found idea file via exact title: ideas/${issueTitle}.md`,
+        );
+
+        return exactPath;
+      } catch {
+        // Not found, continue
+      }
+      break; // Only check one prefix
+    }
+  }
+
+  // Fallback: try slug conversion
   const slug = issueTitle
     .toLowerCase()
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
 
-  const prefixes = ["U-", "C-", "B-", "ARCH-", "PB-", ""];
-
-  for (const prefix of prefixes) {
+  for (const prefix of [...prefixes, ""]) {
     const potentialPath = join(ROOT_DIR, "ideas", `${prefix}${slug}.md`);
     try {
       await access(potentialPath, constants.F_OK);
