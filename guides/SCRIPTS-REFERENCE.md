@@ -600,6 +600,56 @@ artifacts/video/*.webm
 docs/assets/gif/*.gif
 ```
 
+### `pnpm build:playbook`
+
+**Purpose:** Build VitePress documentation site
+
+**What it does:**
+
+- Compiles VitePress docs from `/playbook` directory
+- Generates static site to `playbook-static/`
+- Used in CI and deploy workflows
+
+**Usage:**
+
+```bash
+pnpm build:playbook
+```
+
+**Development:**
+
+```bash
+pnpm playbook:dev      # Start dev server
+pnpm playbook:preview  # Preview built site
+```
+
+## Deployment Scripts
+
+### `node scripts/generate-gh-pages-index.mjs`
+
+**Purpose:** Generate root landing page for GitHub Pages deployment
+
+**What it does:**
+
+- Creates a responsive landing page with navigation cards
+- Links to `/demo`, `/storybook`, and `/playbook` sites
+- Generates styled HTML with gradient background and hover effects
+- Optimized for fast loading (no external dependencies)
+
+**Usage:**
+
+```bash
+# Generate to default location (_deploy/)
+node scripts/generate-gh-pages-index.mjs
+
+# Generate to custom location
+node scripts/generate-gh-pages-index.mjs path/to/output
+```
+
+**Used by:** `.github/workflows/deploy.yml`
+
+**Output:** Root `index.html` with navigation to all deployed sites
+
 ## Pre-commit Hooks
 
 ### Pre-commit Changelog Hook

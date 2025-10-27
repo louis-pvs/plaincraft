@@ -11,6 +11,7 @@ graph TB
     subgraph CI/CD Pipeline
         A[ci.yml<br/>6 jobs + optional record]
         B[version.yml<br/>auto version bump]
+        C[deploy.yml<br/>gh-pages deployment]
     end
 
     subgraph PR Automation
@@ -24,6 +25,7 @@ graph TB
     end
 
     H[Push to main] --> A
+    A -->|CI success| C
     H --> B
     I[PR opened/sync] --> D
     I --> E
@@ -31,6 +33,7 @@ graph TB
     K[Ideas changed] --> G
     L[Schedule 2AM UTC] --> A
     M[Manual dispatch] --> A
+    M --> C
 ```
 
 ## Workflows
@@ -85,7 +88,67 @@ Runs on push to `main` and `feat/aligned-lanes-v1`, all PRs, scheduled nightly a
 
 **CI Time Budget:**
 
-Core CI jobs (check, storybook-test, build-storybook, build-demo, summary) target ≤90s overhead over baseline. Recording job is excluded from default CI to stay within budget.
+Core CI jobs (check, storybook-test, build-storybook, build-demo, build-playbook, summary) target ≤90s overhead over baseline. Recording job is excluded from default CI to stay within budget.
+
+### Deploy to GitHub Pages (`.github/workflows/deploy.yml`)
+
+Runs on CI workflow completion (push to `main` only) and manual workflow dispatch.
+
+**Trigger:**
+
+- Uses `workflow_run` to wait for CI to complete successfully
+- Only deploys if CI passes
+- Can also be triggered manually via workflow dispatch
+
+**Flow:**
+
+```mermaid
+graph LR
+    A[CI completes<br/>on main] --> B{CI successful?}
+    B -->|Yes| C[Download artifacts]
+    B -->|No| D[Skip deploy]
+    C --> E[Download demo-dist]
+    C --> F[Download storybook-static]
+    C --> G[Download playbook-static]
+    E --> H[Generate root index.html]
+    F --> H
+    G --> H
+    H --> I[Add .nojekyll]
+    I --> J[Deploy to gh-pages]
+    J --> K[Generate summary]
+```
+
+**Artifacts Downloaded:**
+
+- `demo-dist` → `/demo`
+- `storybook-static` → `/storybook`
+- `playbook-static` → `/playbook`
+- Root `index.html` generated via `scripts/generate-gh-pages-index.mjs`
+
+**Deployed Structure:**
+
+```
+gh-pages/
+├── index.html          # Landing page with navigation
+├── .nojekyll           # Disable Jekyll processing
+├── demo/               # Vite demo build
+├── storybook/          # Storybook static build
+└── playbook/           # VitePress docs build
+```
+
+**Deployment Summary:**
+
+Posts a summary showing:
+
+- Status of each artifact (✅ Deployed / ⚠️ Missing)
+- Live URLs for all deployed sites
+
+**Security:**
+
+- Uses `peaceiris/actions-gh-pages@v4` for deployment
+- Requires `contents: write` and `pages: write` permissions
+- Force orphan commits to keep gh-pages history clean
+- Commits as `github-actions[bot]`
 
 ### Version Management (`.github/workflows/version.yml`)
 
