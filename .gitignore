@@ -3,5 +3,6 @@ dist
 .idea
 .DS_Store
 storybook-static
+playbook-static
 _tmp
 _*.*

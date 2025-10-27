@@ -9,7 +9,12 @@ import prettierConfig from "eslint-config-prettier";
 export default [
   // Global ignores
   {
-    ignores: ["dist/**", "storybook-static/**", "**/*.mdx"],
+    ignores: [
+      "dist/**",
+      "storybook-static/**",
+      "playbook-static/**",
+      "**/*.mdx",
+    ],
   },
 
   // Base config for all files
