@@ -2,6 +2,126 @@
 
 Quick reference for all automation scripts in the repository.
 
+## Ideas-as-Source-of-Truth Scripts
+
+### `node scripts/ideas-to-issues.mjs`
+
+**Purpose:** Automatically create GitHub Issues from idea files with full metadata population
+
+**What it does:**
+
+- Extracts Purpose, Problem, Proposal, Acceptance Checklist from idea files
+- Generates comprehensive Issue body with all sections
+- Adds source file link footer (`Source: /ideas/filename.md`)
+- Processes Sub-Issues section (creates child Issues with Parent: #N reference)
+- Updates parent Issue with task list of all children
+- Supports dry-run mode for preview
+
+**Usage:**
+
+```bash
+# Create issue from specific idea file
+node scripts/ideas-to-issues.mjs ARCH-source-of-truth.md
+
+# Create issues from all idea files
+node scripts/ideas-to-issues.mjs
+
+# Preview without creating (dry-run)
+node scripts/ideas-to-issues.mjs --dry-run
+
+# Create issue for specific prefix
+node scripts/ideas-to-issues.mjs U-bridge-intro
+```
+
+**Features:**
+
+- Auto-detects type from filename prefix (U-, C-, B-, ARCH-, PB-)
+- Adds appropriate labels (type:unit, lane:C, etc.)
+- Checks for existing Issues to prevent duplicates
+- Backward compatible with idea files missing optional sections
+
+### `node scripts/create-worktree-pr.mjs`
+
+**Purpose:** Create dedicated worktree and PR from Issue with idea file sourcing
+
+**What it does:**
+
+- Creates isolated git worktree for parallel development
+- Fetches Issue metadata from GitHub
+- Sources PR body content from corresponding idea file
+- Automatically links PR to Issue
+- Sets up git config and dependencies
+- Publishes branch and creates PR
+
+**Usage:**
+
+```bash
+# Create worktree and PR for issue #42
+node scripts/create-worktree-pr.mjs 42
+```
+
+**Worktree location:** `/home/user/repo-feat-branch-name`
+
+### `node scripts/merge-subissue-to-parent.mjs`
+
+**Purpose:** Merge completed sub-issue branch to parent branch
+
+**What it does:**
+
+- Detects parent issue from `Parent: #N` metadata in idea file
+- Finds parent worktree by branch name pattern
+- Fetches and merges sub-issue branch to parent branch
+- Handles merge conflicts with clear error messages
+- Auto-pushes merged parent branch
+
+**Usage:**
+
+```bash
+# Merge sub-issue #31 to its parent
+node scripts/merge-subissue-to-parent.mjs 31
+```
+
+**Workflow:**
+
+```
+Sub-issue branch → Parent branch → Main (when all sub-issues complete)
+```
+
+### `node scripts/sync-issue-to-card.mjs`
+
+**Purpose:** Sync GitHub Issue content back to idea file (adds Issue: #N metadata)
+
+**What it does:**
+
+- Finds idea file for given Issue number
+- Fetches Issue metadata from GitHub API (non-interactive)
+- Adds `Issue: #N` to idea file front matter
+- Preserves existing content
+
+**Usage:**
+
+```bash
+# Sync issue #42 metadata to its idea file
+node scripts/sync-issue-to-card.mjs 42
+```
+
+**Note:** Currently only syncs Issue number metadata. Content syncing has known limitations.
+
+### `node scripts/consolidate-changelog.mjs`
+
+**Purpose:** Generate CHANGELOG.md from merged PRs and idea files
+
+**Status:** **Planned enhancement** - Will source from idea files instead of `_tmp/*.md`
+
+**Current behavior:** Sources from `_tmp/` folder (legacy workflow)
+
+**Planned behavior:**
+
+- Find idea file for each closed PR
+- Extract Purpose, Problem, key changes from idea file
+- Generate changelog entry automatically
+- Deprecate `_tmp/` folder requirement
+
 ## Setup & Environment
 
 ### `pnpm gh:prepare`
