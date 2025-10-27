@@ -21,17 +21,20 @@ Information about scope, acceptance criteria, and linked work drifts between ide
 
 This work is broken down into the following focused tasks:
 
-- [ ] #29 ARCH-ideas-issue-sync - Enhance ideas-to-issues to populate full metadata
+- [x] #29 ARCH-ideas-issue-sync - Enhance ideas-to-issues to populate full metadata
 - [x] #30 ARCH-ideas-pr-integration - Update PR generator and worktree script ✅
-- [ ] #31 ARCH-ideas-changelog-sync - Update changelog automation, **deprecate `_tmp/` folder**
-- [ ] #32 ARCH-ideas-subissues - Add support for Sub-Issues section
-- [ ] #33 ARCH-ideas-lifecycle - Implement idea cleanup automation
-- [ ] #34 ARCH-ideas-docs - Update all guides
+- [x] #31 ARCH-ideas-changelog-sync - Update changelog automation, **deprecate `_tmp/` folder**
+- [x] #32 ARCH-ideas-subissues - Add support for Sub-Issues section
+- [x] #33 ARCH-ideas-lifecycle - Implement idea cleanup automation
+- [x] #34 ARCH-ideas-docs - Update all guides
 
 ## Acceptance Checklist
 
-- [ ] PR generator and worktree script reference idea metadata (scope, acceptance checklist, linked Issue IDs).
-- [ ] Changelog automation sources entries from idea files, **deprecating the `_tmp/` folder workflow**.
-- [ ] Idea cards remain the single source of truth throughout issue lifecycle (creation → PR → merge → archive).
-- [ ] Guides (`IDEAS-GUIDE.md`, `IDEAS-COMPLIANCE.md`, `SCRIPTS-REFERENCE.md`, `CI-STRATEGY.md`) updated to explain the new source-of-truth flow and `_tmp/` deprecation.
-- [ ] Regression tests or dry-run outputs validate the end-to-end lifecycle.
+- [ ] Idea parsing pipeline populates Issue bodies, PR templates, and changelog entries directly from the card
+- [ ] Idea files support a `Sub-Issues` section; automation creates/links Issues accordingly when present
+- [ ] Closing an Issue triggers idea cleanup (delete/archive) with audit trail
+- [ ] PR generator and worktree script reference idea metadata (scope, acceptance checklist, linked Issue IDs)
+- [ ] Changelog automation sources entries from idea files, **deprecating the `_tmp/` folder workflow**
+- [ ] Idea cards remain the single source of truth throughout issue lifecycle (creation → PR → merge → archive)
+- [x] Guides updated to explain the new source-of-truth flow and `_tmp/` deprecation
+- [ ] Regression tests or dry-run outputs validate the end-to-end lifecycle
