@@ -85,11 +85,18 @@ async function parseIdeaFile(filePath) {
     const content = await readFile(filePath, "utf-8");
 
     const metadata = {
+      issueNumber: null,
       purpose: "",
       problem: "",
       proposal: "",
       acceptance: [],
     };
+
+    // Extract Issue number
+    const issueMatch = content.match(/Issue:\s*#(\d+)/i);
+    if (issueMatch) {
+      metadata.issueNumber = parseInt(issueMatch[1], 10);
+    }
 
     // Extract Purpose
     const purposeMatch = content.match(/Purpose:\s*(.+?)(?:\n|$)/i);
@@ -300,7 +307,7 @@ async function generatePRBody(issue, ideaFilePath = null) {
     if (ideaMetadata) {
       const ideaFileName = ideaFilePath.split("/").pop();
 
-      let body = `Closes #${issue.number}\n\n`;
+      let body = `Closes #${ideaMetadata.issueNumber || issue.number}\n\n`;
 
       // Add Purpose
       if (ideaMetadata.purpose) {
