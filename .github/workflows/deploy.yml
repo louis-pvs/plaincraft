@@ -1,0 +1,118 @@
+name: deploy
+
+on:
+  workflow_run:
+    workflows: ["ci"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+# Prevent multiple deploys running at once
+concurrency:
+  group: deploy-gh-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    # Only deploy if CI succeeded
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download demo artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-dist
+          path: _deploy/demo
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Download Storybook artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: storybook-static
+          path: _deploy/storybook
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Download Playbook artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: playbook-static
+          path: _deploy/playbook
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Generate root index.html
+        run: node scripts/generate-gh-pages-index.mjs _deploy
+
+      - name: Add .nojekyll file
+        run: touch _deploy/.nojekyll
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_deploy
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: "Deploy from ${{ github.sha }}"
+
+      - name: Generate deployment summary
+        if: always()
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          if [ -d "_deploy/demo" ]; then
+            echo "| Demo | ✅ Deployed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Demo | ⚠️ Missing |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -d "_deploy/storybook" ]; then
+            echo "| Storybook | ✅ Deployed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Storybook | ⚠️ Missing |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -d "_deploy/playbook" ]; then
+            echo "| Playbook | ✅ Deployed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Playbook | ⚠️ Missing |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🌐 **Live URLs:**" >> $GITHUB_STEP_SUMMARY
+          echo "- [Root](https://${{ github.repository_owner }}.github.io/plaincraft/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Demo](https://${{ github.repository_owner }}.github.io/plaincraft/demo/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Storybook](https://${{ github.repository_owner }}.github.io/plaincraft/storybook/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Playbook](https://${{ github.repository_owner }}.github.io/plaincraft/playbook/)" >> $GITHUB_STEP_SUMMARY
