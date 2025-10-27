@@ -3,6 +3,7 @@
 - **Lane**: C
 - **Type**: Bug
 - **Purpose**: Fix worktree script PR creation failures when branches have no commits
+  Issue: #20
 
 ## Problem
 

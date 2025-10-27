@@ -18,7 +18,6 @@ Information about scope, acceptance criteria, and linked work drifts between ide
 
 ## Sub-Issues
 
-2. **ARCH-ideas-pr-integration** - Update PR generator and worktree script to source content from idea files
 3. **ARCH-ideas-changelog-sync** - Update changelog automation to pull entries from idea files
 4. **ARCH-ideas-subissues** - Add support for Subissues section in idea files with auto-creation/linking
 5. **ARCH-ideas-lifecycle** - Implement idea cleanup automation when Issues close (delete/archive with audit)
@@ -26,7 +25,6 @@ Information about scope, acceptance criteria, and linked work drifts between ide
 
 ## Acceptance Checklist
 
-- [ ] Closing an Issue triggers idea cleanup (delete/archive) with audit trail.
 - [ ] PR generator and worktree script reference idea metadata (scope, acceptance checklist, linked Issue IDs).
 - [ ] Changelog automation sources entries from idea files, **deprecating the `_tmp/` folder workflow**.
 - [ ] Idea cards remain the single source of truth throughout issue lifecycle (creation → PR → merge → archive).

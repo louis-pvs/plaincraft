@@ -2,10 +2,9 @@
 
 Lane: C
 Purpose: Automate project creation and issue linking when converting ideas to GitHub issues.
+Issue: #19
 
 ## Problem
-
-When running `ideas-to-issues.mjs`, issues are created but fail to be added to the project board if no project exists. Manual project setup via `gh:setup-project` is required first, creating friction in the ideas-to-issues workflow.
 
 ## Solution
 
@@ -46,7 +45,6 @@ graph LR
 
 ## Acceptance Checklist
 
-- [ ] `ensure-project` job added to ideas workflow
 - [ ] Auto-detects missing/invalid project configuration
 - [ ] Creates project with proper fields and views
 - [ ] Commits config updates automatically

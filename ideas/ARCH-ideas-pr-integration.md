@@ -2,6 +2,7 @@
 
 Lane: C
 Purpose: Update PR generator and worktree script to source content from idea files instead of duplicating text.
+Issue: #30
 Parent: #26 (ARCH-source-of-truth)
 
 ## Problem
