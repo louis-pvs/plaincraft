@@ -166,9 +166,14 @@ async function createWorktree(worktreePath, branchName, baseBranch = "main") {
 async function runPostCheckout(worktreePath) {
   console.log("\n🔧 Running post-checkout setup...");
   try {
+    // Set SKIP_SIMPLE_GIT_HOOKS to prevent hook installation issues in worktree
+    // Worktrees share .git/hooks with main repo, so hooks are already set up
     const { stdout, stderr } = await execAsync(
-      "node scripts/post-checkout.mjs",
-      { cwd: worktreePath },
+      "SKIP_SIMPLE_GIT_HOOKS=1 node scripts/post-checkout.mjs",
+      {
+        cwd: worktreePath,
+        env: { ...process.env, SKIP_SIMPLE_GIT_HOOKS: "1" },
+      },
     );
     if (stdout) console.log(stdout);
     if (stderr && !stderr.includes("warning")) console.error(stderr);
