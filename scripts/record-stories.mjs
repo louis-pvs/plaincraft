@@ -29,6 +29,7 @@ if (!existsSync(GIF_DIR)) {
 
 /**
  * Convert video to optimized GIF using ffmpeg
+ * Target: 960px width, ~2MB max size, 10-second cap
  */
 async function videoToGif(videoPath, gifPath) {
   return new Promise((resolve, reject) => {
@@ -39,7 +40,7 @@ async function videoToGif(videoPath, gifPath) {
       "-i",
       videoPath,
       "-vf",
-      "fps=15,scale=800:-1:flags=lanczos,palettegen",
+      "fps=15,scale=960:-1:flags=lanczos,palettegen",
       "-y",
       paletteFile,
     ]);
@@ -57,7 +58,7 @@ async function videoToGif(videoPath, gifPath) {
         "-i",
         paletteFile,
         "-filter_complex",
-        "fps=15,scale=800:-1:flags=lanczos[x];[x][1:v]paletteuse",
+        "fps=15,scale=960:-1:flags=lanczos[x];[x][1:v]paletteuse",
         "-y",
         gifPath,
       ]);
@@ -111,6 +112,7 @@ async function getStoryList(page) {
 
 /**
  * Record a single story
+ * Maximum recording time: 10 seconds
  */
 async function recordStory(page, storyId) {
   const videoPath = join(VIDEO_DIR, `${storyId}.webm`);
@@ -125,8 +127,8 @@ async function recordStory(page, storyId) {
     // Start recording
     await page.video()?.saveAs(videoPath);
 
-    // Interact with the story (basic recording - 5 seconds)
-    await page.waitForTimeout(5000);
+    // Record for maximum 10 seconds
+    await page.waitForTimeout(10000);
 
     console.log(`✓ Recorded video: ${basename(videoPath)}`);
 
@@ -153,10 +155,10 @@ async function main() {
   });
 
   const context = await browser.newContext({
-    viewport: { width: 1280, height: 720 },
+    viewport: { width: 960, height: 600 },
     recordVideo: {
       dir: VIDEO_DIR,
-      size: { width: 1280, height: 720 },
+      size: { width: 960, height: 600 },
     },
   });
 

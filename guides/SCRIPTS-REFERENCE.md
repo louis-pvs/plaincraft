@@ -669,12 +669,75 @@ pnpm changelog        # Consolidate summaries (if pre-commit missed)
 scripts/
   bump-version.mjs              # Version bumping
   check-ci.mjs                  # CI monitoring
+  commit-msg-hook.mjs           # Commit message validation (git hook)
   consolidate-changelog.mjs     # Changelog consolidation
   generate-pr-content.mjs       # PR generation
   pre-commit-changelog.mjs      # Pre-commit hook
   prepare-gh.mjs                # GitHub CLI setup
   record-stories.mjs            # Story recording
   test-storybook.mjs            # Automated Storybook testing
+```
+
+## Git Hooks
+
+### `commit-msg-hook.mjs`
+
+**Purpose:** Enforce ticket ID prefix conventions in commit messages
+
+**Automatically runs on:** Every commit (via simple-git-hooks)
+
+**What it validates:**
+
+- Commit message starts with valid ticket prefix: `[U-*]`, `[C-*]`, `[B-*]`, `[ARCH-*]`, `[PB-*]`
+- Space exists after the ticket prefix
+- Ticket slug uses kebab-case (lowercase with hyphens)
+- Commit message has meaningful content (>10 characters)
+
+**Skips validation for:**
+
+- Merge commits (messages starting with "Merge")
+- Revert commits (messages starting with "Revert")
+- Empty messages
+
+**Valid commit message formats:**
+
+```bash
+[U-button-component] Add accessible button with ARIA support
+[C-form-wizard] Implement multi-step form composition
+[B-focus-trap] Fix keyboard navigation in modal
+[ARCH-ci-split] Add Playbook build track to CI pipeline
+[PB-recording] Document video recording standards
+```
+
+**Invalid formats (will be rejected):**
+
+```bash
+Add button component                    # Missing ticket prefix
+[button] Add component                  # Invalid prefix format
+[U-Button-Component] Add component      # Uppercase in slug (warning)
+[U-button]Add component                 # Missing space after prefix
+[U-x] y                                 # Message too short (warning)
+```
+
+**Manual testing:**
+
+```bash
+# Test with valid message
+echo "[ARCH-test] Test commit" > /tmp/msg.txt
+node scripts/commit-msg-hook.mjs /tmp/msg.txt
+
+# Test with invalid message
+echo "Invalid commit" > /tmp/msg.txt
+node scripts/commit-msg-hook.mjs /tmp/msg.txt
+```
+
+**Installation:**
+
+The hook is automatically installed when you run:
+
+```bash
+pnpm install       # Runs prepare script
+pnpm prepare       # Reinstalls git hooks
 ```
 
 ## Quick Troubleshooting
