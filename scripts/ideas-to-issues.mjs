@@ -31,9 +31,13 @@ async function parseIdeaFile(filePath) {
     title: "",
     type: "", // unit, composition, bug
     lane: "",
+    purpose: "",
+    problem: "",
+    proposal: "",
     acceptance: [],
     body: content,
     labels: [],
+    sourceFile: filePath.replace(/^.*\/ideas\//, "/ideas/"),
   };
 
   // Extract title from first heading
@@ -68,6 +72,26 @@ async function parseIdeaFile(filePath) {
     metadata.labels.push(`lane:${metadata.lane}`);
   }
 
+  // Extract Purpose
+  const purposeMatch = content.match(/Purpose:\s*(.+?)(?:\n|$)/);
+  if (purposeMatch) {
+    metadata.purpose = purposeMatch[1].trim();
+  }
+
+  // Extract Problem section
+  const problemRegex = /## Problem\s*([\s\S]*?)(?=\n##|\n$)/;
+  const problemMatch = content.match(problemRegex);
+  if (problemMatch) {
+    metadata.problem = problemMatch[1].trim();
+  }
+
+  // Extract Proposal section
+  const proposalRegex = /## Proposal\s*([\s\S]*?)(?=\n##|\n$)/;
+  const proposalMatch = content.match(proposalRegex);
+  if (proposalMatch) {
+    metadata.proposal = proposalMatch[1].trim();
+  }
+
   // Extract acceptance checklist
   const checklistRegex = /## Acceptance Checklist\s*([\s\S]*?)(?=\n##|\n$)/;
   const checklistMatch = content.match(checklistRegex);
@@ -83,16 +107,54 @@ async function parseIdeaFile(filePath) {
 }
 
 /**
+ * Generate formatted Issue body from idea metadata
+ */
+function generateIssueBody(metadata) {
+  const sections = [];
+
+  // Add Purpose if available
+  if (metadata.purpose) {
+    sections.push(`**Purpose:** ${metadata.purpose}\n`);
+  }
+
+  // Add Problem section
+  if (metadata.problem) {
+    sections.push(`## Problem\n\n${metadata.problem}\n`);
+  }
+
+  // Add Proposal section
+  if (metadata.proposal) {
+    sections.push(`## Proposal\n\n${metadata.proposal}\n`);
+  }
+
+  // Add Acceptance Checklist
+  if (metadata.acceptance.length > 0) {
+    sections.push(
+      `## Acceptance Checklist\n\n${metadata.acceptance.join("\n")}\n`,
+    );
+  }
+
+  // Add source file footer
+  sections.push(`---\n\n*Source: \`${metadata.sourceFile}\`*`);
+
+  return sections.join("\n");
+}
+
+/**
  * Create GitHub issue from idea metadata
  */
 async function createIssue(metadata, dryRun = false) {
-  const { title, labels, body } = metadata;
+  const { title, labels } = metadata;
+
+  // Generate formatted body
+  const body = generateIssueBody(metadata);
 
   if (dryRun) {
     console.log("\n[DRY RUN] Would create issue:");
     console.log(`  Title: ${title}`);
     console.log(`  Labels: ${labels.join(", ")}`);
     console.log(`  Checklist items: ${metadata.acceptance.length}`);
+    console.log(`  Body preview:\n${body.substring(0, 200)}...`);
     return null;
   }
 
