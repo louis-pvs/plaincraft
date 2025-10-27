@@ -19,10 +19,14 @@ Information about scope, acceptance criteria, and linked work drifts between ide
 
 ## Sub-Issues
 
-3. **ARCH-ideas-changelog-sync** - Update changelog automation to pull entries from idea files
-4. **ARCH-ideas-subissues** - Add support for Subissues section in idea files with auto-creation/linking
-5. **ARCH-ideas-lifecycle** - Implement idea cleanup automation when Issues close (delete/archive with audit)
-6. **ARCH-ideas-docs** - Update all guides to document the new source-of-truth workflow
+This work is broken down into the following focused tasks:
+
+- [ ] #29 ARCH-ideas-issue-sync - Enhance ideas-to-issues to populate full metadata
+- [x] #30 ARCH-ideas-pr-integration - Update PR generator and worktree script ✅
+- [ ] #31 ARCH-ideas-changelog-sync - Update changelog automation, **deprecate `_tmp/` folder**
+- [ ] #32 ARCH-ideas-subissues - Add support for Sub-Issues section
+- [ ] #33 ARCH-ideas-lifecycle - Implement idea cleanup automation
+- [ ] #34 ARCH-ideas-docs - Update all guides
 
 ## Acceptance Checklist
 
