@@ -20,6 +20,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = join(__dirname, "..");
 const TMP_DIR = join(ROOT, "_tmp");
+const IDEAS_DIR = join(ROOT, "ideas");
 const CHANGELOG = join(ROOT, "CHANGELOG.md");
 const PACKAGE_JSON = join(ROOT, "package.json");
 
@@ -85,6 +86,115 @@ async function parseSummaryFile(filePath) {
     file: filePath.split("/").pop(),
     filePath, // Keep full path for deletion
   };
+}
+
+/**
+ * Find idea file for a given PR title or issue number
+ * Tries multiple strategies to locate the corresponding idea file
+ */
+async function findIdeaFileForPR(prTitle) {
+  if (!existsSync(IDEAS_DIR)) {
+    return null;
+  }
+
+  const files = await readdir(IDEAS_DIR);
+  const ideaFiles = files.filter((f) => f.endsWith(".md"));
+
+  // Strategy 1: Extract tag from PR title (e.g., "[U-button] Add button component")
+  const tagMatch = prTitle.match(/^\[([A-Z]+-[a-z-]+)\]/);
+  if (tagMatch) {
+    const tag = tagMatch[1];
+    const exactMatch = ideaFiles.find(
+      (f) => f.toLowerCase() === `${tag.toLowerCase()}.md`,
+    );
+    if (exactMatch) {
+      return join(IDEAS_DIR, exactMatch);
+    }
+  }
+
+  // Strategy 2: Fuzzy match on PR title words
+  const titleWords = prTitle
+    .toLowerCase()
+    .replace(/^\[.*?\]\s*/, "") // Remove tag
+    .split(/[\s-]+/)
+    .filter((w) => w.length > 3); // Skip short words
+
+  for (const file of ideaFiles) {
+    const fileName = file.toLowerCase();
+    const matchCount = titleWords.filter((word) =>
+      fileName.includes(word),
+    ).length;
+    if (matchCount >= 2) {
+      // At least 2 words match
+      return join(IDEAS_DIR, file);
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Parse idea file and extract changelog-relevant content
+ */
+async function parseIdeaFile(filePath) {
+  const content = await readFile(filePath, "utf-8");
+
+  // Extract title
+  const titleMatch = content.match(/^#\s+(.+)$/m);
+  const title = titleMatch ? titleMatch[1].trim() : "Changes";
+
+  // Extract Purpose
+  const purposeMatch = content.match(/Purpose:\s*(.+?)(?:\n|$)/);
+  const purpose = purposeMatch ? purposeMatch[1].trim() : null;
+
+  // Extract Problem section
+  const problemMatch = content.match(/## Problem\s*([\s\S]*?)(?=\n##|\n$)/);
+  const problem = problemMatch ? problemMatch[1].trim() : null;
+
+  // Extract Acceptance Checklist
+  const checklistMatch = content.match(
+    /## Acceptance Checklist\s*([\s\S]*?)(?=\n##|\n$)/,
+  );
+  const checklist = checklistMatch
+    ? checklistMatch[1]
+        .split("\n")
+        .filter((line) => line.trim().startsWith("- ["))
+        .map((line) => line.replace(/^-\s*\[.\]\s*/, "").trim())
+    : [];
+
+  return {
+    title,
+    purpose,
+    problem,
+    checklist,
+    filePath,
+  };
+}
+
+/**
+ * Generate changelog entry from idea file
+ */
+function generateChangelogFromIdea(ideaData) {
+  let entry = `### ${ideaData.title}\n\n`;
+
+  if (ideaData.purpose) {
+    entry += `**Purpose:** ${ideaData.purpose}\n\n`;
+  }
+
+  if (ideaData.problem && ideaData.problem.length < 300) {
+    // Include short problem descriptions
+    entry += `${ideaData.problem}\n\n`;
+  }
+
+  if (ideaData.checklist && ideaData.checklist.length > 0) {
+    entry += `**Changes:**\n\n`;
+    ideaData.checklist.forEach((item) => {
+      entry += `- ${item}\n`;
+    });
+    entry += `\n`;
+  }
+
+  return entry.trim();
 }
 
 /**
@@ -281,18 +391,34 @@ function insertIntoChangelog(existingChangelog, newEntry, version) {
 async function main() {
   console.log("📝 Changelog Consolidator\n");
 
-  // Get summary files
+  // Get summary files (legacy _tmp/ workflow)
   const summaryFiles = await getSummaryFiles();
 
-  if (summaryFiles.length === 0) {
-    console.log("⚠️  No summary files found in /_tmp folder");
-    console.log("💡 Create summary files in /_tmp to consolidate");
-    return;
+  // Check for _tmp/ folder usage (legacy workflow)
+  if (summaryFiles.length > 0) {
+    console.log(
+      "⚠️  Warning: Using legacy _tmp/ folder workflow. Consider using idea files instead.",
+    );
+    console.log(`Found ${summaryFiles.length} summary files in _tmp/:\n`);
+    summaryFiles.forEach((f) => console.log(`  - ${f.split("/").pop()}`));
+    console.log();
   }
 
-  console.log(`Found ${summaryFiles.length} summary files:`);
-  summaryFiles.forEach((f) => console.log(`  - ${f.split("/").pop()}`));
-  console.log();
+  // Try to find idea files for changelog generation
+  // This is the new preferred workflow
+  const ideaSummaries = [];
+  
+  // For now, we'll keep the _tmp/ workflow functional
+  // Future enhancement: Query GitHub for recently merged PRs and find their idea files
+  
+  if (summaryFiles.length === 0 && ideaSummaries.length === 0) {
+    console.log("ℹ️  No summary files found in /_tmp folder");
+    console.log("💡 Create summary files in /_tmp to consolidate");
+    console.log(
+      "\nNote: Future versions will automatically generate from idea files",
+    );
+    return;
+  }
 
   // Parse all summaries
   const summaries = await Promise.all(
@@ -327,15 +453,17 @@ async function main() {
   summaries.forEach((s) => console.log(`   - ${s.title}`));
 
   // Delete temporary files after successful consolidation
-  console.log(`\n�️  Cleaning up temporary files...`);
-  for (const summary of summaries) {
-    try {
-      await unlink(summary.filePath);
-      console.log(`   ✓ Deleted ${summary.filePath.split("/").pop()}`);
-    } catch (err) {
-      console.warn(
-        `   ⚠ Could not delete ${summary.filePath.split("/").pop()}: ${err.message}`,
-      );
+  if (summaryFiles.length > 0) {
+    console.log(`\n🗑️  Cleaning up temporary files...`);
+    for (const summary of summaries) {
+      try {
+        await unlink(summary.filePath);
+        console.log(`   ✓ Deleted ${summary.filePath.split("/").pop()}`);
+      } catch (err) {
+        console.warn(
+          `   ⚠ Could not delete ${summary.filePath.split("/").pop()}: ${err.message}`,
+        );
+      }
     }
   }
 
