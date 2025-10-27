@@ -340,9 +340,14 @@ async function main() {
       // Check if issue already exists
       if (!dryRun) {
         try {
-          const searchCmd = `gh issue list --search "${metadata.title}" --json number,title --limit 1`;
+          const searchCmd = `gh issue list --search "${metadata.title}" --json number,title --limit 10`;
           const { stdout } = await execAsync(searchCmd);
-          const existing = JSON.parse(stdout);
+          const searchResults = JSON.parse(stdout);
+
+          // Exact title match (GitHub search is fuzzy, so we need to filter)
+          const existing = searchResults.filter(
+            (issue) => issue.title === metadata.title,
+          );
 
           if (existing.length > 0) {
             console.log(
@@ -388,9 +393,14 @@ async function main() {
               // Check if sub-issue already exists
               if (!dryRun) {
                 try {
-                  const searchCmd = `gh issue list --search "${subIssueMetadata.title}" --json number,title --limit 1`;
+                  const searchCmd = `gh issue list --search "${subIssueMetadata.title}" --json number,title --limit 10`;
                   const { stdout } = await execAsync(searchCmd);
-                  const existing = JSON.parse(stdout);
+                  const searchResults = JSON.parse(stdout);
+
+                  // Exact title match (GitHub search is fuzzy, so we need to filter)
+                  const existing = searchResults.filter(
+                    (issue) => issue.title === subIssueMetadata.title,
+                  );
 
                   if (existing.length > 0) {
                     console.log(
