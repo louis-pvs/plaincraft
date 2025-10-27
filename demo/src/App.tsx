@@ -1,5 +1,6 @@
 import React from "react";
 import { Demo as InlineEditLabelDemo } from "../../snippets/InlineEditLabel/InlineEditLabel";
+import { Demo as ProfileFormDemo } from "../../snippets/_compositions/ProfileFormComposed/ProfileFormComposed";
 
 // Import demos by referencing the Demo export in each snippet file
 // Example import below remains commented until a real snippet exists
@@ -21,8 +22,8 @@ export function App() {
         <DemoCard title="InlineEditLabel">
           <InlineEditLabelDemo />
         </DemoCard>
-        <DemoCard title="Getting Started" className="border-dashed bg-slate-50">
-          <EmptyState />
+        <DemoCard title="ProfileFormComposed" className="sm:col-span-2">
+          <ProfileFormDemo />
         </DemoCard>
       </section>
     </div>
@@ -45,17 +46,5 @@ function DemoCard(props: {
       </div>
       <div>{props.children}</div>
     </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <p className="text-slate-700">
-      No snippets yet. Run{" "}
-      <code className="bg-slate-100 px-1 font-mono">
-        pnpm new:snippet YourName
-      </code>{" "}
-      then import its Demo here.
-    </p>
   );
 }
