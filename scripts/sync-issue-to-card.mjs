@@ -17,18 +17,33 @@ const REPO = process.env.GITHUB_REPOSITORY || "louis-pvs/plaincraft";
  */
 async function findIdeaFileForIssue(issueNumber) {
   try {
-    const output = execSync(
-      `gh api repos/${REPO}/issues/${issueNumber} --jq '.body'`,
+    const issueData = execSync(
+      `gh api repos/${REPO}/issues/${issueNumber} --jq '{title, body}'`,
       { encoding: "utf8" },
     );
+    const { title, body } = JSON.parse(issueData);
 
-    // Look for source reference in issue body: "Source: `/ideas/ARCH-example.md`"
-    const match = output.match(/Source:\s*`([^`]+)`/);
+    // Method 1: Look for source reference in issue body: "Source: `/ideas/ARCH-example.md`"
+    let match = body.match(/Source:\s*`([^`]+)`/);
     if (match) {
       const filePath = match[1];
       return filePath.startsWith("/ideas/")
         ? resolve(process.cwd(), filePath.slice(1))
         : resolve(process.cwd(), "ideas", filePath);
+    }
+
+    // Method 2: Look for "See /ideas/ARCH-*.md" reference
+    match = body.match(/See\s+\/ideas\/([^\s]+\.md)/);
+    if (match) {
+      return resolve(process.cwd(), "ideas", match[1]);
+    }
+
+    // Method 3: Derive from title (e.g., "ARCH-source-of-truth" -> "ARCH-source-of-truth.md")
+    // Extract slug from title
+    const titleMatch = title.match(/^([A-Z]+-[a-z0-9-]+)/i);
+    if (titleMatch) {
+      const slug = titleMatch[1];
+      return resolve(process.cwd(), "ideas", `${slug}.md`);
     }
   } catch {
     console.warn(
