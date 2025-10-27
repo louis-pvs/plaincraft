@@ -217,29 +217,66 @@ async function updateParentWithChildren(
   childIssues,
   dryRun = false,
 ) {
+  // Build task list
+  const taskList = childIssues
+    .map((child) => `- [ ] #${child.number} ${child.title}`)
+    .join("\n");
+
   if (dryRun) {
     console.log(`\n[DRY RUN] Would update parent issue #${parentIssueNumber}:`);
     console.log("  Child issues task list:");
     for (const child of childIssues) {
       console.log(`    - [ ] #${child.number} ${child.title}`);
     }
+
+    // Check if section exists to show replacement vs append behavior
+    try {
+      const { stdout } = await execAsync(
+        `gh issue view ${parentIssueNumber} --json body`,
+      );
+      const currentBody = JSON.parse(stdout).body || "";
+      const subIssuesRegex = /## Sub-Issues\s*[\s\S]*?(?=\n##|$)/;
+      const hasSubIssues = subIssuesRegex.test(currentBody);
+
+      if (hasSubIssues) {
+        console.log("  → Would REPLACE existing Sub-Issues section");
+      } else {
+        console.log("  → Would APPEND new Sub-Issues section");
+      }
+    } catch {
+      console.log("  → (Could not check existing issue body)");
+    }
+
     return;
   }
 
   try {
-    // Build task list
-    const taskList = childIssues
-      .map((child) => `- [ ] #${child.number} ${child.title}`)
-      .join("\n");
-
     // Get current issue body
     const { stdout } = await execAsync(
       `gh issue view ${parentIssueNumber} --json body`,
     );
     const currentBody = JSON.parse(stdout).body || "";
 
-    // Append task list to body
-    const updatedBody = `${currentBody}\n\n## Sub-Issues\n\n${taskList}`;
+    // Check if Sub-Issues section already exists
+    const subIssuesRegex = /## Sub-Issues\s*[\s\S]*?(?=\n##|$)/;
+    const hasSubIssues = subIssuesRegex.test(currentBody);
+
+    // Replace existing section or append new one
+    let updatedBody;
+    if (hasSubIssues) {
+      updatedBody = currentBody.replace(
+        subIssuesRegex,
+        `## Sub-Issues\n\n${taskList}`,
+      );
+      console.log(
+        `  → Replacing existing Sub-Issues section in parent #${parentIssueNumber}`,
+      );
+    } else {
+      updatedBody = `${currentBody}\n\n## Sub-Issues\n\n${taskList}`;
+      console.log(
+        `  → Appending new Sub-Issues section to parent #${parentIssueNumber}`,
+      );
+    }
 
     // Write to temp file
     const bodyFile = `/tmp/parent-issue-body-${Date.now()}.md`;
