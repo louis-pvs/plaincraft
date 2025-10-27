@@ -71,19 +71,21 @@ async function getIssueData(issueNumber) {
   }
 }
 
+// Sub-Issues section handling removed - now using simple replacement (see below)
+
 /**
  * Parse issue body to extract metadata
  */
 function parseIssueBody(body) {
   const sections = {};
 
-  // Extract sections: Purpose, Problem, Proposal, Acceptance Checklist, Sub-Issues
-  const sectionRegex = /^##\s+(.+?)\s*$([\s\S]*?)(?=^##\s+|\n*$)/gm;
-  let match;
+  // Split by ## headers and process each section
+  const parts = body.split(/^##\s+/m);
 
-  while ((match = sectionRegex.exec(body)) !== null) {
-    const sectionName = match[1].trim();
-    const sectionContent = match[2].trim();
+  for (let i = 1; i < parts.length; i++) {
+    const [header, ...contentLines] = parts[i].split("\n");
+    const sectionName = header.trim();
+    const sectionContent = contentLines.join("\n").trim();
 
     // Normalize section names
     const normalizedName = sectionName
@@ -149,18 +151,30 @@ async function updateIdeaFile(filePath, issueData) {
       // Skip updating source reference or other metadata sections
       if (["details", "source"].includes(sectionKey)) continue;
 
-      // Find and replace section content
-      const sectionRegex = new RegExp(
-        `(^##\\s+${headerName}\\s*$\\n)([\\s\\S]*?)(?=^##\\s+|$)`,
-        "gm",
-      );
+      // Split content into sections and replace the matching one
+      const sectionSplit = updatedContent.split(/^##\s+/m);
+      const rebuiltSections = [];
 
-      if (sectionRegex.test(updatedContent)) {
-        updatedContent = updatedContent.replace(
-          sectionRegex,
-          `$1${sectionContent}\n\n`,
-        );
+      for (let i = 0; i < sectionSplit.length; i++) {
+        if (i === 0) {
+          // Content before first section (front matter)
+          rebuiltSections.push(sectionSplit[i]);
+          continue;
+        }
+
+        const [header] = sectionSplit[i].split("\n");
+        const currentHeader = header.trim();
+
+        if (currentHeader === headerName) {
+          // Replace this section's content
+          rebuiltSections.push(`## ${headerName}\n\n${sectionContent}\n\n`);
+        } else {
+          // Keep original section
+          rebuiltSections.push(`## ${sectionSplit[i]}`);
+        }
       }
+
+      updatedContent = rebuiltSections.join("");
     }
 
     await writeFile(filePath, updatedContent, "utf-8");

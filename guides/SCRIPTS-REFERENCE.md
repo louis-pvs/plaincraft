@@ -89,23 +89,32 @@ Sub-issue branch → Parent branch → Main (when all sub-issues complete)
 
 ### `node scripts/sync-issue-to-card.mjs`
 
-**Purpose:** Sync GitHub Issue content back to idea file (adds Issue: #N metadata)
+**Purpose:** Sync GitHub Issue content back to idea card file (bidirectional sync)
 
 **What it does:**
 
-- Finds idea file for given Issue number
-- Fetches Issue metadata from GitHub API (non-interactive)
-- Adds `Issue: #N` to idea file front matter
-- Preserves existing content
+- Finds idea file for given Issue number (via Source reference or title match)
+- Fetches Issue body content from GitHub API (non-interactive)
+- Updates idea file sections with Issue content:
+  - Adds/updates `Issue: #N` metadata in front matter
+  - Replaces Problem, Proposal, Acceptance Checklist sections
+  - **Replaces entire Sub-Issues section** with GitHub checklist format
+  - Preserves checkbox state (`- [ ]` vs `- [x]`)
+- Skips `## Details` section (contains source reference)
 
 **Usage:**
 
 ```bash
-# Sync issue #42 metadata to its idea file
+# Sync issue #42 content to its idea file
 node scripts/sync-issue-to-card.mjs 42
 ```
 
-**Note:** Currently only syncs Issue number metadata. Content syncing has known limitations.
+**Important Notes:**
+
+- **Sub-Issues section is completely replaced** - don't manually edit after Issue creation
+- Only sync after Issue is updated in GitHub (not before)
+- This enables GitHub Issue as single source of truth for tracking progress
+- Use after closing sub-issues to update parent card with `[x]` checkboxes
 
 ### `node scripts/consolidate-changelog.mjs`
 
