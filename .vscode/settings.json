@@ -1,15 +1,8 @@
 {
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
-      "file": ".copilot-commit-message-instructions.md",
+      "file": "../guides/SCRIPTS-REFERENCE.md",
       "text": "Every commit message must begin with the ticket ID in brackets: `[U-<slug>]`, `[C-<slug>]`, `[B-<slug>]`, `[ARCH-<slug>]`, `[PB-<slug>]`. The changelog and PR title should share that same tag."
     }
-  ],
-  "yaml.schemas": {
-    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
-  },
-  "yaml.customTags": ["!reference sequence"],
-  "yaml.validate": true,
-  "yaml.schemaStore.enable": true,
-  "yaml.schemaStore.url": "https://www.schemastore.org/api/json/catalog.json"
+  ]
 }
