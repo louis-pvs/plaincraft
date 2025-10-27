@@ -34,7 +34,6 @@ async function parseIdeaFile(filePath) {
     purpose: "",
     problem: "",
     proposal: "",
-    parent: "",
     acceptance: [],
     body: content,
     labels: [],
@@ -86,14 +85,14 @@ async function parseIdeaFile(filePath) {
   }
 
   // Extract Problem section
-  const problemRegex = /## Problem\s*([\s\S]*?)(?=\n##|$)/;
+  const problemRegex = /## Problem\s*([\s\S]*?)(?=\n##|\n$)/;
   const problemMatch = content.match(problemRegex);
   if (problemMatch) {
     metadata.problem = problemMatch[1].trim();
   }
 
   // Extract Proposal section
-  const proposalRegex = /## Proposal\s*([\s\S]*?)(?=\n##|$)/;
+  const proposalRegex = /## Proposal\s*([\s\S]*?)(?=\n##|\n$)/;
   const proposalMatch = content.match(proposalRegex);
   if (proposalMatch) {
     metadata.proposal = proposalMatch[1].trim();
@@ -132,47 +131,37 @@ async function parseIdeaFile(filePath) {
 }
 
 /**
- * Generate formatted issue body from metadata
+ * Generate formatted Issue body from idea metadata
  */
 function generateIssueBody(metadata) {
-  const { purpose, problem, proposal, acceptance, parent, title } = metadata;
-
-  let body = "";
+  const sections = [];
 
   // Add Purpose if available
-  if (purpose) {
-    body += `**Purpose:** ${purpose}\n\n`;
-  }
-
-  // Add Parent reference if available
-  if (parent) {
-    body += `**Parent:** #${parent}\n\n`;
+  if (metadata.purpose) {
+    sections.push(`**Purpose:** ${metadata.purpose}\n`);
   }
 
   // Add Problem section
-  if (problem) {
-    body += `## Problem\n\n${problem}\n\n`;
+  if (metadata.problem) {
+    sections.push(`## Problem\n\n${metadata.problem}\n`);
   }
 
   // Add Proposal section
-  if (proposal) {
-    body += `## Proposal\n\n${proposal}\n\n`;
+  if (metadata.proposal) {
+    sections.push(`## Proposal\n\n${metadata.proposal}\n`);
   }
 
   // Add Acceptance Checklist
-  if (acceptance && acceptance.length > 0) {
-    body += `## Acceptance Checklist\n\n`;
-    acceptance.forEach((item) => {
-      body += `${item}\n`;
-    });
-    body += `\n`;
+  if (metadata.acceptance.length > 0) {
+    sections.push(
+      `## Acceptance Checklist\n\n${metadata.acceptance.join("\n")}\n`,
+    );
   }
 
-  // Add source file reference
-  const filename = title.toLowerCase().replace(/\s+/g, "-");
-  body += `---\n\n**Source:** \`/ideas/${filename}.md\`\n`;
+  // Add source file footer
+  sections.push(`---\n\n*Source: \`${metadata.sourceFile}\`*`);
 
-  return body;
+  return sections.join("\n");
 }
 
 /**
@@ -181,13 +170,15 @@ function generateIssueBody(metadata) {
 async function createIssue(metadata, dryRun = false) {
   const { title, labels } = metadata;
 
+  // Generate formatted body
+  const body = generateIssueBody(metadata);
+
   if (dryRun) {
     console.log("\n[DRY RUN] Would create issue:");
     console.log(`  Title: ${title}`);
     console.log(`  Labels: ${labels.join(", ")}`);
     console.log(`  Checklist items: ${metadata.acceptance.length}`);
-    console.log("\n  Body Preview:");
-    console.log(generateIssueBody(metadata));
+    console.log(`  Body preview:\n${body.substring(0, 200)}...`);
     return null;
   }
 
