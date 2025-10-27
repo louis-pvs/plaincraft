@@ -2,6 +2,7 @@
 
 Lane: C
 Purpose: Add support for Sub-Issues section in idea files with automatic child issue creation and linking.
+Issue: #32
 Parent: #26 (ARCH-source-of-truth)
 
 ## Problem

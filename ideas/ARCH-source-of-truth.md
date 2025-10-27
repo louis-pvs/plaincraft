@@ -2,6 +2,7 @@
 
 Lane: C
 Purpose: Make `/ideas` cards the single source of truth for Issues/PRs/changelog entries and automate lifecycle management.
+Issue: #26
 
 ## Problem
 
@@ -17,7 +18,6 @@ Information about scope, acceptance criteria, and linked work drifts between ide
 
 ## Sub-Issues
 
-1. **ARCH-ideas-issue-sync** - Enhance ideas-to-issues to populate full metadata (body, acceptance criteria) from idea files into Issues
 2. **ARCH-ideas-pr-integration** - Update PR generator and worktree script to source content from idea files
 3. **ARCH-ideas-changelog-sync** - Update changelog automation to pull entries from idea files
 4. **ARCH-ideas-subissues** - Add support for Subissues section in idea files with auto-creation/linking
@@ -26,7 +26,6 @@ Information about scope, acceptance criteria, and linked work drifts between ide
 
 ## Acceptance Checklist
 
-- [ ] Idea files support a `Sub-Issues` section; automation creates/links Issues accordingly when present.
 - [ ] Closing an Issue triggers idea cleanup (delete/archive) with audit trail.
 - [ ] PR generator and worktree script reference idea metadata (scope, acceptance checklist, linked Issue IDs).
 - [ ] Changelog automation sources entries from idea files, **deprecating the `_tmp/` folder workflow**.

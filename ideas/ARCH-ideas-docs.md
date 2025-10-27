@@ -2,6 +2,7 @@
 
 Lane: C
 Purpose: Update all guides to document the new ideas-as-source-of-truth workflow and lifecycle automation.
+Issue: #34
 Parent: #26 (ARCH-source-of-truth)
 
 ## Problem

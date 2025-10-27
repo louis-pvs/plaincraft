@@ -98,7 +98,7 @@ function parseIssueBody(body) {
 }
 
 /**
- * Update idea file with issue content
+ * Update idea file with issue content and metadata
  */
 async function updateIdeaFile(filePath, issueData) {
   try {
@@ -106,6 +106,31 @@ async function updateIdeaFile(filePath, issueData) {
     const sections = parseIssueBody(issueData.body);
 
     let updatedContent = content;
+
+    // Update issue number in front matter (after title/lane/purpose)
+    // Pattern: Line starts with "Issue:" or insert after "Parent:" or "Purpose:" line
+    const issueMetadata = `Issue: #${issueData.number}`;
+    
+    if (/^Issue:\s*#?\d+/m.test(updatedContent)) {
+      // Update existing Issue line
+      updatedContent = updatedContent.replace(
+        /^Issue:\s*#?\d+/m,
+        issueMetadata,
+      );
+    } else {
+      // Insert Issue line after Purpose or Parent line
+      const insertAfterMatch = updatedContent.match(
+        /^(Purpose:.*$|Parent:.*$)/m,
+      );
+      if (insertAfterMatch) {
+        const insertPos = insertAfterMatch.index + insertAfterMatch[0].length;
+        updatedContent =
+          updatedContent.slice(0, insertPos) +
+          "\n" +
+          issueMetadata +
+          updatedContent.slice(insertPos);
+      }
+    }
 
     // Update each section if it exists in the issue
     for (const [sectionKey, sectionContent] of Object.entries(sections)) {
@@ -139,7 +164,7 @@ async function updateIdeaFile(filePath, issueData) {
     }
 
     await writeFile(filePath, updatedContent, "utf-8");
-    console.log(`✓ Updated ${filePath}`);
+    console.log(`✓ Updated ${filePath} (Issue #${issueData.number})`);
 
     return true;
   } catch (error) {

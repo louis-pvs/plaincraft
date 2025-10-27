@@ -2,6 +2,7 @@
 
 Lane: C
 Purpose: Enhance ideas-to-issues script to populate full metadata from idea files into GitHub Issues.
+Issue: #29
 Parent: #26 (ARCH-source-of-truth)
 
 ## Problem

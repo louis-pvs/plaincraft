@@ -2,6 +2,7 @@
 
 Lane: C
 Purpose: Update changelog automation to generate entries from idea files instead of requiring manual \_tmp/\*.md files.
+Issue: #31
 Parent: #26 (ARCH-source-of-truth)
 
 ## Problem

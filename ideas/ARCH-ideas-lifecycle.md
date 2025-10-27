@@ -2,6 +2,7 @@
 
 Lane: C
 Purpose: Implement automatic idea file cleanup when Issues close, with archive support and audit trail.
+Issue: #33
 Parent: #26 (ARCH-source-of-truth)
 
 ## Problem
