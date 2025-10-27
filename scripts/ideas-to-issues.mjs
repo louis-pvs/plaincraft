@@ -31,6 +31,10 @@ async function parseIdeaFile(filePath) {
     title: "",
     type: "", // unit, composition, bug
     lane: "",
+    purpose: "",
+    problem: "",
+    proposal: "",
+    parent: "",
     acceptance: [],
     body: content,
     labels: [],
@@ -40,6 +44,18 @@ async function parseIdeaFile(filePath) {
   const titleMatch = content.match(/^#\s+(.+)$/m);
   if (titleMatch) {
     metadata.title = titleMatch[1];
+  }
+
+  // Extract Purpose (from "Purpose: ..." line after Lane)
+  const purposeMatch = content.match(/Purpose:\s*(.+?)(?:\n|$)/i);
+  if (purposeMatch) {
+    metadata.purpose = purposeMatch[1].trim();
+  }
+
+  // Extract Parent (from "Parent: #N ..." line)
+  const parentMatch = content.match(/Parent:\s*#(\d+)/i);
+  if (parentMatch) {
+    metadata.parent = parentMatch[1];
   }
 
   // Detect type from filename
@@ -68,6 +84,20 @@ async function parseIdeaFile(filePath) {
     metadata.labels.push(`lane:${metadata.lane}`);
   }
 
+  // Extract Problem section
+  const problemRegex = /## Problem\s*([\s\S]*?)(?=\n##|$)/;
+  const problemMatch = content.match(problemRegex);
+  if (problemMatch) {
+    metadata.problem = problemMatch[1].trim();
+  }
+
+  // Extract Proposal section
+  const proposalRegex = /## Proposal\s*([\s\S]*?)(?=\n##|$)/;
+  const proposalMatch = content.match(proposalRegex);
+  if (proposalMatch) {
+    metadata.proposal = proposalMatch[1].trim();
+  }
+
   // Extract acceptance checklist
   const checklistRegex = /## Acceptance Checklist\s*([\s\S]*?)(?=\n##|\n$)/;
   const checklistMatch = content.match(checklistRegex);
@@ -83,20 +113,69 @@ async function parseIdeaFile(filePath) {
 }
 
 /**
+ * Generate formatted issue body from metadata
+ */
+function generateIssueBody(metadata) {
+  const { purpose, problem, proposal, acceptance, parent, title } = metadata;
+
+  let body = "";
+
+  // Add Purpose if available
+  if (purpose) {
+    body += `**Purpose:** ${purpose}\n\n`;
+  }
+
+  // Add Parent reference if available
+  if (parent) {
+    body += `**Parent:** #${parent}\n\n`;
+  }
+
+  // Add Problem section
+  if (problem) {
+    body += `## Problem\n\n${problem}\n\n`;
+  }
+
+  // Add Proposal section
+  if (proposal) {
+    body += `## Proposal\n\n${proposal}\n\n`;
+  }
+
+  // Add Acceptance Checklist
+  if (acceptance && acceptance.length > 0) {
+    body += `## Acceptance Checklist\n\n`;
+    acceptance.forEach((item) => {
+      body += `${item}\n`;
+    });
+    body += `\n`;
+  }
+
+  // Add source file reference
+  const filename = title.toLowerCase().replace(/\s+/g, "-");
+  body += `---\n\n**Source:** \`/ideas/${filename}.md\`\n`;
+
+  return body;
+}
+
+/**
  * Create GitHub issue from idea metadata
  */
 async function createIssue(metadata, dryRun = false) {
-  const { title, labels, body } = metadata;
+  const { title, labels } = metadata;
 
   if (dryRun) {
     console.log("\n[DRY RUN] Would create issue:");
     console.log(`  Title: ${title}`);
     console.log(`  Labels: ${labels.join(", ")}`);
     console.log(`  Checklist items: ${metadata.acceptance.length}`);
+    console.log("\n  Body Preview:");
+    console.log(generateIssueBody(metadata));
     return null;
   }
 
   try {
+    // Generate formatted issue body
+    const body = generateIssueBody(metadata);
+
     // Create issue with gh CLI
     const labelsArg = labels.length > 0 ? `--label "${labels.join(",")}"` : "";
     const bodyFile = `/tmp/issue-body-${Date.now()}.md`;
