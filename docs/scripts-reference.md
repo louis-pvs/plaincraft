@@ -53,6 +53,13 @@ pnpm ideas:sync             # sync-ideas-checklists
 pnpm ideas:validate         # validate-ideas
 ```
 
+### `validate-ideas.mjs` quick reference
+
+- Supports Unit (`U-`), Composition (`C-`), Architecture (`ARCH-`), Playbook (`PB-`), Bug (`B-`), and brief (lowercase) idea cards.
+- Enforces section requirements per type (e.g., Purpose/Problem/Proposal/Acceptance Checklist for ARCH).
+- Warns on thin acceptance checklists and titles missing ticket prefixes to help guardrail compliance.
+- Run with `--filter <prefix>` for focused audits (e.g., `node scripts/checks/validate-ideas.mjs --filter ARCH-`).
+
 ## Supporting Libraries
 
 - `_lib/core.mjs` — logging, CLI parsing, repo discovery, safe I/O.
@@ -61,3 +68,9 @@ pnpm ideas:validate         # validate-ideas
 - `_lib/allowlist.json` — network and file-system allowlist enforced by guardrails.
 
 Keep new automation inside these seams: pure helpers live in `_lib/`, orchestrators in `ops/`, validators in `checks/`, one-offs in `migration/`, and any expiring scripts in `DEPRECATED/` (90-day TTL).
+
+### GitHub automation preference
+
+- Prefer `gh` CLI commands for repository operations (`gh issue list`, `gh pr view`, `gh run view`) to leverage authentication and pagination.
+- Fall back to existing scripts in `/scripts/ops` or `/scripts/checks` when a higher-level workflow already exists.
+- Use raw `curl` only when GitHub CLI and local scripts do not expose the required endpoint.

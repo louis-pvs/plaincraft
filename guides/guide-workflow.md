@@ -56,6 +56,14 @@ last_verified: 2025-10-28
    node scripts/sync-ideas-checklists.mjs
    ```
 
+# GitHub CLI quick reference
+
+- **List open issues:** `gh issue list --state open --json number,title,state` (filter with `--label lane:C`, etc.)
+- **View current PR details:** `gh pr view --json title,body,labels` (append `--web` to open in browser)
+- **Stream workflow/job logs:** `gh run view <run> --log` (handles pagination + auth)
+- **Convert idea to tracked issue:** `pnpm ideas:create <idea-file>` (wraps `scripts/ops/ideas-to-issues.mjs`)
+- **Sync idea checklist with Issue:** `pnpm ideas:sync` (mirrors checklist state both directions)
+
 # Rollback
 
 - Delete idea file and close Issue
