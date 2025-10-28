@@ -119,7 +119,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node scripts/ideas-to-issues.mjs ${{ github.event.inputs.idea_file }}
+          node scripts/ops/ideas-to-issues.mjs ${{ github.event.inputs.idea_file }}
 
       - name: Project info
         run: |
@@ -156,7 +156,7 @@ jobs:
 
       - name: Validate idea files
         run: |
-          node scripts/validate-ideas.mjs ${{ github.event.inputs.idea_file }}
+          node scripts/checks/validate-ideas.mjs ${{ github.event.inputs.idea_file }}
 
       - name: Generate validation report
         if: always()
@@ -205,7 +205,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node scripts/sync-ideas-checklists.mjs ${{ github.event.inputs.idea_file }}
+          node scripts/ops/sync-ideas-checklists.mjs ${{ github.event.inputs.idea_file }}
 
   auto-validate:
     name: Auto-validate on Push
@@ -247,4 +247,4 @@ jobs:
         run: |
           git diff --name-only HEAD~1 HEAD | \
             grep '^ideas/' | \
-            xargs -I {} node scripts/validate-ideas.mjs {}
+            xargs -I {} node scripts/checks/validate-ideas.mjs {}
