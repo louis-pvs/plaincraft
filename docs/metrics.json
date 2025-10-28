@@ -1,0 +1,72 @@
+{
+  "timestamp": "2025-10-28T04:12:35.851Z",
+  "templates": 12,
+  "guides": 4,
+  "ratio": 3,
+  "ratioPassing": true,
+  "guideHealth": [
+    {
+      "file": "guide-changelog.md",
+      "words": 162,
+      "capacity": 27,
+      "ttlDays": 90,
+      "warnings": null,
+      "status": "healthy"
+    },
+    {
+      "file": "guide-roadmap-setup.md",
+      "words": 200,
+      "capacity": 33,
+      "ttlDays": 90,
+      "warnings": "2 long paragraphs",
+      "status": "healthy"
+    },
+    {
+      "file": "guide-scripts.md",
+      "words": 229,
+      "capacity": 38,
+      "ttlDays": 90,
+      "warnings": "3 long paragraphs",
+      "status": "healthy"
+    },
+    {
+      "file": "guide-workflow.md",
+      "words": 154,
+      "capacity": 26,
+      "ttlDays": 90,
+      "warnings": "1 long paragraphs",
+      "status": "healthy"
+    }
+  ],
+  "orphanedTemplates": [
+    "bug-report",
+    "changelog",
+    "roadmap-project",
+    "user-story"
+  ],
+  "referencedTemplates": {
+    "ideas": [
+      "guide-changelog.md",
+      "guide-changelog.md",
+      "guide-workflow.md",
+      "guide-workflow.md"
+    ],
+    "guide": ["guide-roadmap-setup.md"],
+    "roadmap-project-template": ["guide-roadmap-setup.md"],
+    "script": ["guide-scripts.md", "guide-scripts.md"],
+    "test-unit": ["guide-scripts.md"],
+    "test-integration": ["guide-scripts.md"],
+    "issue-unit": ["guide-workflow.md"],
+    "issue-composition": ["guide-workflow.md"],
+    "pull-request": ["guide-workflow.md"]
+  },
+  "recommendations": [
+    "Consider creating guide for 'bug-report' template",
+    "Consider creating guide for 'changelog' template",
+    "Consider creating guide for 'roadmap-project' template",
+    "Consider creating guide for 'user-story' template",
+    "Break long paragraphs in guide-roadmap-setup.md into checklists",
+    "Break long paragraphs in guide-scripts.md into checklists",
+    "Break long paragraphs in guide-workflow.md into checklists"
+  ]
+}
