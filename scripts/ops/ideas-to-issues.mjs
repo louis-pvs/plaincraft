@@ -84,6 +84,13 @@ function generateIssueBody(validation, content, sourceFile) {
  * @param {string} lane - Lane (A, B, C, D)
  * @returns {Array<string>} Labels
  */
+const LANE_LABELS = {
+  A: "lane-A",
+  B: "lane-B",
+  C: "lane-C",
+  D: "lane-D",
+};
+
 function getLabelsForIdea(type, lane) {
   const labels = [];
 
@@ -92,7 +99,15 @@ function getLabelsForIdea(type, lane) {
   }
 
   if (lane) {
-    labels.push(`lane:${lane}`);
+    const normalizedLane =
+      typeof lane === "string" ? lane.trim().toUpperCase() : lane;
+    const fallbackLane =
+      typeof normalizedLane === "string"
+        ? normalizedLane.toLowerCase()
+        : normalizedLane;
+    const laneLabel =
+      LANE_LABELS[normalizedLane] || `lane-${fallbackLane}`;
+    labels.push(laneLabel);
   }
 
   return labels;

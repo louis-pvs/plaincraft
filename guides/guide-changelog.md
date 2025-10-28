@@ -64,7 +64,7 @@ last_verified: 2025-10-28
 
 # Links
 
-- Script: `/scripts/consolidate-changelog.mjs`
+- Script: `/scripts/ops/consolidate-changelog.mjs`
 - Hook: `/scripts/commit-msg-hook.mjs`
 - Template: `/templates/ideas/` (for ticket structure)
 - Pre-commit: `/scripts/pre-commit-changelog.mjs`

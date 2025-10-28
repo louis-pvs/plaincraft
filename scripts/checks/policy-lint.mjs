@@ -32,11 +32,14 @@ if (args.help) {
 Usage: node scripts/checks/policy-lint.mjs [options]
 
 Options:
-  --help              Show this help
-  --output <format>   Output format: json|text (default: text)
-  --log-level <level> Log level: trace|debug|info|warn|error (default: info)
-  --cwd <path>        Working directory (default: current)
-  --strict            Treat warnings as errors
+  --help                 Show this help
+  --output <format>      Output format: json|text (default: text)
+  --log-level <level>    Log level: trace|debug|info|warn|error (default: info)
+  --cwd <path>           Working directory (default: current)
+  --strict               Treat warnings as errors
+  --ignore <dirs>        Comma-separated directory names to skip (default: DEPRECATED)
+  --include-deprecated   Include scripts in scripts/DEPRECATED (overrides --ignore)
+  --filter <patterns>    Comma-separated substrings to include (relative path match)
 
 Description:
   Validates all scripts against repository guardrails:
@@ -63,8 +66,27 @@ try {
   const root = await repoRoot(args.cwd);
   const scriptsDir = path.join(root, "scripts");
 
+  const userIgnores = parseListArg(args.ignore);
+  const filters = parseListArg(args.filter).map((pattern) =>
+    pattern.toLowerCase(),
+  );
+  const includeDeprecated = Boolean(args["include-deprecated"]);
+
+  const excludeDirs = ["node_modules", ".git", ...userIgnores];
+  if (!includeDeprecated && !userIgnores.includes("DEPRECATED")) {
+    excludeDirs.push("DEPRECATED");
+  }
+
   // Scan for all .mjs scripts (excluding _lib, node_modules, etc.)
-  const scriptFiles = await findScriptFiles(scriptsDir);
+  let scriptFiles = await findScriptFiles(scriptsDir, excludeDirs);
+
+  if (filters.length > 0) {
+    scriptFiles = scriptFiles.filter((filePath) => {
+      const relative = path.relative(root, filePath).toLowerCase();
+      return filters.some((pattern) => relative.includes(pattern));
+    });
+  }
+
   logger.info(`Found ${scriptFiles.length} script files to validate`);
 
   const results = [];
@@ -111,27 +133,29 @@ try {
   }
 
   // Check deprecated scripts
-  const deprecatedDir = path.join(scriptsDir, "DEPRECATED");
-  try {
-    const deprecatedFiles = await readdir(deprecatedDir);
-    for (const file of deprecatedFiles) {
-      if (!file.endsWith(".mjs")) continue;
+  if (includeDeprecated) {
+    const deprecatedDir = path.join(scriptsDir, "DEPRECATED");
+    try {
+      const deprecatedFiles = await readdir(deprecatedDir);
+      for (const file of deprecatedFiles) {
+        if (!file.endsWith(".mjs")) continue;
 
-      const filePath = path.join(deprecatedDir, file);
-      const content = await readFile(filePath, "utf-8");
-      const headerValidation = validateScriptHeader(content);
+        const filePath = path.join(deprecatedDir, file);
+        const content = await readFile(filePath, "utf-8");
+        const headerValidation = validateScriptHeader(content);
 
-      if (headerValidation.errors.some((e) => e.includes(">90 days"))) {
-        results.push({
-          file: path.relative(root, filePath),
-          errors: headerValidation.errors,
-          warnings: [],
-        });
-        totalErrors += headerValidation.errors.length;
+        if (headerValidation.errors.some((e) => e.includes(">90 days"))) {
+          results.push({
+            file: path.relative(root, filePath),
+            errors: headerValidation.errors,
+            warnings: [],
+          });
+          totalErrors += headerValidation.errors.length;
+        }
       }
+    } catch {
+      // DEPRECATED dir doesn't exist yet
     }
-  } catch {
-    // DEPRECATED dir doesn't exist yet
   }
 
   const durationMs = Date.now() - start;
@@ -204,4 +228,27 @@ async function findScriptFiles(dir, exclude = ["node_modules", ".git"]) {
   }
 
   return files;
+}
+
+/**
+ * Parse ignore argument into directory names
+ * @param {string|string[]} ignoreArg - Argument value
+ * @returns {string[]} Directory names
+ */
+function parseListArg(value) {
+  if (!value) return [];
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) =>
+      String(item)
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean),
+    );
+  }
+
+  return String(value)
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
 }

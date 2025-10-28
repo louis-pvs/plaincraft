@@ -1,6 +1,6 @@
 {
   "name": "plaincraft",
-  "version": "0.7.0",
+  "version": "0.10.0",
   "author": {
     "name": "Louis Phang",
     "email": "design.vincent.louis@gmail.com"
@@ -13,7 +13,7 @@
     "build": "vite build",
     "build:playbook": "vitepress build playbook",
     "build:storybook": "storybook build",
-    "changelog": "node scripts/consolidate-changelog.mjs",
+    "changelog": "node scripts/ops/consolidate-changelog.mjs",
     "ci:check": "node scripts/check-ci.mjs",
     "ci:watch": "node scripts/check-ci.mjs --watch",
     "format:check": "prettier --check .",

@@ -85,7 +85,7 @@ The consolidation script:
 
 ## Related
 
-- Script: `/scripts/consolidate-changelog.mjs`
+- Script: `/scripts/ops/consolidate-changelog.mjs`
 - Hook: `/scripts/pre-commit-changelog.mjs`
 - Commit hook: `/scripts/commit-msg-hook.mjs`
 - Guide: `/guides/guide-changelog.md`

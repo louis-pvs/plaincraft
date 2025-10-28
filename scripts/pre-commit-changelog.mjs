@@ -133,7 +133,7 @@ async function main() {
     );
 
     // Run changelog consolidation
-    await exec("node", ["scripts/consolidate-changelog.mjs"]);
+    await exec("node", ["scripts/ops/consolidate-changelog.mjs"]);
 
     // Check if CHANGELOG.md was modified
     if (existsSync(join(ROOT, "CHANGELOG.md"))) {

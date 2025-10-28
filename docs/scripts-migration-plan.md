@@ -162,9 +162,9 @@ Scripts that should run once or are specific to a point in time:
    - Extract from PR and changelog scripts
    - Functions: `parseMarkdown()`, `extractSections()`, `generateMarkdown()`
 
-3. **Create `_lib/changelog.mjs`**
-   - Extract from `consolidate-changelog.mjs`, `create-issues-from-changelog.mjs`
-   - Functions: `parseChangelog()`, `validateChangelogEntry()`, `formatChangelog()`
+3. **Create `_lib/changelog.mjs`** ✅
+   - Extracted from `consolidate-changelog.mjs`, `create-issues-from-changelog.mjs`
+   - Provides summary parsing, entry merge, and changelog insertion helpers
 
 4. **Create `_lib/pr.mjs`**
    - Extract from `generate-pr-content.mjs`, `manual-update-pr-checkboxes.mjs`
@@ -197,7 +197,7 @@ Scripts that should run once or are specific to a point in time:
 
 ### Phase 4: Migrate Medium Priority Scripts
 
-6. `consolidate-changelog.mjs` → `ops/consolidate-changelog.mjs`
+6. `consolidate-changelog.mjs` → `ops/consolidate-changelog.mjs` ✅
 7. `generate-pr-content.mjs` → `ops/generate-pr-content.mjs`
 8. `sync-ideas-checklists.mjs` → `ops/sync-ideas-checklists.mjs`
 9. `setup-project.mjs` → `ops/setup-project.mjs`

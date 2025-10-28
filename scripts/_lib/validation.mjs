@@ -46,8 +46,13 @@ export function validateScriptHeader(content) {
   const errors = [];
   const warnings = [];
 
+  // Allow optional shebang before header
+  const trimmedContent = content.startsWith("#!")
+    ? content.slice(content.indexOf("\n") + 1)
+    : content;
+
   // Check for header block
-  const headerMatch = content.match(/^\/\*\*\n[\s\S]*?\*\//);
+  const headerMatch = trimmedContent.match(/^\/\*\*\n[\s\S]*?\*\//);
   if (!headerMatch) {
     errors.push("Missing header comment block");
     return { valid: false, errors, warnings };

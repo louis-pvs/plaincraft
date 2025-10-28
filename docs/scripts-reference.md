@@ -116,20 +116,19 @@ node scripts/sync-issue-to-card.mjs 42
 - This enables GitHub Issue as single source of truth for tracking progress
 - Use after closing sub-issues to update parent card with `[x]` checkboxes
 
-### `node scripts/consolidate-changelog.mjs`
+### `node scripts/ops/consolidate-changelog.mjs`
 
-**Purpose:** Generate CHANGELOG.md from merged PRs and idea files
+**Purpose:** Consolidate `_tmp/*.md` summaries into CHANGELOG.md with guardrails
 
-**Status:** **Planned enhancement** - Will source from idea files instead of `_tmp/*.md`
+**Status:** **Migrated** - Guardrails-compliant orchestrator (legacy `_tmp/` workflow still supported)
 
-**Current behavior:** Sources from `_tmp/` folder (legacy workflow)
+**Current behavior:** Dry-run first, deduplicates duplicate versions, supports JSON/text output, optional temp-file cleanup
 
-**Planned behavior:**
+**Roadmap:**
 
-- Find idea file for each closed PR
-- Extract Purpose, Problem, key changes from idea file
-- Generate changelog entry automatically
-- Deprecate `_tmp/` folder requirement
+- Add idea-file sourcing to replace `_tmp/` workflow
+- Auto-link related issues and PRs during consolidation
+- Provide richer summary metadata for docs automation
 
 ## Setup & Environment
 
@@ -300,7 +299,7 @@ pnpm gh:worktree -- 42 --no-bootstrap
 
 ### `pnpm changelog`
 
-**Script:** `scripts/consolidate-changelog.mjs`  
+**Script:** `scripts/ops/consolidate-changelog.mjs`  
 **Purpose:** Consolidate temporary summaries into CHANGELOG.md
 
 **What it does:**
@@ -327,7 +326,7 @@ pnpm gh:worktree -- 42 --no-bootstrap
 pnpm changelog
 
 # Or directly
-node scripts/consolidate-changelog.mjs
+node scripts/ops/consolidate-changelog.mjs
 ```
 
 **Pre-commit Hook:**

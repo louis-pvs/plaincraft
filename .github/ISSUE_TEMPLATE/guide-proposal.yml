@@ -1,0 +1,137 @@
+name: 📖 New Guide Proposal
+description: Propose a new guide for the /guides/ directory
+title: "[Guide] "
+labels: ["documentation", "guide-proposal", "lane:D"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ⚠️ Template-First Requirement
+
+        **Before proposing a guide, you MUST create a template or script first.**
+
+        Our governance rule: *"Template before guide. If a thing can be automated or scaffolded, it must ship as a template, script, or CLI first."*
+
+  - type: input
+    id: guide-id
+    attributes:
+      label: Proposed Guide ID
+      description: Format must be `guide-[name]` (lowercase, hyphenated)
+      placeholder: guide-my-workflow
+    validations:
+      required: true
+
+  - type: dropdown
+    id: lane
+    attributes:
+      label: Target Lane
+      description: Which lane does this guide belong to?
+      options:
+        - "Lane A (Product)"
+        - "Lane B (Bug Fixes)"
+        - "Lane C (Architecture)"
+        - "Lane D (Operations/Docs)"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: template-requirement
+    attributes:
+      label: Template/Script Requirement
+      description: This guide MUST reference an existing template or script
+      options:
+        - label: Template exists in `/templates/` directory
+          required: false
+        - label: Script exists in `/scripts/` directory
+          required: false
+        - label: Neither exists (proposal is BLOCKED - create template first)
+          required: false
+
+  - type: input
+    id: scaffold-ref
+    attributes:
+      label: Template/Script Reference
+      description: Path to the template or script this guide references
+      placeholder: /templates/my-template or /scripts/ops/my-script.mjs
+    validations:
+      required: true
+
+  - type: textarea
+    id: justification
+    attributes:
+      label: Why is this guide needed?
+      description: Explain the use case and target audience
+      placeholder: |
+        This guide helps developers...
+        Target audience: ...
+        Problem it solves: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: consolidation
+    attributes:
+      label: Why not consolidate with existing guide?
+      description: Explain why this can't be part of an existing guide
+      placeholder: |
+        Checked existing guides:
+        - guide-foo.md: Not applicable because...
+        - guide-bar.md: Different use case because...
+    validations:
+      required: true
+
+  - type: textarea
+    id: ratio-impact
+    attributes:
+      label: Ratio Impact Analysis
+      description: Calculate the impact on the 3:1 template:guide ratio
+      value: |
+        **Current ratio:** 12 templates : 4 guides = 3.0:1 ✓
+        **After this guide:** 12 templates : 5 guides = 2.4:1 ❌
+
+        ⚠️ **Action required:** Must add 3 new templates first to maintain 3:1 ratio
+
+        (Run `pnpm docs:report` to check current ratio)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have created the template/script first (or verified it exists)
+          required: true
+        - label: I have checked existing guides for consolidation opportunities
+          required: true
+        - label: I have verified the 3:1 ratio will be maintained after adding this guide
+          required: true
+        - label: I have read `/docs/guides-governance.md`
+          required: true
+        - label: The guide will be < 600 words (template-first means guides are thin wrappers)
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+        ### ❌ If Template/Script Doesn't Exist
+
+        This proposal will be **automatically closed** if no template/script exists.
+
+        **Next steps:**
+        1. Create the template first: `pnpm new:template`
+        2. Submit PR with the template
+        3. After template is merged, reopen this proposal
+
+        **Why?** Guides document templates, not replace them. If you're writing instructions by hand, it should be a template instead.
+
+        ---
+
+        ### 📊 Check Current Status
+
+        ```bash
+        pnpm docs:report    # View current ratio and recommendations
+        pnpm docs:check     # Run all governance checks
+        ```

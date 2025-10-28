@@ -1,6 +1,6 @@
 # Script Migration Status
 
-## Completed Migrations (19/27 = 70%)
+## Completed Migrations (22/27 = 81%)
 
 ### Core Libraries Created
 
@@ -9,6 +9,7 @@
 - ✅ `_lib/github.mjs` - GitHub API wrappers (issues, PRs, labels)
 - ✅ `_lib/validation.mjs` - Script policy validation
 - ✅ `_lib/ideas.mjs` - Idea file parsing and validation
+- ✅ `_lib/changelog.mjs` - Changelog parsing, dedupe, and entry helpers
 
 ### Migrated Scripts
 
@@ -116,8 +117,8 @@
     - Features: parseFlags, Logger, atomicWrite, JSON output, custom --output-dir
 
 22. ✅ `consolidate-changelog.mjs` - Consolidate changelog entries
-    - Status: Basic migration (--help support)
-    - Note: Legacy \_tmp/ folder workflow, consider full migration if heavily used
+    - Status: Complete (guardrails-compliant)
+    - Features: Dry-run by default, JSON/text output, temp file cleanup, changelog dedupe
 
 23. ✅ `create-issues-from-changelog.mjs` - Create issues from changelog
     - Status: Basic migration (--help support)
@@ -170,7 +171,7 @@ None currently
 
 ### Lower Priority - All Complete! ✅
 
-- ✅ `consolidate-changelog.mjs` - Consolidate changelog entries (basic --help added)
+- ✅ `consolidate-changelog.mjs` - Consolidate changelog entries (full guardrails)
 - ✅ `create-issues-from-changelog.mjs` - Create issues from changelog (basic --help added)
 - ✅ `pre-commit-changelog.mjs` - Pre-commit changelog validation (basic --help added)
 - ✅ `generate-gh-pages-index.mjs` - Generate GitHub Pages index (fully migrated)
@@ -186,14 +187,14 @@ None currently
 ## Migration Statistics
 
 **Total Scripts**: 27
-**Fully Migrated**: 21 (78%)
-**Basic --help Added**: 6 (22%)
+**Fully Migrated**: 22 (81%)
+**Basic --help Added**: 5 (19%)
 **All Scripts Functional**: 27 (100%) ✅
 
 **By Category**:
 
-- Core Libraries: 5/5 (100%)
-- Operations: 15/15 (100%)
+- Core Libraries: 6/6 (100%)
+- Operations: 16/16 (100%)
 - Checks: 4/4 in use + 4 enforcement tools (100%)
 - Lower Priority: 7/7 (100%) ✅
 - Templates: 2/2 (100%) ✅

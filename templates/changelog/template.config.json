@@ -39,11 +39,11 @@
     ]
   },
   "scripts": {
-    "consolidate": "node scripts/consolidate-changelog.mjs",
+    "consolidate": "node scripts/ops/consolidate-changelog.mjs",
     "validate": "node scripts/validate-changelog.mjs"
   },
   "relatedFiles": [
-    "/scripts/consolidate-changelog.mjs",
+    "/scripts/ops/consolidate-changelog.mjs",
     "/scripts/pre-commit-changelog.mjs",
     "/scripts/commit-msg-hook.mjs",
     "/guides/guide-changelog.md"

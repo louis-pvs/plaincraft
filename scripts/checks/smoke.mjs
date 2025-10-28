@@ -32,6 +32,7 @@ Options:
   --log-level <level> Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>        Working directory (default: current)
   --timeout <ms>      Timeout per script in milliseconds (default: 5000)
+  --filter <patterns> Comma-separated substrings to include (relative path match)
 
 Description:
   Runs basic smoke tests on all scripts:
@@ -56,7 +57,18 @@ try {
   const scriptsDir = path.join(root, "scripts");
 
   // Find all executable scripts
-  const scriptFiles = await findExecutableScripts(scriptsDir);
+  let scriptFiles = await findExecutableScripts(scriptsDir);
+
+  const filters = parseListArg(args.filter).map((pattern) =>
+    pattern.toLowerCase(),
+  );
+  if (filters.length > 0) {
+    scriptFiles = scriptFiles.filter((filePath) => {
+      const relative = path.relative(root, filePath).toLowerCase();
+      return filters.some((pattern) => relative.includes(pattern));
+    });
+  }
+
   logger.info(`Found ${scriptFiles.length} executable scripts to test`);
 
   const results = [];
@@ -170,8 +182,11 @@ async function testDryRun(scriptPath, timeout) {
     // Try to parse JSON output
     let jsonValid = false;
     try {
-      JSON.parse(stdout);
-      jsonValid = true;
+      const jsonCandidate = extractJson(stdout);
+      if (jsonCandidate) {
+        JSON.parse(jsonCandidate);
+        jsonValid = true;
+      }
     } catch {
       // JSON parsing failed, jsonValid remains false
     }
@@ -222,4 +237,33 @@ async function findExecutableScripts(dir) {
   }
 
   return files;
+}
+
+function parseListArg(value) {
+  if (!value) return [];
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) =>
+      String(item)
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean),
+    );
+  }
+
+  return String(value)
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function extractJson(output) {
+  if (!output) return null;
+  const start = output.indexOf("{");
+  const end = output.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) {
+    return null;
+  }
+
+  return output.slice(start, end + 1);
 }
