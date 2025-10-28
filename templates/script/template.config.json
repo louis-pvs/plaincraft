@@ -1,6 +1,9 @@
 {
+  "id": "script",
   "name": "script",
   "version": "0.1.0",
+  "category": "tooling",
+  "entrypoint": "template-script.mjs",
   "description": "Compliant script template with full CLI contract and guardrails",
   "created": "2025-10-28",
   "lastUpdated": "2025-10-28",

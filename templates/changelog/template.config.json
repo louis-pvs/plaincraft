@@ -1,6 +1,9 @@
 {
+  "id": "changelog",
   "name": "changelog",
   "version": "0.1.0",
+  "category": "workflow",
+  "entrypoint": "CHANGELOG.md",
   "description": "Changelog consolidation template with _tmp/ workflow",
   "created": "2025-10-28",
   "lastUpdated": "2025-10-28",

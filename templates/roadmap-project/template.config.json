@@ -1,0 +1,37 @@
+{
+  "id": "roadmap-project",
+  "name": "roadmap-project",
+  "version": "0.1.0",
+  "category": "planning",
+  "entrypoint": "roadmap-project-template.json",
+  "description": "GitHub Projects V2 template for roadmap and sprint tracking",
+  "created": "2025-10-28",
+  "lastUpdated": "2025-10-28",
+  "schema": {
+    "columns": ["Backlog", "In Progress", "Review", "Done"],
+    "customFields": {
+      "priority": ["High", "Medium", "Low"],
+      "lane": ["A", "B", "C", "D"],
+      "effort": ["XS", "S", "M", "L", "XL"],
+      "sprint": "text"
+    },
+    "views": ["Board", "Sprint", "Priority", "Timeline"],
+    "automation": {
+      "prCreated": "Move to In Progress",
+      "prReadyForReview": "Move to Review",
+      "prMerged": "Move to Done",
+      "archiveOld": "Archive after 30 days in Done"
+    }
+  },
+  "usage": {
+    "cli": "node scripts/ops/setup-project.mjs --config templates/roadmap-project/roadmap-project-template.json",
+    "gh": "gh project create --format json < templates/roadmap-project/roadmap-project-template.json",
+    "manual": "Import via GitHub Projects UI"
+  },
+  "relatedFiles": [
+    "/guides/guide-roadmap-setup.md",
+    "/scripts/ops/setup-project.mjs",
+    "/templates/issue-unit/",
+    "/templates/pull-request/"
+  ]
+}
