@@ -60,6 +60,8 @@
     "docs:lint": "node scripts/checks/lint-guides.mjs",
     "docs:coverage": "node scripts/checks/template-coverage.mjs",
     "docs:check": "pnpm docs:lint && pnpm docs:coverage",
+    "docs:report": "node scripts/checks/docs-report.mjs",
+    "docs:dedupe": "node scripts/checks/guide-dedupe.mjs",
     "new:template": "node scripts/ops/new-template.mjs",
     "new:guide": "node scripts/ops/new-guide.mjs",
     "guides:lint": "node scripts/checks/lint-guides.mjs",
@@ -123,7 +125,8 @@
       "prettier --cache --write"
     ],
     "guides/guide-*.md": [
-      "node scripts/checks/lint-guides.mjs"
+      "node scripts/checks/lint-guides.mjs",
+      "node scripts/checks/template-coverage.mjs --check-ratio"
     ],
     "templates/**/template.config.json": [
       "node scripts/checks/template-coverage.mjs"
