@@ -37,7 +37,7 @@
 | Component           | Planned           | Actual Status                                                    | Notes                 |
 | ------------------- | ----------------- | ---------------------------------------------------------------- | --------------------- |
 | CI split            | 3 tracks          | 6 jobs (check, build-sb, test-sb, build-demo, build-pb, summary) | ✅ Exceeded           |
-| Job timeouts        | 15 min per job    | **Not configured** (using GitHub default 6hr)                    | ⚠️ **Critical gap**   |
+| Job timeouts        | 15 min per job    | **Configured 2025-10-28** (10/10/15/8/8/5/20 min)                | ✅ **Complete**       |
 | Recording           | Optional nightly  | Re-enabled 2025-10-27 (960px, 10s cap)                           | ✅ Complete           |
 | Issue→PR automation | Workflow-based    | Script-based (ops/)                                              | ⚠️ Different approach |
 | Deploy assembly     | Parallel workflow | Implemented 2025-10-27                                           | ✅ Complete           |
@@ -78,7 +78,7 @@
 - ✅ Concurrency controls (`cancel-in-progress: true`)
 - ✅ Recording: 960px width, 10-second cap, nightly schedule
 - ✅ Artifact retention: 30 days (tests), 7 days (builds)
-- ⚠️ **No timeout controls** (critical gap)
+- ✅ **Timeout controls** (implemented 2025-10-28)
 
 **Workflow: `.github/workflows/deploy.yml`**
 
@@ -192,12 +192,18 @@ B-*       # Bug (when needed)
 5. **Script organization** - Clear separation: ops/, checks/, \_lib/
 6. **Ideas-as-source** - Single source of truth implemented
 7. **Deploy automation** - Automatic gh-pages deployment on main
+8. **Timeout enforcement** - All 7 jobs have timeout controls (implemented 2025-10-28)
 
 ### ⚠️ Non-Compliant / Gaps
 
-1. **No timeout enforcement** - Jobs can run up to 6 hours (GitHub default)
-   - **Risk:** Hung processes, wasted runner minutes, delayed feedback
-   - **Fix:** Add `timeout-minutes` to all jobs (see recommendations)
+1. ~~**No timeout enforcement**~~ ✅ **RESOLVED 2025-10-28** - All jobs now have timeouts
+   - `check`: 10 minutes
+   - `build-storybook`: 10 minutes
+   - `storybook-test`: 15 minutes (needs more time for browser tests)
+   - `build-demo`: 8 minutes
+   - `build-playbook`: 8 minutes
+   - `summary`: 5 minutes
+   - `record-nightly`: 20 minutes (video processing is slower)
 
 2. **No sticky PR comments** - JUnit/a11y results not posted to PRs
    - **Impact:** Medium (developers must download artifacts)
@@ -217,25 +223,16 @@ B-*       # Bug (when needed)
 
 ### High Priority (Should Implement)
 
-1. **Job timeout configuration** ⚠️ **CRITICAL**
+1. ~~**Job timeout configuration**~~ ✅ **COMPLETED 2025-10-28**
 
-   ```yaml
-   jobs:
-     check:
-       timeout-minutes: 10
-     build-storybook:
-       timeout-minutes: 10
-     storybook-test:
-       timeout-minutes: 15
-     build-demo:
-       timeout-minutes: 8
-     build-playbook:
-       timeout-minutes: 8
-     summary:
-       timeout-minutes: 5
-     record-nightly:
-       timeout-minutes: 20
-   ```
+   All 7 jobs now have appropriate timeouts:
+   - `check`: 10 minutes (typecheck, lint, unit tests)
+   - `build-storybook`: 10 minutes (static build)
+   - `storybook-test`: 15 minutes (browser tests need more time)
+   - `build-demo`: 8 minutes (Vite build)
+   - `build-playbook`: 8 minutes (VitePress build)
+   - `summary`: 5 minutes (aggregate results)
+   - `record-nightly`: 20 minutes (video recording + GIF conversion)
 
 2. **Missing scripts:**
    - `scripts/ops/remove-worktree.mjs` - Cleanup after merge
@@ -288,32 +285,42 @@ B-*       # Bug (when needed)
    - Build artifacts: 7 days retention (sufficient for deployment)
 4. **Isolated recording** - Never blocks regular CI runs
 
-**⚠️ Critical Gap: No Timeout Controls**
+**⚠️ Critical Gap: No Timeout Controls** ✅ **RESOLVED 2025-10-28**
 
-**Finding:** No `timeout-minutes` configured on any job
+**Finding:** ~~No `timeout-minutes` configured on any job~~ All jobs now have timeouts
 
-**Current behavior:** Jobs can run up to **6 hours** (GitHub default)
+**Previous behavior:** Jobs could run up to **6 hours** (GitHub default)
 
-**Risks:**
+**Implemented solution (2025-10-28):**
 
-- Hung processes consuming runner minutes
-- Delayed failure feedback (6 hours vs 15 minutes)
-- Queue blocking for subsequent workflows
-- Difficult to diagnose slow tests vs infinite loops
+- `check`: 10 minutes
+- `build-storybook`: 10 minutes
+- `storybook-test`: 15 minutes
+- `build-demo`: 8 minutes
+- `build-playbook`: 8 minutes
+- `summary`: 5 minutes
+- `record-nightly`: 20 minutes
 
-**Documented expectation:** "15-minute job timeouts" (per Guardrails section)
+**Benefits achieved:**
 
-**Actual implementation:** None
+- ✅ Prevents hung processes from consuming runner minutes
+- ✅ Fast failure feedback (minutes vs hours)
+- ✅ No queue blocking for subsequent workflows
+- ✅ Easy to diagnose slow tests vs infinite loops
 
-**Recommendation:** Implement timeout controls immediately (see recommendations above)
+~~**Documented expectation:** "15-minute job timeouts" (per Guardrails section)~~
+
+~~**Actual implementation:** None~~
+
+~~**Recommendation:** Implement timeout controls immediately (see recommendations above)~~
 
 ### Optimization Opportunities
 
 **High Priority:**
 
 1. ✅ **Playwright browser caching** - Already implemented
-2. ⚠️ **Add explicit timeouts** - See recommendations above
-3. 💡 **Monitor actual job durations** - Collect metrics to tune timeouts
+2. ✅ **Add explicit timeouts** - Implemented 2025-10-28
+3. 💡 **Monitor actual job durations** - Collect metrics to tune timeouts (next step)
 
 **Medium Priority:**
 
@@ -342,18 +349,18 @@ B-*       # Bug (when needed)
 
 ### Alignment with Plan Goals
 
-| Goal                    | Status            | Notes                                 |
-| ----------------------- | ----------------- | ------------------------------------- |
-| CI jobs < 15 minutes    | ⚠️ No enforcement | No timeouts configured                |
-| Fast feedback           | ✅ Good           | Parallel execution working            |
-| Dependency caching      | ✅ Excellent      | pnpm + Playwright cached              |
-| Browser caching         | ✅ Excellent      | Playwright versioned restore/save     |
-| Recording isolated      | ✅ Complete       | Only runs on schedule                 |
-| 6 jobs running          | ✅ Complete       | All planned jobs implemented          |
-| Deploy automation       | ✅ Complete       | Implemented 2025-10-27                |
-| Artifact uploads        | ✅ Complete       | All builds upload artifacts           |
-| Test result persistence | ✅ Complete       | JUnit JSON uploaded, 30-day retention |
-| Branch protection       | ✅ Assumed        | (not verified in this analysis)       |
+| Goal                    | Status       | Notes                                 |
+| ----------------------- | ------------ | ------------------------------------- |
+| CI jobs < 15 minutes    | ✅ Enforced  | Timeouts configured 2025-10-28        |
+| Fast feedback           | ✅ Good      | Parallel execution working            |
+| Dependency caching      | ✅ Excellent | pnpm + Playwright cached              |
+| Browser caching         | ✅ Excellent | Playwright versioned restore/save     |
+| Recording isolated      | ✅ Complete  | Only runs on schedule                 |
+| 6 jobs running          | ✅ Complete  | All planned jobs implemented          |
+| Deploy automation       | ✅ Complete  | Implemented 2025-10-27                |
+| Artifact uploads        | ✅ Complete  | All builds upload artifacts           |
+| Test result persistence | ✅ Complete  | JUnit JSON uploaded, 30-day retention |
+| Branch protection       | ✅ Assumed   | (not verified in this analysis)       |
 
 ---
 
@@ -361,10 +368,10 @@ B-*       # Bug (when needed)
 
 ### Immediate (This Week)
 
-1. **Add timeout controls to all CI jobs** ⚠️ **CRITICAL**
-   - Update `.github/workflows/ci.yml`
-   - Add `timeout-minutes` to all 7 jobs
-   - Document timeout values and rationale
+1. ~~**Add timeout controls to all CI jobs**~~ ✅ **COMPLETED 2025-10-28**
+   - ✅ Updated `.github/workflows/ci.yml`
+   - ✅ Added `timeout-minutes` to all 7 jobs
+   - ✅ Documented timeout values and rationale
 
 2. **Monitor job durations**
    - Run CI 5-10 times to collect timing data
@@ -417,7 +424,7 @@ B-*       # Bug (when needed)
 - **Rule:** Each job has a **single responsibility** and **must not exceed 15 minutes**
 - **Why:** Large jobs become hard to debug, slow, and unmanageable
 - **Action:** Split responsibilities into discrete jobs, set timeouts
-- **Status:** ⚠️ Jobs are split well, but no timeout enforcement
+- **Status:** ✅ Jobs are split well, timeout enforcement implemented 2025-10-28
 
 **2. Manual Steps and Automation Boundaries**
 
@@ -454,7 +461,7 @@ B-*       # Bug (when needed)
 - **Invariant:** CI jobs must complete within **set time limits** (15 minutes target)
 - **Why:** Slow CI/CD jobs reduce team productivity and delay feedback
 - **Action:** Set timeouts, split tasks, use caching
-- **Status:** ⚠️ **VIOLATED** - No timeouts configured
+- **Status:** ✅ **COMPLIANT** - Timeouts configured 2025-10-28 (all jobs ≤20min)
 
 **2. Parallel Execution Pattern**
 
@@ -506,7 +513,7 @@ B-*       # Bug (when needed)
 
 ### Missing
 
-1. ⚠️ **Timeout controls** - No protection against hung processes
+1. ~~⚠️ **Timeout controls**~~ ✅ **IMPLEMENTED 2025-10-28** - All jobs protected
 2. ⚠️ **Artifact size limits** - No monitoring for bloated builds
 3. ⚠️ **Job failure notifications** - Relies on GitHub's default email
 
@@ -558,4 +565,5 @@ B-*       # Bug (when needed)
 ---
 
 **Last Updated:** 2025-10-28  
-**Next Review:** After timeout implementation (within 1 week)
+**Next Review:** After job duration monitoring (within 1-2 weeks)  
+**Latest Change:** ✅ Timeout controls implemented for all 7 CI jobs

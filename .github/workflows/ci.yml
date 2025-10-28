@@ -17,6 +17,7 @@ jobs:
   check:
     name: Typecheck, Lint & Unit Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -46,6 +47,7 @@ jobs:
   build-storybook:
     name: Build Storybook Static
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -68,6 +70,7 @@ jobs:
   storybook-test:
     name: Storybook Interaction & A11y Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: build-storybook
     steps:
       - uses: actions/checkout@v5
@@ -129,6 +132,7 @@ jobs:
   build-demo:
     name: Build Demo Site
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -151,6 +155,7 @@ jobs:
   build-playbook:
     name: Build Playbook Docs
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -173,6 +178,7 @@ jobs:
   summary:
     name: PR Summary
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [check, storybook-test, build-storybook, build-demo, build-playbook]
     if: always()
     steps:
@@ -213,6 +219,7 @@ jobs:
   record-nightly:
     name: Record Story Videos & GIFs
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     # Only run on schedule (nightly) or manual workflow_dispatch
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     needs: build-storybook
