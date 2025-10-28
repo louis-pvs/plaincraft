@@ -302,7 +302,7 @@ async function main() {
 
   // Show help first, before any validation
   if (flags.help) {
-      console.log(`
+    console.log(`
 Usage: ${SCRIPT_NAME} <issue-number> [options]
 
 Archive idea file when corresponding GitHub issue is closed.
