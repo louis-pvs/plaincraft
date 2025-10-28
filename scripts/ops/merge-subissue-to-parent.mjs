@@ -27,6 +27,7 @@ const ArgsSchema = z.object({
   logLevel: z.enum(["error", "warn", "info", "debug", "trace"]).default("info"),
   cwd: z.string().optional(),
   subIssueNumber: z.number(),
+  skipCleanup: z.boolean().default(false),
 });
 
 /**
@@ -259,6 +260,45 @@ async function mergeSubIssueToParent(subIssueNumber, dryRun, log) {
 }
 
 /**
+ * Cleanup branch worktree after successful merge
+ * @param {string} branch - Branch to clean up
+ * @param {string|undefined} cwd - Working directory override
+ * @param {Logger} log - Logger
+ * @returns {Promise<{success: boolean, data?: unknown, error?: string}>}
+ */
+async function cleanupWorktree(branch, cwd, log) {
+  if (!branch) {
+    return { success: false, error: "No branch provided for cleanup" };
+  }
+
+  log.info(`Cleaning up worktree for ${branch}...`);
+
+  try {
+    const root = await repoRoot(cwd);
+    const { stdout } = await execCommand(
+      "node",
+      ["scripts/ops/remove-worktree.mjs", branch, "--yes", "--output", "json"],
+      { cwd: root },
+    );
+
+    let data;
+    try {
+      data = stdout.trim() ? JSON.parse(stdout) : undefined;
+    } catch {
+      data = { raw: stdout };
+    }
+
+    log.info(`Worktree cleanup complete for ${branch}`);
+    return { success: true, data };
+  } catch (error) {
+    log.warn(
+      `Worktree cleanup for ${branch} failed: ${error.message}. Please run manually if needed.`,
+    );
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Main entry point
  */
 async function main() {
@@ -275,6 +315,7 @@ Merge sub-issue changes to parent issue branch.
 Options:
   --help                    Show this help message
   --dry-run                 Preview without merging
+  --skip-cleanup            Do not remove sub-issue worktree after merge
   --output <fmt>            Output format: text (default), json
   --log-level <lvl>         Log level: error, warn, info (default), debug, trace
   --cwd <path>              Working directory (default: current)
@@ -301,6 +342,7 @@ Exit codes:
     const args = ArgsSchema.parse({
       ...flags,
       subIssueNumber,
+      skipCleanup: flags.skipCleanup ?? false,
     });
 
     // Check gh CLI
@@ -321,6 +363,11 @@ Exit codes:
       args.dryRun,
       log,
     );
+
+    if (result.merged && !args.skipCleanup) {
+      const cleanup = await cleanupWorktree(result.subBranch, args.cwd, log);
+      result.cleanup = cleanup;
+    }
 
     succeed({
       script: SCRIPT_NAME,
