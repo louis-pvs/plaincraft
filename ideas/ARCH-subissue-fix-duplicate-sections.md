@@ -54,8 +54,8 @@ async function updateParentWithChildren(
 
 - [x] `updateParentWithChildren()` function updated with section replacement logic
 - [x] Regex correctly matches Sub-Issues section boundaries
-- [ ] Test: Run script twice on same parent → single Sub-Issues section appears
-- [ ] Test: Manually edit parent issue, add Sub-Issues → re-run script → section replaced not duplicated
+- [x] Test: Run script twice on same parent → single Sub-Issues section appears
+- [x] Test: Manually edit parent issue, add Sub-Issues → re-run script → section replaced not duplicated
 - [x] Formatting preserved (checklist format: `- [ ] #N Title`)
 - [x] `sync-issue-to-card.mjs` can still parse the section correctly
 - [x] Dry-run mode shows replacement behavior in logs
