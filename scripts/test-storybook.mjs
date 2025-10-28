@@ -1,6 +1,39 @@
 #!/usr/bin/env node
 /**
  * Storybook Test Runner with automatic server management
+ * @version 1.0.0
+ */
+
+// Check for --help first
+if (process.argv.includes("--help") || process.argv.includes("-h")) {
+  console.log(`
+Storybook Test Runner with automatic server management
+
+Handles the full lifecycle:
+1. Build Storybook (if not present or --rebuild flag)
+2. Start static server
+3. Wait for server ready
+4. Run test-storybook
+5. Clean up server
+
+USAGE:
+  node scripts/test-storybook.mjs [options]
+
+OPTIONS:
+  --rebuild  Force rebuild Storybook
+  --json     Output in JSON format
+  --help     Show this help
+
+EXAMPLES:
+  node scripts/test-storybook.mjs
+  node scripts/test-storybook.mjs --rebuild
+  node scripts/test-storybook.mjs --json
+`);
+  process.exit(0);
+}
+
+/**
+ * Storybook Test Runner with automatic server management
  *
  * Handles the full lifecycle:
  * 1. Build Storybook (if not present or --rebuild flag)
@@ -8,11 +41,6 @@
  * 3. Wait for server ready
  * 4. Run test-storybook
  * 5. Clean up server
- *
- * Usage:
- *   node scripts/test-storybook.mjs
- *   node scripts/test-storybook.mjs --rebuild
- *   node scripts/test-storybook.mjs --json
  */
 
 import { spawn } from "node:child_process";

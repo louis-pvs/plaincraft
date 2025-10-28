@@ -1,13 +1,7 @@
 #!/usr/bin/env node
 /**
  * Consolidate temporary summary files into CHANGELOG.md
- *
- * Reads all markdown files from _tmp/ folder and consolidates them
- * into CHANGELOG.md with proper versioning and timestamps.
- * Deletes temporary files after successful consolidation.
- *
- * Usage:
- *   node scripts/consolidate-changelog.mjs
+ * @version 1.0.0
  */
 
 import { readdir, readFile, writeFile, unlink } from "node:fs/promises";
@@ -15,6 +9,27 @@ import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
+
+// Check for --help first
+if (process.argv.includes("--help") || process.argv.includes("-h")) {
+  console.log(`
+Consolidate temporary summary files into CHANGELOG.md
+
+Reads all markdown files from _tmp/ folder and consolidates them
+into CHANGELOG.md with proper versioning and timestamps.
+Deletes temporary files after successful consolidation.
+
+USAGE:
+  node scripts/consolidate-changelog.mjs [options]
+
+OPTIONS:
+  --help   Show this help
+
+EXAMPLES:
+  node scripts/consolidate-changelog.mjs
+`);
+  process.exit(0);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

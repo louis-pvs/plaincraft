@@ -1,23 +1,52 @@
 #!/usr/bin/env node
 /**
  * Generate root index.html for gh-pages deployment
- *
- * This creates a landing page that links to:
- * - /demo - Live application demo
- * - /storybook - Component library documentation
- * - /playbook - Architecture and patterns documentation
- *
- * Usage:
- *   node scripts/generate-gh-pages-index.mjs [output-dir]
+ * @version 1.0.0
  */
 
-import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { parseFlags, Logger, atomicWrite } from "./_lib/core.mjs";
 
-const outputDir = process.argv[2] || "_deploy";
-const outputPath = join(outputDir, "index.html");
+/**
+ * Main entry point
+ */
+async function main() {
+  const flags = parseFlags();
+  const log = new Logger(flags.logLevel);
 
-const html = `<!DOCTYPE html>
+  // Show help first
+  if (flags.help) {
+    console.log(`
+Generate root index.html for gh-pages deployment
+
+This creates a landing page that links to:
+- /demo - Live application demo
+- /storybook - Component library documentation
+- /playbook - Architecture and patterns documentation
+
+USAGE:
+  node scripts/generate-gh-pages-index.mjs [options]
+
+OPTIONS:
+  --output-dir <dir> Output directory (default: _deploy)
+  --dry-run          Preview without writing
+  --yes              Skip confirmation
+  --help             Show this help
+
+EXAMPLES:
+  # Generate with dry-run
+  node scripts/generate-gh-pages-index.mjs
+
+  # Generate to custom directory
+  node scripts/generate-gh-pages-index.mjs --yes --output-dir=dist
+`);
+    process.exit(0);
+  }
+
+  const outputDir = flags["output-dir"] || flags._[0] || "_deploy";
+  const outputPath = join(outputDir, "index.html");
+
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -143,10 +172,47 @@ const html = `<!DOCTYPE html>
 </html>
 `;
 
-try {
-  await writeFile(outputPath, html, "utf-8");
-  console.log(`✓ Generated root index.html at ${outputPath}`);
-} catch (error) {
-  console.error("✗ Failed to generate index.html:", error.message);
-  process.exit(1);
+  if (flags.dryRun) {
+    log.info(`[DRY-RUN] Would write index.html to: ${outputPath}`);
+    if (flags.output === "json") {
+      console.log(
+        JSON.stringify({
+          ok: true,
+          script: "generate-gh-pages-index",
+          dryRun: true,
+          outputPath,
+        }),
+      );
+    }
+    process.exit(0);
+  }
+
+  try {
+    await atomicWrite(outputPath, html);
+    log.success(`Generated root index.html at ${outputPath}`);
+
+    if (flags.output === "json") {
+      console.log(
+        JSON.stringify({
+          ok: true,
+          script: "generate-gh-pages-index",
+          outputPath,
+        }),
+      );
+    }
+  } catch (error) {
+    log.error(`Failed to generate index.html: ${error.message}`);
+    if (flags.output === "json") {
+      console.log(
+        JSON.stringify({
+          ok: false,
+          script: "generate-gh-pages-index",
+          error: error.message,
+        }),
+      );
+    }
+    process.exit(1);
+  }
 }
+
+main();

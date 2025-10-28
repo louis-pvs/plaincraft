@@ -1,11 +1,29 @@
 #!/usr/bin/env node
 /**
  * Pre-commit hook to auto-generate changelog if temporary summary files exist
- *
- * Checks if _tmp/ folder has any .md files.
- * If yes and CHANGELOG.md not staged, runs consolidation.
- * Auto-consolidates and stages CHANGELOG.md if summary files exist.
+ * @version 1.0.0
  */
+
+// Check for --help first
+if (process.argv.includes("--help") || process.argv.includes("-h")) {
+  console.log(`
+Pre-commit hook to auto-generate changelog
+
+Checks if _tmp/ folder has any .md files.
+If yes and CHANGELOG.md not staged, runs consolidation.
+Auto-consolidates and stages CHANGELOG.md if summary files exist.
+
+USAGE:
+  node scripts/pre-commit-changelog.mjs [options]
+
+OPTIONS:
+  --help   Show this help
+
+EXAMPLES:
+  node scripts/pre-commit-changelog.mjs
+`);
+  process.exit(0);
+}
 
 import { spawn } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";

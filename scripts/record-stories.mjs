@@ -1,11 +1,7 @@
 #!/usr/bin/env node
 /**
  * Record Storybook stories with Playwright and convert to GIFs
- *
- * Usage:
- *   STORIES=all node scripts/record-stories.mjs
- *   STORIES=component--story-id node scripts/record-stories.mjs
- *   STORIES=component--story-1,component--story-2 node scripts/record-stories.mjs
+ * @version 1.0.0
  */
 
 import { spawn } from "node:child_process";
@@ -13,9 +9,8 @@ import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { basename, join } from "node:path";
 import { chromium } from "@playwright/test";
+import { parseFlags, Logger } from "./_lib/core.mjs";
 
-const TARGET_URL = process.env.TARGET_URL || "http://127.0.0.1:6006";
-const STORIES_FILTER = process.env.STORIES || "all";
 const VIDEO_DIR = "artifacts/video";
 const GIF_DIR = "docs/assets/gif";
 
@@ -82,11 +77,11 @@ async function videoToGif(videoPath, gifPath) {
 /**
  * Get list of stories to record
  */
-async function getStoryList(page) {
+async function getStoryList(page, targetUrl) {
   const stories = [];
 
   try {
-    await page.goto(TARGET_URL);
+    await page.goto(targetUrl);
     await page.waitForSelector("#storybook-preview-iframe", { timeout: 10000 });
 
     // Get all story links from sidebar
@@ -114,13 +109,13 @@ async function getStoryList(page) {
  * Record a single story
  * Maximum recording time: 10 seconds
  */
-async function recordStory(page, storyId) {
+async function recordStory(page, storyId, targetUrl) {
   const videoPath = join(VIDEO_DIR, `${storyId}.webm`);
   const gifPath = join(GIF_DIR, `${storyId}.gif`);
 
   try {
     // Navigate to story
-    await page.goto(`${TARGET_URL}/iframe.html?id=${storyId}&viewMode=story`);
+    await page.goto(`${targetUrl}/iframe.html?id=${storyId}&viewMode=story`);
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(500); // Let animations settle
 
@@ -146,9 +141,45 @@ async function recordStory(page, storyId) {
  * Main execution
  */
 async function main() {
-  console.log("🎬 Starting story recording...");
-  console.log(`Target: ${TARGET_URL}`);
-  console.log(`Filter: ${STORIES_FILTER}`);
+  const flags = parseFlags();
+  const log = new Logger(flags.logLevel);
+
+  // Show help first
+  if (flags.help) {
+    console.log(`
+Record Storybook stories with Playwright and convert to GIFs
+
+USAGE:
+  node scripts/record-stories.mjs [options]
+
+OPTIONS:
+  --url <url>        Storybook URL (default: http://127.0.0.1:6006)
+  --stories <filter> Story filter: 'all' or comma-separated IDs
+  --output <format>  Output format: text or json (default: text)
+  --help             Show this help
+
+EXAMPLES:
+  # Record all stories
+  node scripts/record-stories.mjs --yes
+
+  # Record specific stories
+  node scripts/record-stories.mjs --yes --stories=component--story-id
+
+  # Multiple stories
+  node scripts/record-stories.mjs --yes --stories=component--story-1,component--story-2
+
+  # Custom Storybook URL
+  node scripts/record-stories.mjs --yes --url=http://localhost:9009
+`);
+    process.exit(0);
+  }
+
+  const TARGET_URL = flags.url || "http://127.0.0.1:6006";
+  const STORIES_FILTER = flags.stories || "all";
+
+  log.info("🎬 Starting story recording...");
+  log.info(`Target: ${TARGET_URL}`);
+  log.info(`Filter: ${STORIES_FILTER}`);
 
   const browser = await chromium.launch({
     headless: true,
@@ -169,7 +200,7 @@ async function main() {
     let storyIds = [];
 
     if (STORIES_FILTER === "all") {
-      storyIds = await getStoryList(page);
+      storyIds = await getStoryList(page, TARGET_URL);
       console.log(`Found ${storyIds.length} stories`);
     } else {
       storyIds = STORIES_FILTER.split(",").map((s) => s.trim());
@@ -180,7 +211,7 @@ async function main() {
     const results = [];
     for (const storyId of storyIds) {
       console.log(`\nRecording: ${storyId}`);
-      const result = await recordStory(page, storyId);
+      const result = await recordStory(page, storyId, TARGET_URL);
       results.push(result);
     }
 

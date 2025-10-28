@@ -1,15 +1,41 @@
 #!/usr/bin/env node
+/**
+ * GitHub Project Setup Script
+ * @version 1.0.0
+ */
+
+// Check for --help first
+if (process.argv.includes("--help") || process.argv.includes("-h")) {
+  console.log(`
+Create and configure GitHub Projects (v2) for Plaincraft Roadmap
+
+Sets up views, fields, and automation according to ROADMAP-GUIDE.md.
+
+USAGE:
+  node scripts/setup-project.mjs [options]
+
+OPTIONS:
+  --project-name <name>  Project name (default: "Plaincraft Roadmap")
+  --dry-run              Preview without creating
+  --help                 Show this help
+
+EXAMPLES:
+  node scripts/setup-project.mjs
+  node scripts/setup-project.mjs --project-name "Plaincraft Roadmap"
+  node scripts/setup-project.mjs --dry-run
+
+REQUIRES:
+  GitHub CLI authenticated with project permissions
+  GraphQL API access for Projects v2
+`);
+  process.exit(0);
+}
 
 /**
  * GitHub Project Setup Script
  *
  * Creates and configures GitHub Projects (v2) for the Plaincraft Roadmap.
  * Sets up views, fields, and automation according to ROADMAP-GUIDE.md.
- *
- * Usage:
- *   node scripts/setup-project.mjs
- *   node scripts/setup-project.mjs --project-name "Plaincraft Roadmap"
- *   node scripts/setup-project.mjs --dry-run
  *
  * Requires:
  *   - GitHub CLI authenticated with project permissions

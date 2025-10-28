@@ -1,15 +1,41 @@
 #!/usr/bin/env node
+/**
+ * Create Issues from Changelog
+ * @version 1.0.0
+ */
+
+// Check for --help first
+if (process.argv.includes("--help") || process.argv.includes("-h")) {
+  console.log(`
+Create GitHub issues from CHANGELOG.md entries
+
+Parses CHANGELOG.md and creates GitHub issues for each change entry.
+Automatically detects lane from commit tags and applies appropriate labels.
+
+USAGE:
+  node scripts/create-issues-from-changelog.mjs [options]
+
+OPTIONS:
+  --version <ver>  Target specific version
+  --dry-run        Preview without creating issues
+  --help           Show this help
+
+EXAMPLES:
+  node scripts/create-issues-from-changelog.mjs
+  node scripts/create-issues-from-changelog.mjs --version 0.1.0
+  node scripts/create-issues-from-changelog.mjs --dry-run
+
+REQUIRES:
+  GitHub CLI authenticated (gh auth login)
+`);
+  process.exit(0);
+}
 
 /**
  * Create Issues from Changelog
  *
  * Parses CHANGELOG.md and creates GitHub issues for each change entry.
  * Automatically detects lane from commit tags and applies appropriate labels.
- *
- * Usage:
- *   node scripts/create-issues-from-changelog.mjs
- *   node scripts/create-issues-from-changelog.mjs --version 0.1.0
- *   node scripts/create-issues-from-changelog.mjs --dry-run
  *
  * Requires:
  *   - GitHub CLI authenticated (`gh auth login`)
