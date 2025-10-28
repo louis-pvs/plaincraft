@@ -57,7 +57,7 @@
     "scripts:size": "node scripts/checks/size-check.mjs",
     "scripts:deprecation": "node scripts/checks/deprecation-sweeper.mjs",
     "scripts:guardrails": "pnpm scripts:lint && pnpm scripts:test && pnpm scripts:smoke && pnpm scripts:size && pnpm scripts:deprecation",
-    "docs:lint": "node scripts/checks/docs-lint.mjs",
+    "docs:lint": "node scripts/checks/lint-guides.mjs",
     "docs:coverage": "node scripts/checks/template-coverage.mjs",
     "docs:check": "pnpm docs:lint && pnpm docs:coverage",
     "guides:lint": "node scripts/checks/lint-guides.mjs",
@@ -121,7 +121,7 @@
       "prettier --cache --write"
     ],
     "guides/guide-*.md": [
-      "node scripts/checks/docs-lint.mjs --files"
+      "node scripts/checks/lint-guides.mjs"
     ],
     "templates/**/template.config.json": [
       "node scripts/checks/template-coverage.mjs"
