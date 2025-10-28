@@ -25,7 +25,7 @@ The scripts migration has achieved major milestones:
 
 However, critical work remains incomplete:
 
-- ❌ **Zero unit test coverage** for `_lib` modules (35-50 hours estimated)
+- ✅ ~~**Zero unit test coverage** for `_lib` modules~~ → **COMPLETED** - 355 tests across 7 modules
 - ❌ package.json still references old script paths
 - ❌ No DEPRECATED shims for backward compatibility (90-day policy)
 - ❌ CI workflows not updated to use new script locations
@@ -113,7 +113,7 @@ Create comprehensive test suites for all `_lib` modules targeting 80% coverage m
 
 ## Sub-Issues
 
-- [ ] `U-lib-unit-tests` - Write unit tests for all 7 `_lib` modules (35-50 hours)
+- [x] `U-lib-unit-tests` - Write unit tests for all 7 `_lib` modules (35-50 hours) ✅ **COMPLETED** - Issue #69 closed, 355 tests passing
 - [ ] `U-package-json-migration` - Update package.json commands and scripts section
 - [ ] `U-deprecated-shims` - Create backward compatibility redirect shims
 - [ ] `U-ci-workflow-migration` - Update GitHub Actions workflows
@@ -121,8 +121,8 @@ Create comprehensive test suites for all `_lib` modules targeting 80% coverage m
 
 ## Acceptance Checklist
 
-- [ ] All 7 `_lib` modules have test files with ≥80% coverage
-- [ ] `pnpm scripts:test` runs all unit tests successfully
+- [x] All 7 `_lib` modules have test files with ≥80% coverage ✅ **COMPLETED**
+- [x] `pnpm scripts:test` runs all unit tests successfully ✅ **COMPLETED** - 355 tests passing
 - [ ] All package.json commands reference new script paths
 - [ ] DEPRECATED shims created for all moved scripts (expires 2026-01-26)
 - [ ] CI workflows updated and tested in PR
