@@ -84,7 +84,9 @@ export async function atomicWrite(targetPath, content) {
   } catch (error) {
     try {
       await fs.unlink(tmpPath);
-    } catch {}
+    } catch {
+      // Ignore cleanup errors
+    }
     throw error;
   }
 }
@@ -94,7 +96,7 @@ export async function atomicWrite(targetPath, content) {
  * @param {string[]} argv - Process arguments (from process.argv.slice(2))
  * @returns {object} Parsed flags
  */
-export function parseFlags(argv) {
+export function parseFlags(argv = process.argv.slice(2)) {
   const parsed = {
     _: [],
     dryRun: true, // default to dry-run

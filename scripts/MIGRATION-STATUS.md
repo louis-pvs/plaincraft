@@ -1,6 +1,6 @@
 # Script Migration Status
 
-## Completed Migrations (11/27)
+## Completed Migrations (15/27 = 56%)
 
 ### Core Libraries Created
 
@@ -12,7 +12,7 @@
 
 ### Migrated Scripts
 
-#### ops/ (8)
+#### ops/ (11)
 
 1. ✅ `setup-labels.mjs` - Create/update repository lane labels
    - Status: Complete
@@ -58,7 +58,22 @@
    - Original: `DEPRECATED/sync-issue-to-card.mjs`
    - Features: Bidirectional sync, section updates, smart file discovery
 
-#### checks/ (3)
+10. ✅ `manual-update-pr-checkboxes.mjs` - Update PR checkboxes
+    - Status: Complete
+    - Original: `DEPRECATED/manual-update-pr-checkboxes.mjs`
+    - Features: Acceptance/related checkboxes, preview mode
+
+11. ✅ `merge-subissue-to-parent.mjs` - Merge sub-issue to parent branch
+    - Status: Complete
+    - Original: `DEPRECATED/merge-subissue-to-parent.mjs`
+    - Features: Worktree detection, auto-merge, conflict handling
+
+12. ✅ `generate-pr-content.mjs` - Generate PR title/body from changelog or idea
+    - Status: Complete
+    - Original: `DEPRECATED/generate-pr-content.mjs`
+    - Features: Multiple sources, template integration, GitHub Actions output
+
+#### checks/ (4)
 
 1. ✅ `validate-ideas.mjs` - Validate idea file structure
    - Status: Complete
@@ -70,10 +85,15 @@
    - Original: `DEPRECATED/check-ci.mjs`
    - Features: Watch mode, formatted reports, JSON output
 
-3. ✅ `policy-lint.mjs` - Enforce script guardrails (created earlier)
-4. ✅ `smoke.mjs` - Smoke test all scripts (created earlier)
-5. ✅ `lint-guides.mjs` - Validate guides (created earlier)
-6. ✅ `dedupe-guides.mjs` - Detect duplicate guides (created earlier)
+3. ✅ `pr-requirements.mjs` - PR requirements automation
+   - Status: Complete
+   - Original: `DEPRECATED/pr-requirements.mjs`
+   - Features: Create issues, verify PRs, apply labels, lane detection
+
+4. ✅ `policy-lint.mjs` - Enforce script guardrails (created earlier)
+5. ✅ `smoke.mjs` - Smoke test all scripts (created earlier)
+6. ✅ `lint-guides.mjs` - Validate guides (created earlier)
+7. ✅ `dedupe-guides.mjs` - Detect duplicate guides (created earlier)
 
 ## In Progress (0)
 
