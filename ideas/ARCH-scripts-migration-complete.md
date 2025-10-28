@@ -116,7 +116,7 @@ Create comprehensive test suites for all `_lib` modules targeting 80% coverage m
 - [x] `U-lib-unit-tests` - Write unit tests for all 7 `_lib` modules (35-50 hours) ✅ **COMPLETED** - Issue #69 closed, 355 tests passing
 - [x] `U-package-json-migration` - Update package.json commands and scripts section ✅ **COMPLETED** - 14 paths fixed, verified working
 - [x] `U-deprecated-shims` - Create backward compatibility redirect shims ✅ **COMPLETED** - 11 shims created, expire 2026-01-26
-- [ ] `U-ci-workflow-migration` - Update GitHub Actions workflows
+- [x] `U-ci-workflow-migration` - Update GitHub Actions workflows ✅ **COMPLETED** - ideas.yml updated with 4 path corrections
 - [ ] `U-docs-migration-complete` - Finalize all documentation updates
 
 ## Acceptance Checklist
@@ -125,6 +125,7 @@ Create comprehensive test suites for all `_lib` modules targeting 80% coverage m
 - [x] `pnpm scripts:test` runs all unit tests successfully ✅ **COMPLETED** - 355 tests passing
 - [x] All package.json commands reference new script paths ✅ **COMPLETED** - 14 paths updated
 - [x] DEPRECATED shims created for all moved scripts (expires 2026-01-26) ✅ **COMPLETED** - 11 shims
+- [x] CI workflows updated and tested in PR ✅ **COMPLETED** - ideas.yml fixed, 4 references updated
 - [ ] DEPRECATED shims created for all moved scripts (expires 2026-01-26)
 - [ ] CI workflows updated and tested in PR
 - [ ] Documentation fully updated (scripts-reference, guide-scripts, README)
