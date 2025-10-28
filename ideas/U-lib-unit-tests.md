@@ -2,6 +2,8 @@
 
 - **Lane**: C
 - **Linked Composition**: `ARCH-scripts-migration-complete`
+- **Parent**: `ARCH-scripts-migration-complete`
+- **Issue**: #69
 - **Contracts**: Ensure all `_lib` modules have comprehensive unit test coverage (≥80%) to prevent regressions during refactoring.
 
 ## Lane
@@ -154,7 +156,7 @@ N/A - Backend testing only, no UI components.
 - [x] Fixtures directory `scripts/_lib/__fixtures__/` created with test data
 - [x] All tests pass with `pnpm scripts:test` (355 tests passing)
 - [x] Coverage report configured (vitest.config.ts excludes DEPRECATED/archived folders)
-- [ ] CI integration: Tests run on every PR via GitHub Actions
+- [x] CI integration: Tests run on every PR via GitHub Actions
 - [x] Documentation: Testing section added to `scripts/README.md`
 
 ## Notes

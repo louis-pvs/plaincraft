@@ -1,6 +1,7 @@
 # ARCH-ideas-validator-fix
 
 Lane: C (DevOps & Automation)
+Parent: ARCH-subissue-pipeline-repair
 
 ## Lane
 
@@ -90,13 +91,13 @@ Update `scripts/validate-ideas.mjs` to support all file types:
 
 ## Acceptance Checklist
 
-- [ ] `VALIDATION_RULES` object updated with `arch`, `playbook`, `brief` types
-- [ ] ARCH type requires: Problem, Proposal, Acceptance Checklist
-- [ ] PB type requires: Purpose, Steps, Acceptance Checklist
-- [ ] Brief type requires: Problem, Signal, Hunch (lenient validation)
-- [ ] Type detection logic recognizes all 6 prefixes (U, C, B, ARCH, PB, brief)
-- [ ] Test: Validate ARCH file → passes with correct sections
-- [ ] Test: Validate all 12 existing ARCH files → all pass
-- [ ] Test: Validate U/C/B files → no regression, still works
-- [ ] Test: Missing required section → proper error message
-- [ ] Documentation: Updated validator rules in `SCRIPTS-REFERENCE.md`
+- [x] `VALIDATION_RULES` object updated with `arch`, `playbook`, `brief` types
+- [x] ARCH type requires: Problem, Proposal, Acceptance Checklist
+- [x] PB type requires: Purpose, Steps, Acceptance Checklist
+- [x] Brief type requires: Problem, Signal, Hunch (lenient validation)
+- [x] Type detection logic recognizes all 6 prefixes (U, C, B, ARCH, PB, brief)
+- [x] Test: Validate ARCH file → passes with correct sections
+- [x] Test: Validate all 12 existing ARCH files → all pass
+- [x] Test: Validate U/C/B files → no regression, still works
+- [x] Test: Missing required section → proper error message
+- [x] Documentation: Updated validator rules in `SCRIPTS-REFERENCE.md`
