@@ -1,0 +1,161 @@
+/**
+ * github.mjs
+ * @since 2025-10-28
+ * @version 0.1.0
+ * GitHub API helpers using gh CLI
+ */
+
+import { execa } from "execa";
+
+/**
+ * Check if gh CLI is authenticated
+ * @returns {Promise<boolean>} True if authenticated
+ */
+export async function isGhAuthenticated() {
+  try {
+    await execa("gh", ["auth", "status"]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Get issue details
+ * @param {number} issueNumber - Issue number
+ * @param {string} cwd - Working directory
+ * @returns {Promise<object>} Issue data
+ */
+export async function getIssue(issueNumber, cwd = process.cwd()) {
+  const { stdout } = await execa(
+    "gh",
+    [
+      "issue",
+      "view",
+      String(issueNumber),
+      "--json",
+      "number,title,labels,body,state",
+    ],
+    { cwd },
+  );
+  return JSON.parse(stdout);
+}
+
+/**
+ * Create a PR
+ * @param {object} options - PR options
+ * @param {string} options.title - PR title
+ * @param {string} options.body - PR body
+ * @param {string} options.base - Base branch
+ * @param {boolean} options.draft - Create as draft
+ * @param {string} cwd - Working directory
+ * @returns {Promise<object>} PR data
+ */
+export async function createPR(options, cwd = process.cwd()) {
+  const args = [
+    "pr",
+    "create",
+    "--title",
+    options.title,
+    "--body",
+    options.body || "",
+    "--base",
+    options.base || "main",
+  ];
+
+  if (options.draft) {
+    args.push("--draft");
+  }
+
+  const { stdout } = await execa("gh", args, { cwd });
+  return { url: stdout.trim() };
+}
+
+/**
+ * List issues with filters
+ * @param {object} filters - Filter options
+ * @param {string} filters.state - Issue state (open/closed/all)
+ * @param {string} filters.label - Label filter
+ * @param {string} cwd - Working directory
+ * @returns {Promise<Array>} Issues
+ */
+export async function listIssues(filters = {}, cwd = process.cwd()) {
+  const args = ["issue", "list", "--json", "number,title,labels,state"];
+
+  if (filters.state) {
+    args.push("--state", filters.state);
+  }
+
+  if (filters.label) {
+    args.push("--label", filters.label);
+  }
+
+  const { stdout } = await execa("gh", args, { cwd });
+  return JSON.parse(stdout);
+}
+
+/**
+ * Get PR details
+ * @param {number} prNumber - PR number
+ * @param {string} cwd - Working directory
+ * @returns {Promise<object>} PR data
+ */
+export async function getPR(prNumber, cwd = process.cwd()) {
+  const { stdout } = await execa(
+    "gh",
+    [
+      "pr",
+      "view",
+      String(prNumber),
+      "--json",
+      "number,title,body,state,labels",
+    ],
+    { cwd },
+  );
+  return JSON.parse(stdout);
+}
+
+/**
+ * Update PR
+ * @param {number} prNumber - PR number
+ * @param {object} updates - Fields to update
+ * @param {string} cwd - Working directory
+ * @returns {Promise<void>}
+ */
+export async function updatePR(prNumber, updates, cwd = process.cwd()) {
+  const args = ["pr", "edit", String(prNumber)];
+
+  if (updates.title) {
+    args.push("--title", updates.title);
+  }
+
+  if (updates.body) {
+    args.push("--body", updates.body);
+  }
+
+  await execa("gh", args, { cwd });
+}
+
+/**
+ * Create or update a label
+ * @param {object} label - Label definition
+ * @param {string} label.name - Label name
+ * @param {string} label.color - Hex color
+ * @param {string} label.description - Label description
+ * @param {string} cwd - Working directory
+ * @returns {Promise<void>}
+ */
+export async function createLabel(label, cwd = process.cwd()) {
+  const args = [
+    "label",
+    "create",
+    label.name,
+    "--color",
+    label.color,
+    "--description",
+    label.description || "",
+    "--force",
+  ];
+
+  await execa("gh", args, { cwd });
+}

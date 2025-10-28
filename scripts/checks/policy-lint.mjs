@@ -1,0 +1,207 @@
+#!/usr/bin/env node
+/**
+ * policy-lint.mjs
+ * @since 2025-10-28
+ * @version 0.1.0
+ * Summary: Enforce script guardrails and policy compliance
+ */
+
+import { readFile, readdir } from "node:fs/promises";
+import path from "node:path";
+import {
+  parseFlags,
+  formatOutput,
+  fail,
+  succeed,
+  Logger,
+  repoRoot,
+  generateRunId,
+} from "../_lib/core.mjs";
+import {
+  validateScriptHeader,
+  validateCLIContract,
+  detectDangerousPatterns,
+  checkSizeCompliance,
+} from "../_lib/validation.mjs";
+
+const start = Date.now();
+const args = parseFlags(process.argv.slice(2));
+
+if (args.help) {
+  console.log(`
+Usage: node scripts/checks/policy-lint.mjs [options]
+
+Options:
+  --help              Show this help
+  --output <format>   Output format: json|text (default: text)
+  --log-level <level> Log level: trace|debug|info|warn|error (default: info)
+  --cwd <path>        Working directory (default: current)
+  --strict            Treat warnings as errors
+
+Description:
+  Validates all scripts against repository guardrails:
+  - Header metadata (@since, @version, @deprecated)
+  - CLI contract compliance (--dry-run, --yes, --output, etc.)
+  - Dangerous pattern detection (sudo, rm -rf, eval, etc.)
+  - Size limits (<300 LOC per script, <60 LOC per function)
+  - Deprecated script age enforcement (>90 days)
+
+Exit codes:
+  0  - All checks passed
+  11 - Validation failed
+  13 - Unsafe patterns detected
+`);
+  process.exit(0);
+}
+
+const logger = new Logger(args.logLevel);
+const runId = generateRunId();
+
+logger.info("Starting policy lint");
+
+try {
+  const root = await repoRoot(args.cwd);
+  const scriptsDir = path.join(root, "scripts");
+
+  // Scan for all .mjs scripts (excluding _lib, node_modules, etc.)
+  const scriptFiles = await findScriptFiles(scriptsDir);
+  logger.info(`Found ${scriptFiles.length} script files to validate`);
+
+  const results = [];
+  let totalErrors = 0;
+  let totalWarnings = 0;
+
+  for (const scriptPath of scriptFiles) {
+    const relativePath = path.relative(root, scriptPath);
+    logger.debug(`Validating ${relativePath}`);
+
+    const content = await readFile(scriptPath, "utf-8");
+    const result = {
+      file: relativePath,
+      errors: [],
+      warnings: [],
+    };
+
+    // Validate header
+    const headerValidation = validateScriptHeader(content);
+    result.errors.push(...headerValidation.errors);
+    result.warnings.push(...headerValidation.warnings);
+
+    // Validate CLI contract (skip for _lib helpers)
+    if (!scriptPath.includes("/_lib/")) {
+      const cliValidation = validateCLIContract(content);
+      result.errors.push(...cliValidation.errors);
+    }
+
+    // Detect dangerous patterns
+    const dangerValidation = detectDangerousPatterns(content);
+    result.errors.push(...dangerValidation.errors);
+    result.warnings.push(...dangerValidation.warnings);
+
+    // Check size compliance
+    const sizeValidation = checkSizeCompliance(content);
+    result.warnings.push(...sizeValidation.warnings);
+
+    totalErrors += result.errors.length;
+    totalWarnings += result.warnings.length;
+
+    if (result.errors.length > 0 || result.warnings.length > 0) {
+      results.push(result);
+    }
+  }
+
+  // Check deprecated scripts
+  const deprecatedDir = path.join(scriptsDir, "DEPRECATED");
+  try {
+    const deprecatedFiles = await readdir(deprecatedDir);
+    for (const file of deprecatedFiles) {
+      if (!file.endsWith(".mjs")) continue;
+
+      const filePath = path.join(deprecatedDir, file);
+      const content = await readFile(filePath, "utf-8");
+      const headerValidation = validateScriptHeader(content);
+
+      if (headerValidation.errors.some((e) => e.includes(">90 days"))) {
+        results.push({
+          file: path.relative(root, filePath),
+          errors: headerValidation.errors,
+          warnings: [],
+        });
+        totalErrors += headerValidation.errors.length;
+      }
+    }
+  } catch {
+    // DEPRECATED dir doesn't exist yet
+  }
+
+  const durationMs = Date.now() - start;
+
+  // Determine exit code
+  let exitCode = 0;
+  let status = "passed";
+
+  if (args.strict && totalWarnings > 0) {
+    exitCode = 11;
+    status = "failed";
+  } else if (totalErrors > 0) {
+    exitCode = results.some((r) =>
+      r.errors.some((e) => e.includes("sudo") || e.includes("eval")),
+    )
+      ? 13
+      : 11;
+    status = "failed";
+  }
+
+  const output = {
+    runId,
+    script: "policy-lint",
+    status,
+    totalFiles: scriptFiles.length,
+    totalErrors,
+    totalWarnings,
+    durationMs,
+  };
+
+  if (results.length > 0) {
+    output.results = results;
+  }
+
+  if (exitCode === 0) {
+    succeed(output, args.output);
+  } else {
+    process.stdout.write(formatOutput(output, args.output));
+    process.exit(exitCode);
+  }
+} catch (error) {
+  logger.error("Policy lint failed:", error.message);
+  fail(11, "validation_error", error.message, args.output);
+}
+
+/**
+ * Find all script files recursively
+ * @param {string} dir - Directory to search
+ * @param {string[]} [exclude] - Directories to exclude
+ * @returns {Promise<string[]>} Script file paths
+ */
+async function findScriptFiles(dir, exclude = ["node_modules", ".git"]) {
+  const files = [];
+  const entries = await readdir(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      // Skip excluded directories
+      if (exclude.includes(entry.name)) continue;
+      // Skip _lib for CLI contract checks (validated separately)
+      files.push(...(await findScriptFiles(fullPath, exclude)));
+    } else if (entry.isFile() && entry.name.endsWith(".mjs")) {
+      // Skip test files
+      if (!entry.name.endsWith(".spec.mjs")) {
+        files.push(fullPath);
+      }
+    }
+  }
+
+  return files;
+}
