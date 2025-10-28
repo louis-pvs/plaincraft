@@ -214,10 +214,7 @@ export function insertVersionEntry(existingChangelog, newEntry, version) {
 
   if (versionPattern.test(sanitizedChangelog)) {
     const blockRegex = new RegExp(
-      `## \\[${version.replace(
-        /\./g,
-        "\\.",
-      )}\\][\\s\\S]*?(?=\n## \\[|$)`,
+      `## \\[${version.replace(/\./g, "\\.")}\\][\\s\\S]*?(?=\n## \\[|$)`,
       "m",
     );
     const match = sanitizedChangelog.match(blockRegex);

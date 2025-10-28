@@ -9,7 +9,6 @@
 import path from "node:path";
 import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
-import readline from "node:readline";
 import {
   parseFlags,
   fail,
@@ -35,8 +34,8 @@ Options:
   --output <format>   Output format: json|text (default: text)
   --log-level <level> Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>        Working directory (default: current directory)
-  --id <id>           Template ID (skips interactive prompt)
-  --category <cat>    Template category (skips prompt)
+  --id <id>           Template ID (REQUIRED, kebab-case, e.g., feature-request)
+  --category <cat>    Template category (REQUIRED, e.g., workflow, documentation)
 
 Description:
   Creates a new template directory with all required files:
@@ -63,19 +62,6 @@ const dryRun = args.dryRun !== false && args.yes !== true;
 
 logger.info(`Starting new-template wizard (runId: ${runId})`);
 
-async function prompt(question) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer.trim());
-    });
-  });
-}
-
 async function preflight(root) {
   const templatesDir = path.join(root, "templates");
   if (!existsSync(templatesDir)) {
@@ -100,15 +86,12 @@ try {
   const root = await repoRoot(args.cwd);
   await preflight(root);
 
-  // Get template ID
-  let templateId = args.id;
-  if (!templateId && !dryRun) {
-    templateId = await prompt(
-      "Template ID (kebab-case, e.g., feature-request): ",
-    );
-  }
+  // Get template ID (required via CLI)
+  const templateId = args.id;
   if (!templateId) {
-    templateId = "example-template";
+    throw new Error(
+      "Missing required flag: --id <id>. Template ID must be provided in kebab-case (e.g., --id feature-request)",
+    );
   }
 
   // Validate ID format
@@ -123,8 +106,8 @@ try {
     throw new Error(`Template directory already exists: ${templateDir}`);
   }
 
-  // Get category
-  let category = args.category;
+  // Get category (required via CLI)
+  const category = args.category;
   const validCategories = [
     "workflow",
     "documentation",
@@ -133,11 +116,10 @@ try {
     "testing",
   ];
 
-  if (!category && !dryRun) {
-    category = await prompt(`Category (${validCategories.join(", ")}): `);
-  }
   if (!category) {
-    category = "workflow";
+    throw new Error(
+      `Missing required flag: --category <cat>. Must be one of: ${validCategories.join(", ")}`,
+    );
   }
 
   if (!validCategories.includes(category)) {

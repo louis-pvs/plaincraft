@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
  * Storybook Test Runner with automatic server management
+ * @since 2025-10-28
  * @version 1.0.0
  */
 
@@ -20,14 +21,19 @@ USAGE:
   node scripts/test-storybook.mjs [options]
 
 OPTIONS:
-  --rebuild  Force rebuild Storybook
-  --json     Output in JSON format
-  --help     Show this help
+  --help      Show this help
+  --dry-run   Preview mode (default: false)
+  --yes       Execute mode (default: true)
+  --output    Output format: text|json (default: text)
+  --log-level Log level (default: info)
+  --cwd       Working directory (default: current)
+  --rebuild   Force rebuild Storybook
+  --json      Output in JSON format (deprecated, use --output json)
 
 EXAMPLES:
   node scripts/test-storybook.mjs
   node scripts/test-storybook.mjs --rebuild
-  node scripts/test-storybook.mjs --json
+  node scripts/test-storybook.mjs --output json
 `);
   process.exit(0);
 }

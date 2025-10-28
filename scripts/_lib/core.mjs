@@ -195,7 +195,7 @@ export function fail(options) {
   const { exitCode = 1, message, error, output = "text", script } = options;
   const result = { ok: false, script, message, error };
   if (output === "json") {
-    console.log(JSON.stringify(result));
+    process.stdout.write(`${JSON.stringify(result)}\n`);
   } else {
     process.stdout.write(formatOutput(result, output));
   }
@@ -212,7 +212,7 @@ export function succeed(options) {
   const { output = "text", ...data } = options;
   const result = { ok: true, ...data };
   if (output === "json") {
-    console.log(JSON.stringify(result));
+    process.stdout.write(`${JSON.stringify(result)}\n`);
   } else {
     process.stdout.write(formatOutput(result, output));
   }

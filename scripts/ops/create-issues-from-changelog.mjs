@@ -44,11 +44,7 @@ const ArgsSchema = z.object({
   cwd: z.string().min(1),
   changelog: z.string().default("CHANGELOG.md"),
   assign: z.boolean().default(false),
-  max: z
-    .number()
-    .int()
-    .positive()
-    .optional(),
+  max: z.number().int().positive().optional(),
 });
 
 const argsForValidation = {
@@ -195,7 +191,9 @@ async function processSections(sections, root) {
         dryRun: false,
       });
     } catch (error) {
-      logger.error(`Failed to create issue for ${issueTitle}: ${error.message}`);
+      logger.error(
+        `Failed to create issue for ${issueTitle}: ${error.message}`,
+      );
       results.push({
         title: issueTitle,
         labels,

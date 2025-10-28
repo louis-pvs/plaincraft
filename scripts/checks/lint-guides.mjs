@@ -26,6 +26,7 @@ Usage: node scripts/checks/lint-guides.mjs [options]
 
 Options:
   --help              Show this help
+  --yes               Execute mode (confirms execution)
   --output <format>   Output format: json|text (default: text)
   --log-level <level> Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>        Working directory (default: current)

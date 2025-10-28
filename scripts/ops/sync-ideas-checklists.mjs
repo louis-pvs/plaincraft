@@ -23,6 +23,7 @@ const SCRIPT_NAME = "sync-ideas-checklists";
 const ArgsSchema = z.object({
   help: z.boolean().default(false),
   dryRun: z.boolean().default(false),
+  yes: z.boolean().default(false),
   output: z.enum(["text", "json"]).default("text"),
   logLevel: z.enum(["error", "warn", "info", "debug", "trace"]).default("info"),
   cwd: z.string().optional(),
@@ -262,6 +263,7 @@ Sync acceptance checklists from idea files to GitHub Issues.
 Options:
   --help              Show this help message
   --dry-run           Preview without updating issues
+  --yes               Execute mode (confirms execution, overrides --dry-run)
   --output <fmt>      Output format: text (default), json
   --log-level <lvl>   Log level: error, warn, info (default), debug, trace
   --cwd <path>        Working directory (default: current)

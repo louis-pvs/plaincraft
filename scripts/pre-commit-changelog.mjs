@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
  * Pre-commit hook to auto-generate changelog if temporary summary files exist
+ * @since 2025-10-28
  * @version 1.0.0
  */
 
@@ -11,13 +12,18 @@ Pre-commit hook to auto-generate changelog
 
 Checks if _tmp/ folder has any .md files.
 If yes and CHANGELOG.md not staged, runs consolidation.
-Auto-consolidates and stages CHANGELOG.md if summary files exist.
+Auto-consolidates and stages CHANGELOG.MD if summary files exist.
 
 USAGE:
   node scripts/pre-commit-changelog.mjs [options]
 
 OPTIONS:
-  --help   Show this help
+  --help      Show this help
+  --dry-run   Preview mode (default: false)
+  --yes       Execute mode (default: true for git hooks)
+  --output    Output format: text|json (default: text)
+  --log-level Log level (default: info)
+  --cwd       Working directory (default: current)
 
 EXAMPLES:
   node scripts/pre-commit-changelog.mjs

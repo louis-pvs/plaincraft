@@ -27,6 +27,7 @@ const SCRIPT_NAME = "ideas-to-issues";
 const ArgsSchema = z.object({
   help: z.boolean().default(false),
   dryRun: z.boolean().default(false),
+  yes: z.boolean().default(false),
   output: z.enum(["text", "json"]).default("text"),
   logLevel: z.enum(["error", "warn", "info", "debug", "trace"]).default("info"),
   cwd: z.string().optional(),
@@ -105,8 +106,7 @@ function getLabelsForIdea(type, lane) {
       typeof normalizedLane === "string"
         ? normalizedLane.toLowerCase()
         : normalizedLane;
-    const laneLabel =
-      LANE_LABELS[normalizedLane] || `lane-${fallbackLane}`;
+    const laneLabel = LANE_LABELS[normalizedLane] || `lane-${fallbackLane}`;
     labels.push(laneLabel);
   }
 
@@ -397,6 +397,7 @@ Convert idea files from /ideas directory to GitHub Issues.
 Options:
   --help              Show this help message
   --dry-run           Preview without creating issues
+  --yes               Execute mode (confirms execution, overrides --dry-run)
   --output <fmt>      Output format: text (default), json
   --log-level <lvl>   Log level: error, warn, info (default), debug, trace
   --cwd <path>        Working directory (default: current)

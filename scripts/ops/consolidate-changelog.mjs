@@ -236,9 +236,7 @@ async function resolveVersion(packageJsonPath, override) {
       exitCode: 10,
       message: "precondition_failed",
       error:
-        error instanceof Error
-          ? error.message
-          : "Unable to read package.json",
+        error instanceof Error ? error.message : "Unable to read package.json",
       output: args.output,
       script: SCRIPT_NAME,
     });

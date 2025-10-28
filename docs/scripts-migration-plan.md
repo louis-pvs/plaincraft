@@ -162,9 +162,9 @@ Scripts that should run once or are specific to a point in time:
    - Extract from PR and changelog scripts
    - Functions: `parseMarkdown()`, `extractSections()`, `generateMarkdown()`
 
-3. **Create `_lib/changelog.mjs`** ✅
+3. **Create `_lib/changelog.mjs`**
+   - Status: completed (shared changelog helpers now consumed by ops scripts)
    - Extracted from `consolidate-changelog.mjs`, `create-issues-from-changelog.mjs`
-   - Provides summary parsing, entry merge, and changelog insertion helpers
 
 4. **Create `_lib/pr.mjs`**
    - Extract from `generate-pr-content.mjs`, `manual-update-pr-checkboxes.mjs`
@@ -197,12 +197,12 @@ Scripts that should run once or are specific to a point in time:
 
 ### Phase 4: Migrate Medium Priority Scripts
 
-6. `consolidate-changelog.mjs` → `ops/consolidate-changelog.mjs` ✅
-7. `create-issues-from-changelog.mjs` → `ops/create-issues-from-changelog.mjs` ✅
-8. `generate-pr-content.mjs` → `ops/generate-pr-content.mjs`
-9. `sync-ideas-checklists.mjs` → `ops/sync-ideas-checklists.mjs`
-10. `setup-project.mjs` → `ops/setup-project.mjs`
-11. `auto-tag.mjs` → `ops/auto-tag.mjs`
+6. `consolidate-changelog.mjs` → `ops/consolidate-changelog.mjs` (migrated)
+7. `create-issues-from-changelog.mjs` → `ops/create-issues-from-changelog.mjs` (migrated)
+8. `generate-pr-content.mjs` → `ops/generate-pr-content.mjs` (failing policy-lint: add CLI contract)
+9. `sync-ideas-checklists.mjs` → `ops/sync-ideas-checklists.mjs` (failing policy-lint: add CLI contract)
+10. `setup-project.mjs` → `ops/setup-project.mjs` (migrated)
+11. `auto-tag.mjs` → `ops/auto-tag.mjs` (failing policy-lint: add CLI contract)
 
 ### Phase 5: Migrate Low Priority / One-offs
 

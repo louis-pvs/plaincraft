@@ -3,7 +3,7 @@
  * generate-template-catalog.mjs
  * @since 2025-10-28
  * @version 0.1.0
- * 
+ *
  * Auto-generate discoverable template index with usage examples
  */
 
@@ -75,16 +75,18 @@ EXAMPLES:
   if (flags.dryRun) {
     log.info(`[DRY-RUN] Would write catalog to: ${outputPath}`);
     log.info(`\nPreview (first 500 chars):\n${markdown.slice(0, 500)}...`);
-    
+
     if (flags.output === "json") {
-      console.log(JSON.stringify({
-        ok: true,
-        script: "generate-template-catalog",
-        dryRun: true,
-        outputPath,
-        templateCount: templates.length,
-        categories: Object.keys(categorized),
-      }));
+      console.log(
+        JSON.stringify({
+          ok: true,
+          script: "generate-template-catalog",
+          dryRun: true,
+          outputPath,
+          templateCount: templates.length,
+          categories: Object.keys(categorized),
+        }),
+      );
     }
     process.exit(0);
   }
@@ -94,13 +96,15 @@ EXAMPLES:
   log.info(`✓ Generated template catalog: ${outputPath}`);
 
   if (flags.output === "json") {
-    console.log(JSON.stringify({
-      ok: true,
-      script: "generate-template-catalog",
-      outputPath,
-      templateCount: templates.length,
-      categories: Object.keys(categorized),
-    }));
+    console.log(
+      JSON.stringify({
+        ok: true,
+        script: "generate-template-catalog",
+        outputPath,
+        templateCount: templates.length,
+        categories: Object.keys(categorized),
+      }),
+    );
   }
 }
 
@@ -157,9 +161,11 @@ async function findGuideReferences(guidesDir, log) {
     if (!guide.endsWith(".md")) continue;
 
     const content = await readFile(join(guidesDir, guide), "utf-8");
-    
+
     // Look for scaffold_ref in frontmatter
-    const frontmatterMatch = content.match(/scaffold_ref:\s*\/templates\/([^\s\n]+)/);
+    const frontmatterMatch = content.match(
+      /scaffold_ref:\s*\/templates\/([^\s\n]+)/,
+    );
     if (frontmatterMatch) {
       const templateId = frontmatterMatch[1].split("@")[0]; // Remove version
       if (!refs[templateId]) refs[templateId] = [];
@@ -200,7 +206,7 @@ function groupByCategory(templates) {
  */
 function generateCatalog(templates, categorized, guideRefs) {
   const timestamp = new Date().toISOString().split("T")[0];
-  
+
   let md = `# Template Catalog\n\n`;
   md += `**Auto-generated:** ${timestamp}  \n`;
   md += `**Total Templates:** ${templates.length}\n\n`;
@@ -228,7 +234,9 @@ function generateCatalog(templates, categorized, guideRefs) {
   }
 
   // Orphaned templates (no guide references)
-  const orphaned = templates.filter(t => !guideRefs[t.id] || guideRefs[t.id].length === 0);
+  const orphaned = templates.filter(
+    (t) => !guideRefs[t.id] || guideRefs[t.id].length === 0,
+  );
   if (orphaned.length > 0) {
     md += `## ⚠️ Orphaned Templates\n\n`;
     md += `These templates are not referenced by any guides. Consider creating a guide or removing if unused.\n\n`;
@@ -253,7 +261,7 @@ function generateTemplateSection(template, guideRefs) {
   const refs = guideRefs[id] || [];
 
   let md = `### ${config.name || id}\n\n`;
-  
+
   if (config.description) {
     md += `${config.description}\n\n`;
   }
@@ -261,9 +269,9 @@ function generateTemplateSection(template, guideRefs) {
   md += `**Version:** ${config.version}  \n`;
   md += `**Category:** ${config.category}  \n`;
   md += `**Created:** ${config.created}  \n`;
-  
+
   if (refs.length > 0) {
-    md += `**Referenced by:** ${refs.map(g => `[${g}](../guides/${g})`).join(", ")}  \n`;
+    md += `**Referenced by:** ${refs.map((g) => `[${g}](../guides/${g})`).join(", ")}  \n`;
   } else {
     md += `**Referenced by:** ⚠️ None (consider creating a guide)  \n`;
   }

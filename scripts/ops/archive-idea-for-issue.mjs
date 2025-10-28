@@ -26,6 +26,7 @@ const SCRIPT_NAME = "archive-idea-for-issue";
 const ArgsSchema = z.object({
   help: z.boolean().default(false),
   dryRun: z.boolean().default(false),
+  yes: z.boolean().default(false),
   output: z.enum(["text", "json"]).default("text"),
   logLevel: z.enum(["error", "warn", "info", "debug", "trace"]).default("info"),
   cwd: z.string().optional(),
@@ -310,6 +311,7 @@ Archive idea file when corresponding GitHub issue is closed.
 Options:
   --help              Show this help message
   --dry-run           Preview without archiving
+  --yes               Execute mode (confirms execution, overrides --dry-run)
   --output <fmt>      Output format: text (default), json
   --log-level <lvl>   Log level: error, warn, info (default), debug, trace
   --cwd <path>        Working directory (default: current)

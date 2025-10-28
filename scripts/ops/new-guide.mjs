@@ -8,7 +8,6 @@
 
 import path from "node:path";
 import { existsSync } from "node:fs";
-import readline from "node:readline";
 import {
   parseFlags,
   fail,
@@ -39,8 +38,8 @@ Options:
   --output <format>     Output format: json|text (default: text)
   --log-level <level>   Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>          Working directory (default: current directory)
-  --slug <slug>         Guide slug (skips interactive prompt)
-  --template-ref <ref>  Template reference path (skips prompt)
+  --slug <slug>         Guide slug (REQUIRED, e.g., deployment, testing)
+  --template-ref <ref>  Template reference path (REQUIRED, e.g., /templates/guide@v0.1.0)
 
 Description:
   Creates a new guide following template-first governance:
@@ -65,19 +64,6 @@ const runId = generateRunId();
 const dryRun = args.dryRun !== false && args.yes !== true;
 
 logger.info(`Starting new-guide wizard (runId: ${runId})`);
-
-async function prompt(question) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer.trim());
-    });
-  });
-}
 
 async function preflight(root) {
   const guidesDir = path.join(root, "guides");
@@ -108,13 +94,12 @@ try {
   const templates = await listTemplates(root);
   logger.debug(`Available templates: ${templates.map((t) => t.id).join(", ")}`);
 
-  // Get slug
-  let slug = args.slug;
-  if (!slug && !dryRun) {
-    slug = await prompt("Guide slug (e.g., deployment, testing): ");
-  }
+  // Get slug (required via CLI)
+  const slug = args.slug;
   if (!slug) {
-    slug = "example";
+    throw new Error(
+      "Missing required flag: --slug <slug>. Guide slug must be provided (e.g., --slug deployment)",
+    );
   }
 
   // Validate slug
@@ -129,19 +114,16 @@ try {
     throw new Error(`Guide already exists: ${guidePath}`);
   }
 
-  // Get template reference
-  let templateRef = args.templateRef;
-  if (!templateRef && !dryRun) {
-    console.log("\nAvailable templates:");
-    templates.forEach((t, i) => {
-      console.log(`  ${i + 1}. ${t.id} (${t.category}) - ${t.ref}`);
-    });
-    templateRef = await prompt(
-      "\nTemplate reference (e.g., /templates/guide@v0.1.0): ",
-    );
-  }
+  // Get template reference (required via CLI)
+  const templateRef = args.templateRef;
   if (!templateRef) {
-    templateRef = "/templates/guide@v0.1.0";
+    logger.info("Available templates:");
+    templates.forEach((t, i) => {
+      logger.info(`  ${i + 1}. ${t.id} (${t.category}) - ${t.ref}`);
+    });
+    throw new Error(
+      "Missing required flag: --template-ref <ref>. Example: --template-ref /templates/guide@v0.1.0",
+    );
   }
 
   // Validate template exists

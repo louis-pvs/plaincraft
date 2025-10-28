@@ -23,6 +23,7 @@ const SCRIPT_NAME = "cleanup-ideas";
 const ArgsSchema = z.object({
   help: z.boolean().default(false),
   dryRun: z.boolean().default(true),
+  yes: z.boolean().default(false),
   output: z.enum(["text", "json"]).default("text"),
   logLevel: z.enum(["error", "warn", "info", "debug", "trace"]).default("info"),
   cwd: z.string().optional(),
@@ -229,6 +230,7 @@ Clean up and archive idea files for closed issues.
 Options:
   --help              Show this help message
   --dry-run           Preview without archiving (default)
+  --yes               Execute mode (confirms execution, overrides --dry-run)
   --execute           Actually archive files (disables dry-run)
   --output <fmt>      Output format: text (default), json
   --log-level <lvl>   Log level: error, warn, info (default), debug, trace

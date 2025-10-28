@@ -2,3 +2,5 @@ dist
 coverage
 pnpm-lock.yaml
 **/*.mdx
+**/DEPRECATED/*
+**/_archive/*

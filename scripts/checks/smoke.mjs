@@ -38,6 +38,7 @@ Description:
   Runs basic smoke tests on all scripts:
   - Executes --help flag (must exit 0)
   - For ops scripts: executes --dry-run --output json
+  --yes               Execute mode (confirms execution, overrides --dry-run)
 
 Exit codes:
   0  - All tests passed

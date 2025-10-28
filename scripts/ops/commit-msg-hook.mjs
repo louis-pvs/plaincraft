@@ -108,6 +108,7 @@ Arguments:
 
 Options:
   --help                    Show this help message
+  --yes               Execute mode (confirms execution)
   --output <fmt>            Output format: text (default), json
   --log-level <lvl>         Log level: error, warn, info (default), debug, trace
 

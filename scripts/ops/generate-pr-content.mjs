@@ -14,21 +14,31 @@ import { appendFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
-import { Logger, parseFlags, fail, succeed, repoRoot } from "../_lib/core.mjs";
+import {
+  Logger,
+  parseFlags,
+  fail,
+  succeed,
+  repoRoot,
+  generateRunId,
+} from "../_lib/core.mjs";
 import { execCommand } from "../_lib/git.mjs";
 import { getIssue } from "../_lib/github.mjs";
 import { parseIdeaFile, findIdeaFiles } from "../_lib/ideas.mjs";
 
 const SCRIPT_NAME = "generate-pr-content";
+const rawArgs = parseFlags(process.argv.slice(2));
+const runId = generateRunId();
+const start = Date.now();
 
 // Zod schema for CLI args
 const ArgsSchema = z.object({
-  help: z.boolean().default(false),
-  dryRun: z.boolean().default(false),
+  dryRun: z.boolean().default(true),
+  yes: z.boolean().default(false),
   output: z.enum(["text", "json"]).default("text"),
   logLevel: z.enum(["error", "warn", "info", "debug", "trace"]).default("info"),
   cwd: z.string().optional(),
-  issueNumber: z.number().optional(),
+  issueNumber: z.number().nullable().optional(),
   source: z.enum(["idea", "changelog", "auto"]).default("auto"),
 });
 
@@ -38,27 +48,30 @@ const ArgsSchema = z.object({
  * @param {Logger} log - Logger
  * @returns {Promise<string|null>} Idea file path
  */
-async function findIdeaFileForIssue(issueNumber, log) {
+async function findIdeaFileForIssue(issueNumber, log, root) {
   try {
     const issue = await getIssue(issueNumber);
     const { title, body } = issue;
 
     log.debug(`Searching for idea file for issue #${issueNumber}`);
 
+    const ideasDir = join(root, "ideas");
+
     // Method 1: Check body for source reference
     let match = body.match(/Source:\s*`([^`]+)`/);
     if (match) {
       const filePath = match[1];
-      const fullPath = filePath.startsWith("/ideas/")
-        ? join(repoRoot(), filePath.slice(1))
-        : join(repoRoot(), "ideas", filePath);
+      const normalized = filePath.replace(/^\/+/, "");
+      const fullPath = normalized.startsWith("ideas/")
+        ? join(root, normalized)
+        : join(ideasDir, normalized);
       if (existsSync(fullPath)) return fullPath;
     }
 
     // Method 2: Check for "See /ideas/..." reference
     match = body.match(/See\s+\/ideas\/([^\s]+\.md)/);
     if (match) {
-      const fullPath = join(repoRoot(), "ideas", match[1]);
+      const fullPath = join(ideasDir, match[1]);
       if (existsSync(fullPath)) return fullPath;
     }
 
@@ -66,13 +79,14 @@ async function findIdeaFileForIssue(issueNumber, log) {
     const titleMatch = title.match(/^\[?([A-Z]+-[a-z0-9-]+)\]?/i);
     if (titleMatch) {
       const tag = titleMatch[1];
-      const fullPath = join(repoRoot(), "ideas", `${tag}.md`);
+      const fullPath = join(ideasDir, `${tag}.md`);
       if (existsSync(fullPath)) return fullPath;
     }
 
     // Method 4: Search all idea files for matching issue
-    const allIdeas = await findIdeaFiles();
-    for (const ideaPath of allIdeas) {
+    const allIdeas = await findIdeaFiles(ideasDir);
+    for (const ideaFile of allIdeas) {
+      const ideaPath = join(ideasDir, ideaFile);
       const parsed = await parseIdeaFile(ideaPath);
       if (parsed.metadata.issue === issueNumber) return ideaPath;
     }
@@ -135,8 +149,8 @@ async function fetchAcceptanceChecklist(issueNumber, log) {
  * @param {Logger} log - Logger
  * @returns {Promise<object>} Changelog data
  */
-async function parseChangelog(log) {
-  const changelogPath = join(repoRoot(), "CHANGELOG.md");
+async function parseChangelog(log, root) {
+  const changelogPath = join(root, "CHANGELOG.md");
 
   if (!existsSync(changelogPath)) {
     log.debug("No CHANGELOG.md found");
@@ -265,7 +279,7 @@ function extractAllTags(sections) {
  * @param {Logger} log - Logger
  * @returns {Promise<string>} PR body
  */
-async function generateBodyFromChangelog(sections, version, log) {
+async function generateBodyFromChangelog(sections, version, log, root) {
   if (sections.length === 0) {
     return version
       ? `## Release v${version}\n\nSee CHANGELOG.md for details.`
@@ -324,16 +338,20 @@ async function generateBodyFromChangelog(sections, version, log) {
   if (ticketId) {
     log.info(`Searching for issue with ticket ID: ${ticketId}`);
     try {
-      const { stdout } = await execCommand("gh", [
-        "issue",
-        "list",
-        "--search",
-        `${ticketId} in:title`,
-        "--json",
-        "number,title",
-        "--limit",
-        "10",
-      ]);
+      const { stdout } = await execCommand(
+        "gh",
+        [
+          "issue",
+          "list",
+          "--search",
+          `${ticketId} in:title`,
+          "--json",
+          "number,title",
+          "--limit",
+          "10",
+        ],
+        { cwd: root },
+      );
 
       const issues = JSON.parse(stdout);
       const match = issues.find((issue) =>
@@ -486,14 +504,18 @@ function setOutput(key, value) {
  * @param {Logger} log - Logger
  * @returns {Promise<object>} Title and body
  */
-async function generatePRContent(args, log) {
+async function generatePRContent(args, log, root) {
   let title = "";
   let body = "";
 
   // Try idea file first if issue number provided or auto mode
   if ((args.source === "auto" || args.source === "idea") && args.issueNumber) {
     log.info(`Looking for idea file for issue #${args.issueNumber}...`);
-    const ideaFilePath = await findIdeaFileForIssue(args.issueNumber, log);
+    const ideaFilePath = await findIdeaFileForIssue(
+      args.issueNumber,
+      log,
+      root,
+    );
 
     if (ideaFilePath) {
       log.info(`Found idea file: ${ideaFilePath.split("/").pop()}`);
@@ -513,7 +535,7 @@ async function generatePRContent(args, log) {
   // Fallback to CHANGELOG.md
   if (args.source === "auto" || args.source === "changelog") {
     log.info("Reading CHANGELOG.md...");
-    const { version, sections } = await parseChangelog(log);
+    const { version, sections } = await parseChangelog(log, root);
 
     if (sections.length === 0) {
       log.info("No version sections found in CHANGELOG.md");
@@ -522,74 +544,82 @@ async function generatePRContent(args, log) {
 
     log.info(`Found version ${version} with ${sections.length} section(s)`);
     title = generateTitle(sections, version);
-    body = await generateBodyFromChangelog(sections, version, log);
+    body = await generateBodyFromChangelog(sections, version, log, root);
 
     return { title, body };
   }
 
   return { title, body };
 }
+if (rawArgs.help) {
+  printHelp();
+  process.exit(0);
+}
+
+const rawIssueNumber =
+  parseInt(process.env.PR_NUMBER || process.env.ISSUE_NUMBER || "", 10) ||
+  (Array.isArray(rawArgs._) ? parseInt(rawArgs._[0], 10) : null);
+
+const argsForValidation = {
+  dryRun: coerceBoolean(rawArgs.dryRun, true),
+  yes: coerceBoolean(rawArgs.yes, false),
+  output: rawArgs.output,
+  logLevel: rawArgs.logLevel,
+  cwd: rawArgs.cwd,
+  source: rawArgs.source,
+  issueNumber:
+    Number.isFinite(rawIssueNumber) && !Number.isNaN(rawIssueNumber)
+      ? rawIssueNumber
+      : null,
+};
+
+const parsedArgs = ArgsSchema.safeParse(argsForValidation);
+
+if (!parsedArgs.success) {
+  fail({
+    exitCode: 11,
+    script: SCRIPT_NAME,
+    message: "Invalid arguments",
+    error: parsedArgs.error.format(),
+    output: rawArgs.output || "text",
+    runId,
+  });
+}
+
+const args = {
+  ...parsedArgs.data,
+  dryRun: parsedArgs.data.yes ? false : parsedArgs.data.dryRun,
+};
+
+const log = new Logger(args.logLevel);
 
 /**
  * Main entry point
  */
 async function main() {
-  const flags = parseFlags();
-  const log = new Logger(flags.logLevel);
-
-  // Show help first, before any validation
-  if (flags.help) {
-    console.log(`
-Usage: ${SCRIPT_NAME} [issue-number] [options]
-
-Generate PR title and body from CHANGELOG.md or idea files.
-
-Options:
-  --help                    Show this help message
-  --dry-run                 Preview without outputting
-  --output <fmt>            Output format: text (default), json
-  --log-level <lvl>         Log level: error, warn, info (default), debug, trace
-  --cwd <path>              Working directory (default: current)
-
-Exit codes:
-  0  - Success
-  11 - Validation failed
-`);
-    process.exit(0);
-  }
-
+  let root;
   try {
-    // Parse issue number from env or positional arg
-    const issueNumber =
-      parseInt(process.env.PR_NUMBER || process.env.ISSUE_NUMBER, 10) ||
-      parseInt(flags._?.[0], 10) ||
-      null;
-
-    const args = ArgsSchema.parse({
-      ...flags,
-      issueNumber,
-    });
-
-    // Generate content
-    const { title, body } = await generatePRContent(args, log);
+    root = await repoRoot(args.cwd);
+    const { title, body } = await generatePRContent(args, log, root);
+    const durationMs = Date.now() - start;
 
     if (!title && !body) {
       log.warn("No content generated");
-      if (!args.dryRun) {
-        setOutput("title", "");
-        setOutput("body", "");
-      }
       succeed({
-        script: SCRIPT_NAME,
-        message: "No content generated",
-        exitCode: 2,
         output: args.output,
-        data: { title: "", body: "" },
+        script: SCRIPT_NAME,
+        runId,
+        dryRun: args.dryRun,
+        noop: true,
+        title: "",
+        body: "",
+        durationMs,
       });
+      return;
     }
 
     if (args.dryRun) {
-      log.info("[DRY-RUN] Generated PR content:");
+      log.info("[DRY-RUN] Generated PR content");
       log.info(`Title: ${title}`);
       log.info(`Body length: ${body.length} characters`);
     } else {
@@ -598,31 +628,81 @@ Exit codes:
     }
 
     succeed({
-      script: SCRIPT_NAME,
-      message: "Generated PR content",
       output: args.output,
-      data: { title, body, length: body.length },
+      script: SCRIPT_NAME,
+      runId,
+      dryRun: args.dryRun,
+      title,
+      body,
+      length: body.length,
+      durationMs,
     });
   } catch (error) {
+    const outputMode = args.output || rawArgs.output || "text";
+
     if (error instanceof z.ZodError) {
       log.error("Validation error:", error.errors);
       fail({
+        exitCode: 11,
         script: SCRIPT_NAME,
         message: "Invalid arguments",
-        exitCode: 11,
-        output: flags.output || "text",
-        error,
+        error: error.format(),
+        output: outputMode,
+        runId,
       });
+      return;
     }
 
-    log.error("Failed to generate PR content:", error.message);
+    log.error(
+      "Failed to generate PR content:",
+      error instanceof Error ? error.message : String(error),
+    );
+
     fail({
+      exitCode: 13,
       script: SCRIPT_NAME,
-      message: error.message,
-      output: flags.output || "text",
+      message: error instanceof Error ? error.message : String(error),
       error,
+      output: outputMode,
+      runId,
     });
   }
 }
 
 main();
+
+function coerceBoolean(value, defaultValue) {
+  if (value === undefined || value === null) return defaultValue;
+  if (typeof value === "boolean") return value;
+  const normalized = String(value).toLowerCase();
+  if (["false", "0", "no"].includes(normalized)) return false;
+  if (["true", "1", "yes"].includes(normalized)) return true;
+  return defaultValue;
+}
+
+function printHelp() {
+  console.log(`
+Generate PR title and body from CHANGELOG.md or idea files.
+
+Usage:
+  node scripts/ops/${SCRIPT_NAME}.mjs [issue-number] [options]
+
+Options:
+  --source <mode>        Source mode: idea|changelog|auto (default: auto)
+  --yes                  Execute (disable dry-run preview)
+  --dry-run              Preview output without emitting GITHUB_OUTPUT (default)
+  --output <format>      text|json (default: text)
+  --log-level <level>    trace|debug|info|warn|error (default: info)
+  --cwd <path>           Working directory (default: current)
+  --help                 Show this help message
+
+Examples:
+  node scripts/ops/${SCRIPT_NAME}.mjs --dry-run --output json
+  node scripts/ops/${SCRIPT_NAME}.mjs 123 --yes --source idea
+
+Exit codes:
+  0  Success
+  11 Validation error
+  13 Unexpected error
+`);
+}

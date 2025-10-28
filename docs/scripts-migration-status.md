@@ -1,162 +1,71 @@
 # Script Migration Status
 
-## Completed Migrations (23/27 = 85%)
+## Latest Guardrail Snapshot (policy-lint run `1761637694803-a64aa7`)
 
-### Core Libraries Created
+- **51** scripts scanned
+- **73** blocking errors (missing flags, dangerous patterns, interactive prompts)
+- **66** warnings (primarily length/complexity)
+- Warnings are being tracked but **not** a priority for the current migration pass.
 
-- ✅ `_lib/core.mjs` - Core utilities (Logger, parseFlags, repoRoot, atomicWrite, etc.)
-- ✅ `_lib/git.mjs` - Git operations (worktrees, commits, branches)
-- ✅ `_lib/github.mjs` - GitHub API wrappers (issues, PRs, labels)
-- ✅ `_lib/validation.mjs` - Script policy validation
-- ✅ `_lib/ideas.mjs` - Idea file parsing and validation
-- ✅ `_lib/changelog.mjs` - Changelog parsing, dedupe, and entry helpers
+### Blocking Errors (grouped by category)
 
-### Migrated Scripts
+**Core helper issues**
 
-#### ops/ (20)
+- `scripts/_lib/validation.mjs` — flagged for dangerous patterns (`rm -rf /`, `eval()`), needs review.
 
-1. ✅ `setup-labels.mjs` - Create/update repository lane labels
-   - Status: Complete
-   - Original: `DEPRECATED/setup-labels.mjs`
-   - Features: Full CLI contract, dry-run, JSON output
+**Checks missing CLI contract**
 
-2. ✅ `bump-version.mjs` - Bump package.json version
-   - Status: Complete (migrated earlier)
-   - Features: Auto-detect from commits, force type, GitHub Actions output
+- `scripts/checks/check-ci.mjs`
+- `scripts/checks/dedupe-guides.mjs`
+- `scripts/checks/deprecation-sweeper.mjs`
+- `scripts/checks/docs-report.mjs`
+- `scripts/checks/guide-dedupe.mjs`
+- `scripts/checks/lint-guides.mjs`
+- `scripts/checks/pr-requirements.mjs`
+- `scripts/checks/prepare-gh.mjs`
+- `scripts/checks/size-check.mjs`
+- `scripts/checks/smoke.mjs`
+- `scripts/checks/template-coverage.mjs`
+- `scripts/checks/validate-ideas.mjs`
 
-3. ✅ `create-worktree-pr.mjs` - Create worktree + branch + PR from issue
-   - Status: Complete
-   - Original: `DEPRECATED/create-worktree-pr.mjs`
-   - Features: Parent-child issues, bootstrap commits, post-checkout setup
+**Ops scripts still lacking guardrail flags**
 
-4. ✅ `ideas-to-issues.mjs` - Convert idea files to GitHub Issues
-   - Status: Complete
-   - Original: `DEPRECATED/ideas-to-issues.mjs`
-   - Features: Sub-issues, task lists, skip existing
+- `scripts/bump-version.mjs`
+- `scripts/generate-gh-pages-index.mjs`
+- `scripts/ops/archive-idea-for-issue.mjs`
+- `scripts/ops/auto-tag.mjs`
+- `scripts/ops/cleanup-ideas.mjs`
+- `scripts/ops/commit-msg-hook.mjs`
+- `scripts/ops/create-worktree-pr.mjs`
+- `scripts/ops/generate-template-catalog.mjs`
+- `scripts/ops/ideas-to-issues.mjs`
+- `scripts/ops/manual-update-pr-checkboxes.mjs`
+- `scripts/ops/new-snippet.mjs`
+- `scripts/ops/post-checkout.mjs`
+- `scripts/ops/setup-labels.mjs`
+- `scripts/ops/sync-ideas-checklists.mjs`
+- `scripts/ops/sync-issue-to-card.mjs`
+- `scripts/pre-commit-changelog.mjs`
+- `scripts/record-stories.mjs`
+- `scripts/test-storybook.mjs`
 
-5. ✅ `sync-ideas-checklists.mjs` - Sync acceptance checklists to issues
-   - Status: Complete
-   - Original: `DEPRECATED/sync-ideas-checklists.mjs`
-   - Features: Force update, skip if unchanged, filter support
+**Interactive prompts to replace**
 
-6. ✅ `archive-idea-for-issue.mjs` - Archive ideas when issues close
-   - Status: Complete
-   - Original: `DEPRECATED/archive-idea-for-issue.mjs`
-   - Features: Safety checks, auto-commit, GitHub Actions mode
+- `scripts/ops/new-guide.mjs`
+- `scripts/ops/new-template.mjs`
 
-7. ✅ `cleanup-ideas.mjs` - Clean up orphaned idea files
-   - Status: Complete
-   - Original: `DEPRECATED/cleanup-ideas.mjs`
-   - Features: Batch archive, filter by issue, preview mode
+### Recently Migrated (guardrail-compliant)
 
-8. ✅ `post-checkout.mjs` - Git post-checkout hook
-   - Status: Complete
-   - Original: `DEPRECATED/post-checkout.mjs`
-   - Features: Install deps, set git config, publish branch, skip flags
+- `scripts/ops/consolidate-changelog.mjs`
+- `scripts/ops/create-issues-from-changelog.mjs`
+- `scripts/ops/setup-project.mjs`
+- `scripts/ops/generate-pr-content.mjs` _(now emits structured dry-run output; smoke still flags JSON capture due to tooling limitation)._
 
-9. ✅ `sync-issue-to-card.mjs` - Sync issue content to idea files
-   - Status: Complete
-   - Original: `DEPRECATED/sync-issue-to-card.mjs`
-   - Features: Bidirectional sync, section updates, smart file discovery
+### Next Focus
 
-10. ✅ `manual-update-pr-checkboxes.mjs` - Update PR checkboxes
-    - Status: Complete
-    - Original: `DEPRECATED/manual-update-pr-checkboxes.mjs`
-    - Features: Acceptance/related checkboxes, preview mode
-
-11. ✅ `merge-subissue-to-parent.mjs` - Merge sub-issue to parent branch
-    - Status: Complete
-    - Original: `DEPRECATED/merge-subissue-to-parent.mjs`
-    - Features: Worktree detection, auto-merge, conflict handling
-
-12. ✅ `generate-pr-content.mjs` - Generate PR title/body from changelog or idea
-    - Status: Complete
-    - Original: `DEPRECATED/generate-pr-content.mjs`
-    - Features: Multiple sources, template integration, GitHub Actions output
-
-13. ✅ `commit-msg-hook.mjs` - Git commit message validation hook
-    - Status: Complete
-    - Original: `DEPRECATED/commit-msg-hook.mjs`
-    - Features: Ticket prefix validation, helpful error messages
-
-14. ✅ `new-snippet.mjs` - Create new snippet from template
-    - Status: Complete
-    - Original: `DEPRECATED/new-snippet.mjs`
-    - Features: PascalCase validation, template replacement
-
-15. ✅ `auto-tag.mjs` - Auto-tag releases from version changes
-    - Status: Complete
-    - Original: `DEPRECATED/auto-tag.mjs`
-    - Features: CHANGELOG extraction, GitHub releases, push tags
-
-16. ✅ `new-guide.mjs` - Create new guide from template
-    - Status: Complete
-    - Features: Template replacement, validation
-
-17. ✅ `new-template.mjs` - Create new template
-    - Status: Complete
-    - Features: Template scaffolding
-
-18. ✅ `index-guides.mjs` - Generate guides index
-    - Status: Complete
-    - Features: Auto-indexing of guide files
-
-19. ✅ `archive-expired-guides.mjs` - Archive old guides
-    - Status: Complete
-    - Features: Date-based archival
-
-20. ✅ `create-issues-from-changelog.mjs` - Create GitHub issues from changelog sections
-    - Status: Complete (guardrails-compliant)
-    - Features: Dry-run JSON output, lane label normalization (`lane-*`), GitHub CLI integration
-
-#### Lower Priority / Specialized (6)
-
-20. ✅ `record-stories.mjs` - Record Storybook stories with Playwright
-    - Status: Complete (fully migrated)
-    - Features: Custom flags (--url, --stories), parseFlags, Logger
-    - Note: Requires Playwright and running Storybook server
-
-21. ✅ `generate-gh-pages-index.mjs` - Generate GitHub Pages landing page
-    - Status: Complete (fully migrated)
-    - Features: parseFlags, Logger, atomicWrite, JSON output, custom --output-dir
-
-22. ✅ `consolidate-changelog.mjs` - Consolidate changelog entries
-    - Status: Complete (guardrails-compliant)
-    - Features: Dry-run by default, JSON/text output, temp file cleanup, changelog dedupe
-
-23. ✅ `pre-commit-changelog.mjs` - Pre-commit changelog validation
-    - Status: Basic migration (--help support)
-    - Note: Git hook, works with consolidate-changelog.mjs
-
-24. ✅ `setup-project.mjs` - GitHub Project setup automation
-    - Status: Complete (guardrails-compliant)
-    - Features: Dry-run JSON output, GH auth checks, field provisioning, pipeline config update
-
-25. ✅ `test-storybook.mjs` - Storybook test runner with server management
-    - Status: Basic migration (--help support)
-    - Note: Requires Storybook and test infrastructure
-
-#### checks/ (6)
-
-1. ✅ `validate-ideas.mjs` - Validate idea file structure
-   - Status: Complete
-   - Original: `DEPRECATED/validate-ideas.mjs`
-   - Features: Strict mode, filter, type validation
-
-2. ✅ `check-ci.mjs` - Monitor GitHub Actions workflow status
-   - Status: Complete
-   - Original: `DEPRECATED/check-ci.mjs`
-   - Features: Watch mode, formatted reports, JSON output
-
-3. ✅ `pr-requirements.mjs` - PR requirements automation
-   - Status: Complete
-   - Original: `DEPRECATED/pr-requirements.mjs`
-   - Features: Create issues, verify PRs, apply labels, lane detection
-
-4. ✅ `prepare-gh.mjs` - GitHub CLI environment check
-   - Status: Complete
-   - Original: `DEPRECATED/prepare-gh.mjs`
-   - Features: Installation/auth checks, repo access verification
+- Convert remaining ops/check scripts listed above to the guardrails template (flags, Logger, dry-run/yes handling).
+- Replace interactive prompts in `new-guide.mjs` / `new-template.mjs` with flag-driven flows.
+- Audit `_lib/validation.mjs` to remove dangerous patterns surfaced by policy-lint.
 
 5. ✅ `policy-lint.mjs` - Enforce script guardrails (created earlier)
 6. ✅ `smoke.mjs` - Smoke test all scripts (created earlier)
