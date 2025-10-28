@@ -456,8 +456,7 @@ node scripts/ops/my-script.mjs --dry-run --output json
 
 ## Resources
 
-- [Guardrails Document](../guides/SCRIPTS-REFERENCE.md) - Full policy
-- [Migration Plan](./MIGRATION-PLAN.md) - Migration strategy
+- [Guardrails Document](../docs/SCRIPTS-REFERENCE.md) - Full policy
 - [Package.json Scripts](../package.json) - Available commands
 
 ---
