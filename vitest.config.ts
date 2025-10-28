@@ -12,6 +12,24 @@ export default defineConfig({
     },
     environment: "jsdom",
     globals: true,
-    include: ["snippets/**/*.spec.{ts,tsx}"],
+    include: ["snippets/**/*.spec.{ts,tsx}", "scripts/**/*.spec.mjs"],
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/DEPRECATED/**",
+      "**/_archive/**",
+      "**/archived/**",
+    ],
+    coverage: {
+      exclude: [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/DEPRECATED/**",
+        "**/_archive/**",
+        "**/archived/**",
+        "**/*.spec.{ts,tsx,mjs}",
+        "**/*.config.{ts,js,mjs}",
+      ],
+    },
   },
 });

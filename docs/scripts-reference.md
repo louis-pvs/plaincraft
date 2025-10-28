@@ -38,12 +38,20 @@ All scripts honour the shared CLI contract:
 
 ## Idea Workflow Helpers
 
-| Command                                             | Snapshot                                                           |
-| --------------------------------------------------- | ------------------------------------------------------------------ |
-| `node scripts/ideas-to-issues.mjs <idea>`           | Converts idea cards to GitHub Issues, applies labels, links source |
-| `node scripts/sync-ideas-checklists.mjs`            | Mirrors checklist state between idea files and live issues         |
-| `node scripts/merge-subissue-to-parent.mjs <issue>` | Merges sub-issue branches back into the parent lane                |
-| `node scripts/sync-issue-to-card.mjs <issue>`       | Pulls updated Issue content back into the originating idea file    |
+| Command                                                 | Snapshot                                                           |
+| ------------------------------------------------------- | ------------------------------------------------------------------ |
+| `node scripts/ops/ideas-to-issues.mjs <idea>`           | Converts idea cards to GitHub Issues, applies labels, links source |
+| `node scripts/ops/sync-ideas-checklists.mjs`            | Mirrors checklist state between idea files and live issues         |
+| `node scripts/ops/merge-subissue-to-parent.mjs <issue>` | Merges sub-issue branches back into the parent lane                |
+| `node scripts/ops/sync-issue-to-card.mjs <issue>`       | Pulls updated Issue content back into the originating idea file    |
+
+Or use the pnpm shortcuts:
+
+```bash
+pnpm ideas:create <idea>    # ideas-to-issues
+pnpm ideas:sync             # sync-ideas-checklists
+pnpm ideas:validate         # validate-ideas
+```
 
 ## Supporting Libraries
 
