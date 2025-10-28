@@ -66,12 +66,25 @@ last_verified: 2025-10-28
 
 # Requirements
 
-- Project named **Plaincraft Roadmap**
-- Views: Lane A/B/C/D with filter `label:lane:<letter>`, WIP limit 3
-- Custom fields: ID (text), Lane (single select), Acceptance (text), Units (text), Metric (text)
-- Labels: `lane:A`, `lane:B`, `lane:C`, `lane:D`, `lane:unit`, `lane:composition`, `lane:bug`
+**Project shell**
+
+- Name project **Plaincraft Roadmap**
+- Configure views Lane A/B/C/D with filter `label:lane:<letter>` and WIP limit 3
+
+**Field definitions**
+
+- ID — text
+- Lane — single select
+- Acceptance — text
+- Units — text
+- Metric — text
+
+**Repo sync points**
+
+- Labels lane:A/B/C/D
+- Labels lane:unit / lane:composition / lane:bug
 - `.github/pipeline-config.json` synced with project ID
-- Issue templates in `.github/ISSUE_TEMPLATE/`
+- Issue templates stored in `.github/ISSUE_TEMPLATE/`
 
 # Links
 

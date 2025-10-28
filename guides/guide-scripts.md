@@ -75,21 +75,15 @@ last_verified: 2025-10-28
 
 **CLI Contract (all scripts):**
 
-- `--dry-run` (default true for ops)
-- `--yes` to execute writes
-- `--output json|text`
-- `--log-level trace|debug|info|warn|error`
-- `--cwd <path>`
-- Zero interactive prompts
+- Default to `--dry-run`; require `--yes` for writes
+- Output control: `--output json|text`
+- Logging control: `--log-level trace|debug|info|warn|error`
+- Context + UX: `--cwd <path>` with zero interactive prompts
 
 **Exit Codes:**
 
-- 0: success
-- 2: noop/idempotent
-- 3: partial success retryable
-- 10: precondition failed
-- 11: validation failed
-- 13: unsafe environment
+- Success: `0` (completed), `2` (noop/idempotent), `3` (retryable partial)
+- Failure: `10` (precondition failed), `11` (validation failed), `13` (unsafe environment)
 
 **Header Required:**
 
@@ -106,11 +100,7 @@ last_verified: 2025-10-28
 # Links
 
 - Templates: `/templates/script/`, `/templates/test-unit/`, `/templates/test-integration/`
-- Policy linter: `/scripts/checks/policy-lint.mjs`
-- Smoke tests: `/scripts/checks/smoke.mjs`
-- Size checker: `/scripts/checks/size-check.mjs`
-- Deprecation sweeper: `/scripts/checks/deprecation-sweeper.mjs`
-- Core library: `/scripts/_lib/core.mjs`
-- Validation library: `/scripts/_lib/validation.mjs`
-- Network allowlist: `/scripts/_lib/allowlist.json`
-- Deprecated scripts: `/scripts/DEPRECATED/`
+- Policy + validation: `/scripts/checks/policy-lint.mjs`, `/scripts/_lib/validation.mjs`
+- Smoke + size checks: `/scripts/checks/smoke.mjs`, `/scripts/checks/size-check.mjs`
+- Deprecation + allowlist: `/scripts/checks/deprecation-sweeper.mjs`, `/scripts/_lib/allowlist.json`
+- Core + legacy: `/scripts/_lib/core.mjs`, `/scripts/DEPRECATED/`

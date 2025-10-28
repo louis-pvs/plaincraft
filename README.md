@@ -1,134 +1,78 @@
 # plaincraft
 
-One file UX snippets for React and TypeScript. Each snippet is a single TSX file with a tiny Demo at the bottom and an acceptance test you can verify in minutes.
+One-file UX snippets for React + TypeScript. Each snippet ships with a demo, tests, and the scaffolds you need to keep ramp-up under ten minutes.
 
-## Philosophy
-
-Seams via props. Invariants guarded at the top. A11y first. Runnable in under 10 minutes from a clean clone.
-
-> **For Contributors:** See [guides/DEVELOPMENT.md](./guides/DEVELOPMENT.md) for detailed architecture patterns, SOLID principles, testing standards, and code review checklists.
-
-## Use this template
-
-- GitHub: Use this template then create your repo, run `pnpm i` and `pnpm dev`
-- CLI: `gh repo create <name> --template louis-pvs/plaincraft --public`
-- Clean copy: `pnpm dlx degit louis-pvs/plaincraft <name>`
-
-## Getting started
+## Quick Start
 
 ```bash
 pnpm i
 pnpm dev
 ```
 
-## Add a snippet
+- GitHub: `Use this template` on the repo page then `pnpm i && pnpm dev`
+- CLI: `gh repo create <name> --template louis-pvs/plaincraft --public`
+- Degit: `pnpm dlx degit louis-pvs/plaincraft <name>`
+
+## Documentation Index
+
+- `guides/README.md` — How the guide system works, rules, and active inventory (≤12 live guides).
+- `guides/components/README.md` — Component-focused playbooks that point to snippet templates.
+- `guides/workflows/README.md` — End-to-end delivery flows, worktree automation, and CI touchpoints.
+- `guides/templates/README.md` — Catalog of scaffolds, schema references, and usage docs.
+- `guides/_archive/` — Auto-managed graveyard for anything past TTL or lacking an owner.
+
+Guides are thin overlays. They always defer to scaffolds living in `/templates/**`, scripts under `/scripts/**`, or snippet READMEs.
+
+## Template-First Toolkit
+
+- `/templates/guide/guide-template.md` — Frontmatter-complete starting point for any new guide.
+- `/templates/issue-unit/` — Backlog-ready unit issue scaffold with CLI helpers.
+- `/templates/issue-composition/` — Cross-cutting composition issue scaffold.
+- `/templates/pull-request/` — Standardized PR body with acceptance checklist slots.
+- `/templates/ideas/USAGE.md` — Machine-importable source of truth used by idea automation.
+
+Run `pnpm guides:lint`, `pnpm guides:ttl`, or `pnpm guides:check` before submitting documentation PRs to confirm frontmatter, TTL, command executability, and dedupe budgets.
+
+## Working With Snippets
 
 ```bash
 pnpm new:snippet <PascalCaseName>
 pnpm dev
 ```
 
-Each snippet lives in `snippets/<Name>/<Name>.tsx` and exports both the component and `Demo`.
+- Snippets live in `snippets/<Name>/<Name>.tsx` and expose both the component and `Demo`.
+- Architecture follows controller + view seams with invariants enforced up front. Extended rationale lives in `guides/DEVELOPMENT.md`.
 
-**Architecture:** All snippets follow a headless controller + view pattern. See [guides/DEVELOPMENT.md](./guides/DEVELOPMENT.md) for the standard architecture, testing strategy, and SOLID principles.
+## 10 Minute Runnable Contract
 
-## Repo layout
+- Fresh clone to running demo in ≤10 minutes
+- Keyboard + screen reader paths documented
+- No external UI dependencies
+- TypeScript `--strict` + CI must remain green
 
-```
-demo/           Vite app that imports snippet Demos
-snippets/       Snippets and the _template
-guides/         Development standards and architecture patterns
-scripts/        Helper scripts
-```
+## Storybook
 
-## Documentation
+- Serve locally: `pnpm storybook`
+- Build static bundle: `pnpm build:storybook`
+- Install Playwright browsers once: `pnpm exec playwright install --with-deps`
+- Headless interaction tests: `TARGET_URL=http://127.0.0.1:6006 pnpm storybook:test`
 
-- **[guides/DEVELOPMENT.md](./guides/DEVELOPMENT.md)** - Architecture patterns, SOLID principles, testing standards, and code review checklists for contributors
-- **snippets/[Name]/README.md** - Per-snippet API documentation, props, behavior, and accessibility guidelines
-- **snippets/[Name]/ADOPTION.md** - Integration guides and adoption strategies for each snippet
+Each scaffolded snippet ships with:
 
-## 10 minute runnable contract
+- `README.md` (use cases, props, a11y, acceptance checklist)
+- `*.stories.tsx` (Basic, Interaction, Edge cases)
+- `*.mdx` that imports the README via `?raw` for Storybook docs
 
-- Fresh clone to running demo in under 10 minutes
-- Keyboard and screen reader paths documented
-- No external UI dependency
-- TypeScript strict passes, CI is green
+## Quality Gates
+
+- Clean clone:
+  - `pnpm i && pnpm storybook` succeeds
+  - `pnpm storybook:test` passes against the static build
+  - `pnpm new:snippet <Name>` generates working stories/docs without edits
+- GitHub Actions:
+  - `app-checks` runs format, typecheck, lint, unit tests, and build
+  - `storybook-tests` caches browsers, builds Storybook, and exercises the Storybook test runner
 
 ## License
 
 MIT © 2024 Louis Phang
-
----
-
-## Storybook
-
-Run Storybook locally:
-
-```bash
-pnpm storybook
-```
-
-Build static Storybook:
-
-```bash
-pnpm build:storybook
-```
-
-Install Playwright browsers (once per environment):
-
-```bash
-pnpm exec playwright install --with-deps
-```
-
-Headless interaction tests:
-
-```bash
-TARGET_URL=http://127.0.0.1:6006 pnpm storybook:test
-```
-
-### How docs get generated
-
-Each snippet includes:
-
-- `README.md` with use case, props, behavior, a11y, and a 10-minute acceptance checklist.
-- `*.mdx` that imports `README.md` via `?raw` and renders it inside Storybook docs.
-- `*.stories.tsx` with 2–3 stories: Basic, Interaction (with `play()`), and an Edge case.
-
-### Scaffolding a new snippet (stories included)
-
-```bash
-pnpm new:snippet <PascalCaseName>
-pnpm storybook
-```
-
-This creates:
-
-- `snippets/<Name>/<Name>.tsx`
-- `snippets/<Name>/<Name>.spec.tsx`
-- `snippets/<Name>/README.md`
-- `snippets/<Name>/<Name>.stories.tsx`
-- `snippets/<Name>/<Name>.mdx`
-
-Import its `Demo` into the demo app to keep the “single source of truth”:
-
-```ts
-import { Demo as <Name>Demo } from "../../snippets/<Name>/<Name>";
-```
-
----
-
-Quality gates
-
-- From a clean clone:
-  - `pnpm i && pnpm storybook` starts Storybook successfully.
-  - `pnpm storybook:test` runs (Storybook test runner against the static build) and passes.
-  - Creating a new snippet via `pnpm new:snippet <Name>` yields working docs and stories without manual edits.
-
-- GitHub Actions:
-  - `app-checks` installs deps once, then format, typecheck, lint, unit test, and build the app.
-  - `storybook-tests` restores Playwright browsers cached per `@playwright/test` version/runner arch, installs browsers only on cache misses, builds Storybook, serves the static bundle, waits on `http://127.0.0.1:6006`, and runs the Storybook 9 test runner with the same command we use locally.
-
-Do not exceed these time boxes:
-
-- Storybook setup ≤ 60 minutes
-- CI build+tests additional time ≤ 90 seconds vs. baseline
