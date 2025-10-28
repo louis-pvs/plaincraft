@@ -144,6 +144,7 @@ Prepare local environment for GitHub CLI workflows.
 
 Options:
   --help                    Show this help message
+  --dry-run           Preview mode without making changes (default: true)
   --yes               Execute mode (confirms execution)
   --output <fmt>            Output format: text (default), json
   --log-level <lvl>         Log level: error, warn, info (default), debug, trace

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generate root index.html for gh-pages deployment
+ * @since 2025-10-28
  * @version 1.0.0
  */
 
@@ -30,6 +31,8 @@ USAGE:
 OPTIONS:
   --output-dir <dir> Output directory (default: _deploy)
   --dry-run          Preview without writing
+  --log-level <level> Log level (default: info)
+  --cwd <path>        Working directory (default: current)
   --yes              Skip confirmation
   --help             Show this help
 

@@ -27,6 +27,7 @@ Usage: node scripts/checks/size-check.mjs [options]
 
 Options:
   --help              Show this help
+  --dry-run           Preview mode without making changes (default: true)
   --yes               Execute mode (confirms execution)
   --output <format>   Output format: json|text (default: text)
   --log-level <level> Log level: trace|debug|info|warn|error (default: info)

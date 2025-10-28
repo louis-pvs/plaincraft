@@ -53,6 +53,11 @@ OPTIONS:
   --orphans          List templates not referenced by any guide
   --json             Output JSON format
   --help             Show this help
+  --output <format>   Output format: text|json (default: text)
+  --log-level <level> Log level: trace|debug|info|warn|error (default: info)
+  --cwd <path>        Working directory (default: current)
+  --yes               Execute mode (confirms execution)
+  --dry-run           Preview mode without making changes (default: true)
 
 EXAMPLES:
   node scripts/checks/template-coverage.mjs

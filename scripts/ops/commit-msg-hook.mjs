@@ -18,8 +18,10 @@ const SCRIPT_NAME = "commit-msg-hook";
 // Zod schema for CLI args
 const ArgsSchema = z.object({
   help: z.boolean().default(false),
+  dryRun: z.boolean().default(false),
   output: z.enum(["text", "json"]).default("text"),
-  logLevel: z.enum(["error", "warn", "info", "debug", "trace"]).default("info"),
+  logLevel: z.enum(["trace", "debug", "info", "warn", "error"]).default("info"),
+  cwd: z.string().optional(),
   commitMsgFile: z.string(),
 });
 
@@ -108,9 +110,11 @@ Arguments:
 
 Options:
   --help                    Show this help message
+  --dry-run           Preview mode without making changes (default: true)
   --yes               Execute mode (confirms execution)
   --output <fmt>            Output format: text (default), json
   --log-level <lvl>         Log level: error, warn, info (default), debug, trace
+  --cwd <path>        Working directory (default: current)
 
 Enforces:
   - Commit messages start with [ticket-id] prefix

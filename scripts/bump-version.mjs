@@ -1,19 +1,42 @@
 #!/usr/bin/env node
 /**
- * Bump package.json version based on commit messages
+ * bump-version.mjs
+ * @since 2025-10-28
+ * @version 1.0.0
+ * Summary: Bump package.json version based on commit messages
  *
  * Convention:
  * - [MAJOR] or breaking: → major bump
  * - [MINOR] or feat: → minor bump
  * - [PATCH] or fix: → patch bump
  * - Default → patch bump
- *
- * Usage:
- *   node scripts/bump-version.mjs          # Auto-detect from commits
- *   node scripts/bump-version.mjs major    # Force major
- *   node scripts/bump-version.mjs minor    # Force minor
- *   node scripts/bump-version.mjs patch    # Force patch
  */
+
+// Check for --help first
+if (process.argv.includes("--help") || process.argv.includes("-h")) {
+  console.log(`
+Usage: node scripts/bump-version.mjs [version-type] [options]
+
+Arguments:
+  version-type        Version bump type: major|minor|patch (auto-detect if omitted)
+
+Options:
+  --help              Show this help
+  --dry-run           Preview mode without making changes (default: false)
+  --yes               Execute mode (default: true)
+  --output <format>   Output format: text|json (default: text)
+  --log-level <level> Log level (default: info)
+  --cwd <path>        Working directory (default: current)
+
+Examples:
+  node scripts/bump-version.mjs          # Auto-detect from commits
+  node scripts/bump-version.mjs major    # Force major
+  node scripts/bump-version.mjs minor    # Force minor
+  node scripts/bump-version.mjs patch    # Force patch
+  node scripts/bump-version.mjs --dry-run  # Preview only
+`);
+  process.exit(0);
+}
 
 import { readFile, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";

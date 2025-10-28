@@ -35,6 +35,8 @@ USAGE:
 OPTIONS:
   --output-file <path>   Output file path (default: templates/INDEX.md)
   --dry-run              Preview without writing
+  --log-level <level> Log level (default: info)
+  --cwd <path>        Working directory (default: current)
   --yes                  Skip confirmation
   --help                 Show this help
 

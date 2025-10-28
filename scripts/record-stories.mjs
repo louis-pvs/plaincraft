@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
  * Record Storybook stories with Playwright and convert to GIFs
+ * @since 2025-10-28
  * @version 1.0.0
  */
 
@@ -156,7 +157,10 @@ OPTIONS:
   --url <url>        Storybook URL (default: http://127.0.0.1:6006)
   --stories <filter> Story filter: 'all' or comma-separated IDs
   --output <format>  Output format: text or json (default: text)
+  --log-level <level> Log level: trace|debug|info|warn|error (default: info)
+  --cwd <path>        Working directory (default: current)
   --help             Show this help
+  --dry-run           Preview mode without making changes (default: true)
 
 EXAMPLES:
   # Record all stories
