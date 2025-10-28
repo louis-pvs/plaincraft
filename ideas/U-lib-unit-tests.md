@@ -144,15 +144,15 @@ N/A - Backend testing only, no UI components.
 
 ## Acceptance Checklist
 
-- [ ] `scripts/_lib/core.spec.mjs` created with ≥80% coverage (Logger, parseFlags, atomicWrite, formatOutput)
-- [ ] `scripts/_lib/validation.spec.mjs` created with ≥80% coverage (validateScriptHeader, validateCLIContract, detectDangerousPatterns)
-- [ ] `scripts/_lib/ideas.spec.mjs` created with ≥80% coverage (parseIdeaFile, validateIdeaFile, extractSubIssues)
+- [x] `scripts/_lib/core.spec.mjs` created with ≥80% coverage (Logger, parseFlags, atomicWrite, formatOutput)
+- [x] `scripts/_lib/validation.spec.mjs` created with ≥80% coverage (validateScriptHeader, validateCLIContract, detectDangerousPatterns)
+- [x] `scripts/_lib/ideas.spec.mjs` created with ≥80% coverage (parseIdeaFile, validateIdeaFile, extractSubIssues)
 - [ ] `scripts/_lib/changelog.spec.mjs` created with ≥80% coverage (parseSummaryFile, mergeVersionEntries, insertVersionEntry)
 - [ ] `scripts/_lib/templates.spec.mjs` created with ≥80% coverage (listTemplates, validateTemplateRef, generateTemplateFiles)
 - [ ] `scripts/_lib/github.spec.mjs` created with ≥80% coverage (getIssue, createPR, updateIssue)
 - [ ] `scripts/_lib/git.spec.mjs` created with ≥80% coverage (isGitClean, getCurrentBranch, createWorktree)
-- [ ] Fixtures directory `scripts/_lib/__fixtures__/` created with test data
-- [ ] All tests pass with `pnpm scripts:test` (exit code 0)
+- [x] Fixtures directory `scripts/_lib/__fixtures__/` created with test data
+- [x] All tests pass with `pnpm scripts:test` (exit code 0)
 - [ ] Coverage report shows ≥80% for all modules
 - [ ] CI integration: Tests run on every PR via GitHub Actions
 - [ ] Documentation: Add testing section to `scripts/README.md`

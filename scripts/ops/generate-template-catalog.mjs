@@ -8,7 +8,7 @@
  */
 
 import { readdir, readFile } from "node:fs/promises";
-import { join, basename } from "node:path";
+import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { parseFlags, Logger, atomicWrite, repoRoot } from "../_lib/core.mjs";
 
