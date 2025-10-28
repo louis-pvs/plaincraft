@@ -97,9 +97,9 @@ Create comprehensive test suites for all `_lib` modules targeting 80% coverage m
 ### Phase 3: Documentation & Team Onboarding (Week 4)
 
 1. **Update documentation**
-   - `docs/scripts-reference.md` - Full API reference for new structure
+   - `docs/scripts-reference.md` - Format the docs following ./guide/README.md structure
    - `guides/guide-scripts.md` - Updated workflow examples
-   - `README.md` - Update quick start commands
+   - `README.md` - Update quick start commands and all relevant references
 
 2. **Team review**
    - Walkthrough session for new structure
