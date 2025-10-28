@@ -61,7 +61,7 @@ Add agent instructions to prefer:
 - [x] Add agent instruction preference: `gh` > existing scripts > `curl`
 - [x] Create quick reference: GitHub operation → recommended command/script
 - [ ] Test agent follows preference on sample issue workflow
-- [ ] Update SCRIPTS-REFERENCE.md with "When to use each tool" section
+- [x] Update SCRIPTS-REFERENCE.md with "When to use each tool" section
 
 ## References
 
