@@ -235,7 +235,7 @@ B-*       # Bug (when needed)
    - `record-nightly`: 20 minutes (video recording + GIF conversion)
 
 2. **Missing scripts:**
-   - `scripts/ops/remove-worktree.mjs` - Cleanup after merge
+   - ~~`scripts/ops/remove-worktree.mjs` - Cleanup after merge~~ ✅ Implemented 2025-10-28
    - `scripts/checks/validate-idea.mjs` - CLI validator (currently workflow-only)
 
 ### Medium Priority (Nice to Have)
@@ -260,7 +260,7 @@ B-*       # Bug (when needed)
 
 ### Functionality Gaps
 
-- No automated worktree cleanup after merge
+- Worktree cleanup still manual (use `scripts/ops/remove-worktree.mjs`)
 - No standalone idea file validator CLI
 - No JUnit parser for PR comment generation
 - No automated PR label syncing from parent Issues
@@ -380,9 +380,8 @@ B-*       # Bug (when needed)
 
 ### Short-Term (Next 2 Weeks)
 
-1. **Implement worktree cleanup script**
-   - `scripts/ops/remove-worktree.mjs`
-   - Hook into post-merge workflow or manual CLI
+1. ~~**Implement worktree cleanup script**~~ ✅ Completed via `scripts/ops/remove-worktree.mjs` (manual CLI)
+   - Script handles worktree removal plus optional branch cleanup; automation hook still TBD
 
 2. **Add artifact size monitoring**
    - Warn if builds exceed thresholds
