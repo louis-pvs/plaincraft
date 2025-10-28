@@ -1,0 +1,52 @@
+{
+  "id": "user-story",
+  "name": "user-story",
+  "version": "0.1.0",
+  "category": "planning",
+  "entrypoint": "user-story-template.md",
+  "description": "Template for creating development-ready user stories that connect ideas to roadmap execution",
+  "created": "2025-10-28",
+  "lastUpdated": "2025-10-28",
+  "schema": {
+    "requiredSections": [
+      "Title",
+      "Persona & Need",
+      "Context",
+      "Scope",
+      "Technical Notes",
+      "Risks & Dependencies"
+    ],
+    "titleFormat": "^\\[(U|C)-[a-z0-9-]+\\]",
+    "requiredLinks": ["sourceIdea", "roadmapCard"]
+  },
+  "automation": {
+    "validation": {
+      "preBuild": true,
+      "preCommit": true,
+      "ci": true
+    },
+    "lifecycle": {
+      "draftPhase": "ideas/",
+      "archivePath": "ideas/_archive/{year}/",
+      "ttlDays": 90
+    }
+  },
+  "usage": {
+    "commands": {
+      "create": "pnpm new:story",
+      "validate": "pnpm docs:check"
+    },
+    "examples": [
+      {
+        "title": "User feature story",
+        "file": "ideas/U-profile-form-composed.md"
+      },
+      {
+        "title": "Creator feature story",
+        "file": "ideas/C-creator-onboarding-bridge.md"
+      }
+    ]
+  },
+  "relatedTemplates": ["ideas", "roadmap-project"],
+  "relatedGuides": ["guide-workflow.md", "guide-roadmap-setup.md"]
+}
