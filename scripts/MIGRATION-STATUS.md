@@ -1,6 +1,6 @@
 # Script Migration Status
 
-## Completed Migrations (9/27)
+## Completed Migrations (11/27)
 
 ### Core Libraries Created
 
@@ -12,7 +12,7 @@
 
 ### Migrated Scripts
 
-#### ops/ (6)
+#### ops/ (8)
 
 1. ✅ `setup-labels.mjs` - Create/update repository lane labels
    - Status: Complete
@@ -48,6 +48,16 @@
    - Original: `DEPRECATED/cleanup-ideas.mjs`
    - Features: Batch archive, filter by issue, preview mode
 
+8. ✅ `post-checkout.mjs` - Git post-checkout hook
+   - Status: Complete
+   - Original: `DEPRECATED/post-checkout.mjs`
+   - Features: Install deps, set git config, publish branch, skip flags
+
+9. ✅ `sync-issue-to-card.mjs` - Sync issue content to idea files
+   - Status: Complete
+   - Original: `DEPRECATED/sync-issue-to-card.mjs`
+   - Features: Bidirectional sync, section updates, smart file discovery
+
 #### checks/ (3)
 
 1. ✅ `validate-ideas.mjs` - Validate idea file structure
@@ -69,15 +79,14 @@
 
 None currently
 
-## Remaining Scripts (18)
+## Remaining Scripts (16)
 
 ### High Priority (Next Batch)
 
-- [ ] `post-checkout.mjs` - Git post-checkout hook
+None remaining - all high priority complete!
 
 ### Medium Priority
 
-- [ ] `sync-issue-to-card.mjs` - Sync issue to project card
 - [ ] `manual-update-pr-checkboxes.mjs` - Update PR checkboxes
 - [ ] `merge-subissue-to-parent.mjs` - Merge sub-issue to parent
 - [ ] `generate-pr-content.mjs` - Generate PR content from templates
@@ -117,8 +126,8 @@ For each script migration:
 ## Statistics
 
 - **Total Scripts**: 27
-- **Migrated**: 9 (33%)
-- **Remaining**: 18 (67%)
+- **Migrated**: 11 (41%)
+- **Remaining**: 16 (59%)
 - **Libraries Created**: 5
 - **Enforcement Tools**: 4 (policy-lint, smoke, lint-guides, dedupe-guides)
 
