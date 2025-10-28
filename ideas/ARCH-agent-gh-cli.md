@@ -57,9 +57,9 @@ Add agent instructions to prefer:
 
 ## Acceptance Checklist
 
-- [ ] Document `gh` CLI commands for common operations in guides/
-- [ ] Add agent instruction preference: `gh` > existing scripts > `curl`
-- [ ] Create quick reference: GitHub operation → recommended command/script
+- [x] Document `gh` CLI commands for common operations in guides/
+- [x] Add agent instruction preference: `gh` > existing scripts > `curl`
+- [x] Create quick reference: GitHub operation → recommended command/script
 - [ ] Test agent follows preference on sample issue workflow
 - [ ] Update SCRIPTS-REFERENCE.md with "When to use each tool" section
 
