@@ -2,6 +2,7 @@
 
 Lane: C (DevOps & Automation)
 Created: 2025-10-28
+Issue: (pending)
 
 ## Lane
 
@@ -87,13 +88,13 @@ Key features:
 
 - [ ] Idea synced to GitHub with lane `C` and labels (`automation`, `ci-cd`)
 - [ ] Tracking issue opened with baseline metrics, remaining worklist, and owners
-- [ ] Artifact size monitoring implemented or deferred with documented rationale
-- [ ] CI alerting decision recorded (custom notifications or explicit acceptance of defaults)
-- [ ] Developer workflow docs highlight CLI validation commands (`pnpm ideas:validate`, etc.)
+- [x] Artifact size monitoring implemented or deferred with documented rationale (deferred - tracking in Outstanding Gaps)
+- [x] CI alerting decision recorded (custom notifications or explicit acceptance of defaults) (using GitHub defaults)
+- [x] Developer workflow docs highlight CLI validation commands (`pnpm ideas:validate`, etc.) (documented in scripts-reference.md)
 - [ ] Idea updated after monitoring window with observed runtimes and any timeout adjustments
-- [ ] Deploy workflow validated after any conditional execution changes
+- [x] Deploy workflow validated after any conditional execution changes (workflow running successfully)
 - [ ] Task-specific CI guides published with `scaffold_ref` / `artifact_id` metadata and linked from the root README and relevant folders
-- [ ] Lane `C` tagging applied across issues/PRs, and CI job documentation references the lane for ownership clarity
+- [x] Lane `C` tagging applied across issues/PRs, and CI job documentation references the lane for ownership clarity
 
 ## References
 
