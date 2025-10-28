@@ -49,6 +49,10 @@ export const VALIDATION_RULES = {
     requiredSections: ["Lane", "Expected Behavior", "Actual Behavior", "Steps"],
     filenamePattern: /^B-[\w-]+\.md$/,
   },
+  brief: {
+    requiredSections: ["Problem", "Signal", "Hunch"],
+    filenamePattern: /^[a-z][\w-]*\.md$/,
+  },
 };
 
 /**
@@ -62,6 +66,7 @@ export function getIdeaType(filename) {
   if (filename.startsWith("ARCH-")) return "architecture";
   if (filename.startsWith("PB-")) return "playbook";
   if (filename.startsWith("B-")) return "bug";
+  if (/^[a-z]/.test(filename)) return "brief";
   return null;
 }
 
@@ -174,7 +179,7 @@ export async function validateIdeaFile(filePath) {
     }
 
     // Check for ticket ID in title
-    if (metadata.title) {
+    if (metadata.title && type !== "brief") {
       const ticketPrefix = filename.substring(0, filename.indexOf("-") + 1);
       if (!metadata.title.includes(ticketPrefix.replace("-", ""))) {
         warnings.push(
