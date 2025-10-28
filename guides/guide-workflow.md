@@ -54,6 +54,8 @@ last_verified: 2025-10-28
    node scripts/create-worktree-pr.mjs <issue-number>
    ```
 
+   - Copies `node_modules` from the source checkout so `pnpm` works in sandboxed worktrees without network access.
+
 5. **Sync checklists (if needed):**
    ```bash
    node scripts/sync-ideas-checklists.mjs

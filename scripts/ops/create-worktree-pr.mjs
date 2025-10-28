@@ -14,7 +14,7 @@
  */
 
 import path from "node:path";
-import { writeFile } from "node:fs/promises";
+import { access, cp, rm, writeFile } from "node:fs/promises";
 import { z } from "zod";
 import { execa } from "execa";
 import {
@@ -95,6 +95,49 @@ function generateWorktreePath(branchName, customDir, root) {
   // Default: ../plaincraft-{branch-name}
   const baseName = branchName.replace(/\//g, "-");
   return path.join(root, "..", `plaincraft-${baseName}`);
+}
+
+/**
+ * Bootstrap node_modules into the worktree so pnpm is available offline
+ * @param {string} sourceRoot - Main repository root
+ * @param {string} worktreePath - Target worktree directory
+ * @param {Logger} log - Logger
+ * @returns {Promise<boolean>} Success
+ */
+async function bootstrapNodeModules(sourceRoot, worktreePath, log) {
+  const sourceNodeModules = path.join(sourceRoot, "node_modules");
+  const targetNodeModules = path.join(worktreePath, "node_modules");
+
+  try {
+    await access(sourceNodeModules);
+  } catch {
+    log.warn("Skipping dependency bootstrap: source node_modules missing");
+    return false;
+  }
+
+  if (path.resolve(sourceRoot) === path.resolve(worktreePath)) {
+    return false;
+  }
+
+  try {
+    await rm(targetNodeModules, { recursive: true, force: true });
+  } catch {
+    // Ignore cleanup errors; force handles most cases
+  }
+
+  log.info("Bootstrapping node_modules into worktree...");
+  try {
+    await cp(sourceNodeModules, targetNodeModules, {
+      recursive: true,
+      force: true,
+      dereference: true,
+    });
+    log.info("node_modules bootstrapped");
+    return true;
+  } catch (error) {
+    log.warn(`Failed to bootstrap node_modules: ${error.message}`);
+    return false;
+  }
 }
 
 /**
@@ -251,7 +294,7 @@ You can safely delete this file or amend this commit once you've added your actu
  * @param {Logger} log - Logger
  * @returns {Promise<boolean>} Success
  */
-async function runPostCheckout(worktreePath, log) {
+async function runPostCheckout(worktreePath, log, options = {}) {
   log.info("Running post-checkout setup...");
   try {
     const postCheckoutScript = path.join(
@@ -260,9 +303,14 @@ async function runPostCheckout(worktreePath, log) {
       "post-checkout.mjs",
     );
 
+    const env = { ...process.env, SKIP_SIMPLE_GIT_HOOKS: "1" };
+    if (options.bootstrappedDependencies) {
+      env.PLAINCRAFT_BOOTSTRAPPED_NODE_MODULES = "1";
+    }
+
     await execa("node", [postCheckoutScript], {
       cwd: worktreePath,
-      env: { ...process.env, SKIP_SIMPLE_GIT_HOOKS: "1" },
+      env,
     });
 
     log.info("Post-checkout setup complete");
@@ -354,8 +402,16 @@ async function executeWorkflow(args, log) {
   log.info("Creating worktree...");
   await createWorktree(worktreePath, branchName, args.baseBranch);
 
+  const bootstrappedDependencies = await bootstrapNodeModules(
+    root,
+    worktreePath,
+    log,
+  );
+
   // Run post-checkout setup
-  await runPostCheckout(worktreePath, log);
+  await runPostCheckout(worktreePath, log, {
+    bootstrappedDependencies,
+  });
 
   // Check for commits
   log.info("Checking for commits...");
