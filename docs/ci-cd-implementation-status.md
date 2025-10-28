@@ -241,6 +241,50 @@ B-*       # Bug (when needed)
 3. **Known Bugs:**
    - ⚠️ `scripts/ops/create-worktree-pr.mjs` - Bug in line 355: passes `args.baseBranch` as `cwd` parameter to `createWorktree()` instead of `root`. This causes git command to fail with ENOENT when base branch is not "main". **Workaround:** Create worktree manually with `git worktree add -b <branch> <path> <base-branch>` and PR with `gh pr create`. **Fix needed:** Change `await createWorktree(worktreePath, branchName, args.baseBranch)` to `await createWorktree(worktreePath, branchName, root)` and modify `createWorktree()` signature to accept base branch parameter properly.
 
+4. **🚨 BREAKING: package.json Path Mismatches** ⚠️ **CRITICAL - Identified 2025-10-28**
+
+   **Impact:** 14 out of 19 pnpm script commands reference incorrect paths after scripts migration
+
+   **Root Cause:** Scripts migrated to `ops/` and `checks/` subdirectories, but package.json not updated
+
+   **Broken Commands:**
+
+   ```bash
+   pnpm ci:check          # ❌ scripts/check-ci.mjs → scripts/checks/check-ci.mjs
+   pnpm ci:watch          # ❌ scripts/check-ci.mjs → scripts/checks/check-ci.mjs
+   pnpm gh:prepare        # ❌ scripts/prepare-gh.mjs → scripts/checks/prepare-gh.mjs
+   pnpm gh:setup-labels   # ❌ scripts/setup-labels.mjs → scripts/ops/setup-labels.mjs
+   pnpm gh:worktree       # ❌ scripts/create-worktree-pr.mjs → scripts/ops/create-worktree-pr.mjs
+   pnpm postcheckout      # ❌ scripts/post-checkout.mjs → scripts/ops/post-checkout.mjs
+   pnpm ideas:create      # ❌ scripts/ideas-to-issues.mjs → scripts/ops/ideas-to-issues.mjs
+   pnpm ideas:sync        # ❌ scripts/sync-ideas-checklists.mjs → scripts/ops/sync-ideas-checklists.mjs
+   pnpm ideas:validate    # ❌ scripts/validate-ideas.mjs → scripts/checks/validate-ideas.mjs
+   pnpm new:snippet       # ❌ scripts/new-snippet.mjs → scripts/ops/new-snippet.mjs
+   pnpm pr:check          # ❌ scripts/pr-requirements.mjs → scripts/checks/pr-requirements.mjs
+   pnpm pr:create-issue   # ❌ scripts/pr-requirements.mjs → scripts/checks/pr-requirements.mjs
+   pnpm pr:generate       # ❌ scripts/generate-pr-content.mjs → scripts/ops/generate-pr-content.mjs
+   pnpm pr:verify         # ❌ scripts/pr-requirements.mjs → scripts/checks/pr-requirements.mjs
+   ```
+
+   **Working Commands:**
+
+   ```bash
+   pnpm changelog         # ✅ scripts/ops/consolidate-changelog.mjs
+   pnpm gh:setup-project  # ✅ scripts/ops/setup-project.mjs
+   pnpm issues:create     # ✅ scripts/ops/create-issues-from-changelog.mjs
+   pnpm record:stories    # ✅ scripts/record-stories.mjs (not migrated)
+   pnpm storybook:test    # ✅ scripts/test-storybook.mjs (not migrated)
+   ```
+
+   **User Impact:**
+   - ❌ Most workflow automation commands fail with "ENOENT: no such file"
+   - ❌ CI likely broken if using pnpm shortcuts (e.g., `pnpm ideas:validate`)
+   - ❌ Documentation and guides reference broken commands
+
+   **Mitigation:** Tracked in Issue #68 (ARCH-scripts-migration-complete) Phase 2
+
+   **Fix:** Sub-issue U-package-json-migration created to systematically update all paths
+
 ### Medium Priority (Nice to Have)
 
 1. **Release automation:**
