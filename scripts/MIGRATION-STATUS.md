@@ -1,6 +1,6 @@
 # Script Migration Status
 
-## Completed Migrations (6/27)
+## Completed Migrations (9/27)
 
 ### Core Libraries Created
 
@@ -12,7 +12,7 @@
 
 ### Migrated Scripts
 
-#### ops/ (3)
+#### ops/ (6)
 
 1. ✅ `setup-labels.mjs` - Create/update repository lane labels
    - Status: Complete
@@ -32,6 +32,21 @@
    - Status: Complete
    - Original: `DEPRECATED/ideas-to-issues.mjs`
    - Features: Sub-issues, task lists, skip existing
+
+5. ✅ `sync-ideas-checklists.mjs` - Sync acceptance checklists to issues
+   - Status: Complete
+   - Original: `DEPRECATED/sync-ideas-checklists.mjs`
+   - Features: Force update, skip if unchanged, filter support
+
+6. ✅ `archive-idea-for-issue.mjs` - Archive ideas when issues close
+   - Status: Complete
+   - Original: `DEPRECATED/archive-idea-for-issue.mjs`
+   - Features: Safety checks, auto-commit, GitHub Actions mode
+
+7. ✅ `cleanup-ideas.mjs` - Clean up orphaned idea files
+   - Status: Complete
+   - Original: `DEPRECATED/cleanup-ideas.mjs`
+   - Features: Batch archive, filter by issue, preview mode
 
 #### checks/ (3)
 
@@ -54,13 +69,10 @@
 
 None currently
 
-## Remaining Scripts (21)
+## Remaining Scripts (18)
 
 ### High Priority (Next Batch)
 
-- [ ] `sync-ideas-checklists.mjs` - Sync acceptance checklists to issues
-- [ ] `archive-idea-for-issue.mjs` - Archive ideas when issues close
-- [ ] `cleanup-ideas.mjs` - Clean up orphaned idea files
 - [ ] `post-checkout.mjs` - Git post-checkout hook
 
 ### Medium Priority
@@ -105,8 +117,8 @@ For each script migration:
 ## Statistics
 
 - **Total Scripts**: 27
-- **Migrated**: 6 (22%)
-- **Remaining**: 21 (78%)
+- **Migrated**: 9 (33%)
+- **Remaining**: 18 (67%)
 - **Libraries Created**: 5
 - **Enforcement Tools**: 4 (policy-lint, smoke, lint-guides, dedupe-guides)
 
