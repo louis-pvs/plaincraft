@@ -54,7 +54,12 @@
     "scripts:lint": "node scripts/checks/policy-lint.mjs",
     "scripts:test": "vitest run --reporter=dot scripts/**/*.spec.mjs",
     "scripts:smoke": "node scripts/checks/smoke.mjs",
-    "scripts:guardrails": "pnpm scripts:lint && pnpm scripts:test && pnpm scripts:smoke"
+    "scripts:guardrails": "pnpm scripts:lint && pnpm scripts:test && pnpm scripts:smoke",
+    "guides:lint": "node scripts/checks/lint-guides.mjs",
+    "guides:dedupe": "node scripts/checks/dedupe-guides.mjs",
+    "guides:ttl": "node scripts/ops/archive-expired-guides.mjs",
+    "guides:index": "node scripts/ops/index-guides.mjs",
+    "guides:check": "pnpm guides:lint && pnpm guides:dedupe && pnpm guides:ttl --dry-run"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.2",
