@@ -265,20 +265,9 @@ async function main() {
   const flags = parseFlags();
   const log = new Logger(flags.logLevel);
 
-  try {
-    // Parse sub-issue number from positional arg
-    const subIssueNumber = parseInt(flags._?.[0], 10);
-    if (!subIssueNumber || isNaN(subIssueNumber)) {
-      throw new Error("Sub-issue number required as first argument");
-    }
-
-    const args = ArgsSchema.parse({
-      ...flags,
-      subIssueNumber,
-    });
-
-    if (args.help) {
-      console.log(`
+  // Show help first, before any validation
+  if (flags.help) {
+    console.log(`
 Usage: ${SCRIPT_NAME} <sub-issue-number> [options]
 
 Merge sub-issue changes to parent issue branch.
@@ -296,19 +285,23 @@ Examples:
 
 Exit codes:
   0  - Success (merged)
-  1  - Failed to merge
-  10 - Precondition failed (no parent worktree, gh not authenticated)
-  11 - Validation failed (no parent issue metadata)
-
-Prerequisites:
-  - Parent worktree must exist (create with create-worktree-pr.mjs)
-  - Sub-issue card must have "Parent: #N" metadata
-  - GitHub CLI must be authenticated
-
-Note: This script performs a non-fast-forward merge and pushes to origin.
+  10 - Precondition failed (gh not authenticated)
+  11 - Validation failed
 `);
-      process.exit(0);
+    process.exit(0);
+  }
+
+  try {
+    // Parse sub-issue number from positional arg
+    const subIssueNumber = parseInt(flags._?.[0], 10);
+    if (!subIssueNumber || isNaN(subIssueNumber)) {
+      throw new Error("Sub-issue number required as first argument");
     }
+
+    const args = ArgsSchema.parse({
+      ...flags,
+      subIssueNumber,
+    });
 
     // Check gh CLI
     try {

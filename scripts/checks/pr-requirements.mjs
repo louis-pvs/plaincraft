@@ -348,6 +348,30 @@ async function main() {
   const flags = parseFlags();
   const log = new Logger(flags.logLevel);
 
+  // Show help first
+  if (flags.help) {
+    console.log(`
+Usage: ${SCRIPT_NAME} [action] [options]
+
+Check and enforce PR requirements based on lane/tag.
+
+Actions:
+  create-issue              Create issue from PR metadata
+  check-pr                  Validate PR requirements
+  verify-pr                 Verify PR meets all requirements
+
+Options:
+  --help                    Show this help message
+  --output <fmt>            Output format: text (default), json
+  --log-level <lvl>         Log level: error, warn, info (default), debug, trace
+
+Exit codes:
+  0  - Success
+  11 - Validation failed
+`);
+    process.exit(0);
+  }
+
   try {
     // Detect action from flags or positional args
     let action = flags.action;

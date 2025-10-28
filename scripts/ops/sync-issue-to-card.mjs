@@ -227,6 +227,28 @@ async function main() {
   const flags = parseFlags();
   const log = new Logger(flags.logLevel);
 
+  // Show help first, before any validation
+  if (flags.help) {
+    console.log(`
+Usage: ${SCRIPT_NAME} <issue-number> [options]
+
+Bidirectional sync between GitHub issue and idea file.
+
+Options:
+  --help                    Show this help message
+  --dry-run                 Preview without syncing
+  --output <fmt>            Output format: text (default), json
+  --log-level <lvl>         Log level: error, warn, info (default), debug, trace
+  --cwd <path>              Working directory (default: current)
+
+Exit codes:
+  0  - Success (synced)
+  10 - Precondition failed
+  11 - Validation failed
+`);
+    process.exit(0);
+  }
+
   try {
     // Parse issue number from positional arg
     const issueNumber = parseInt(flags._?.[0], 10);
@@ -238,46 +260,6 @@ async function main() {
       ...flags,
       issueNumber,
     });
-
-    if (args.help) {
-      console.log(`
-Usage: ${SCRIPT_NAME} <issue-number> [options]
-
-Sync GitHub Issue content back to idea card file.
-
-Fetches issue data and updates corresponding idea file with latest:
-  - Issue number in metadata
-  - Problem section
-  - Proposal section
-  - Acceptance Checklist
-  - Sub-Issues
-
-Options:
-  --help              Show this help message
-  --dry-run           Preview without updating
-  --output <fmt>      Output format: text (default), json
-  --log-level <lvl>   Log level: error, warn, info (default), debug, trace
-  --cwd <path>        Working directory (default: current)
-
-Examples:
-  ${SCRIPT_NAME} 42                     # Sync issue #42 to idea card
-  ${SCRIPT_NAME} 42 --dry-run            # Preview changes
-  ${SCRIPT_NAME} 42 --output json        # JSON output
-
-Exit codes:
-  0  - Success (idea file updated)
-  1  - Failed to update
-  2  - Idea file not found
-  10 - Precondition failed (gh not authenticated)
-  11 - Validation failed
-
-Note: Finds idea file by:
-  1. Source reference in issue body
-  2. "See /ideas/..." link in body
-  3. Title pattern matching
-`);
-      process.exit(0);
-    }
 
     // Check gh CLI
     try {

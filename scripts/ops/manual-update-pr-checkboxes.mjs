@@ -117,6 +117,35 @@ async function main() {
   const flags = parseFlags();
   const log = new Logger(flags.logLevel);
 
+  // Show help first, before any validation
+  if (flags.help) {
+    console.log(`
+Usage: ${SCRIPT_NAME} <pr-number> [options]
+
+Update checkboxes in PR body for Acceptance Checklist and Related Issue sections.
+
+Options:
+  --help                    Show this help message
+  --dry-run                 Preview without updating
+  --output <fmt>            Output format: text (default), json
+  --log-level <lvl>         Log level: error, warn, info (default), debug, trace
+  --cwd <path>              Working directory (default: current)
+  --acceptance <indexes>    Comma-separated 1-indexed positions to check
+  --related <indexes>       Comma-separated 1-indexed positions to check
+
+Examples:
+  ${SCRIPT_NAME} 123 --acceptance 1,3          # Check items 1 and 3 in Acceptance Checklist
+  ${SCRIPT_NAME} 123 --related 1               # Check item 1 in Related Issue
+  ${SCRIPT_NAME} 123 --acceptance 1,2,3        # Check multiple items
+
+Exit codes:
+  0  - Success (checkboxes updated)
+  10 - Precondition failed (gh not authenticated)
+  11 - Validation failed
+`);
+    process.exit(0);
+  }
+
   try {
     // Parse PR number from positional arg
     const prNumber = parseInt(flags._?.[0], 10);
@@ -144,39 +173,6 @@ async function main() {
       acceptance,
       related,
     });
-
-    if (args.help) {
-      console.log(`
-Usage: ${SCRIPT_NAME} <pr-number> [options]
-
-Update checkboxes in PR body for Acceptance Checklist and Related Issue sections.
-
-Options:
-  --help                    Show this help message
-  --dry-run                 Preview without updating
-  --output <fmt>            Output format: text (default), json
-  --log-level <lvl>         Log level: error, warn, info (default), debug, trace
-  --cwd <path>              Working directory (default: current)
-  --acceptance <indexes>    Comma-separated 1-indexed positions to check
-  --related <indexes>       Comma-separated 1-indexed positions to check
-
-Examples:
-  ${SCRIPT_NAME} 123 --acceptance 1,3          # Check items 1 and 3 in Acceptance Checklist
-  ${SCRIPT_NAME} 123 --related 1               # Check item 1 in Related Issue
-  ${SCRIPT_NAME} 123 --acceptance 1,2,3 --related 1    # Check multiple sections
-  ${SCRIPT_NAME} 123 --dry-run                 # Preview changes
-
-Exit codes:
-  0  - Success (checkboxes updated)
-  1  - Failed to update
-  2  - No changes needed
-  10 - Precondition failed (gh not authenticated)
-  11 - Validation failed
-
-Note: All unchecked boxes are reset to [ ], and only specified indexes are checked [x].
-`);
-      process.exit(0);
-    }
 
     // Validate at least one checkbox list provided
     if (args.acceptance.length === 0 && args.related.length === 0) {

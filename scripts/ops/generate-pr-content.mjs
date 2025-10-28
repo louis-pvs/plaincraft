@@ -537,6 +537,27 @@ async function main() {
   const flags = parseFlags();
   const log = new Logger(flags.logLevel);
 
+  // Show help first, before any validation
+  if (flags.help) {
+    console.log(`
+Usage: ${SCRIPT_NAME} [issue-number] [options]
+
+Generate PR title and body from CHANGELOG.md or idea files.
+
+Options:
+  --help                    Show this help message
+  --dry-run                 Preview without outputting
+  --output <fmt>            Output format: text (default), json
+  --log-level <lvl>         Log level: error, warn, info (default), debug, trace
+  --cwd <path>              Working directory (default: current)
+
+Exit codes:
+  0  - Success
+  11 - Validation failed
+`);
+    process.exit(0);
+  }
+
   try {
     // Parse issue number from env or positional arg
     const issueNumber =
@@ -548,40 +569,6 @@ async function main() {
       ...flags,
       issueNumber,
     });
-
-    if (args.help) {
-      console.log(`
-Usage: ${SCRIPT_NAME} [issue-number] [options]
-
-Generate PR title and body from CHANGELOG.md or idea files.
-
-Options:
-  --help                    Show this help message
-  --dry-run                 Preview without outputting
-  --output <fmt>            Output format: text (default), json
-  --log-level <lvl>         Log level: error, warn, info (default), debug, trace
-  --cwd <path>              Working directory (default: current)
-  --source <src>            Source: auto (default), idea, changelog
-
-Environment Variables:
-  PR_NUMBER                 PR or issue number (alternative to positional arg)
-  ISSUE_NUMBER              Issue number (alternative to positional arg)
-  GITHUB_OUTPUT             GitHub Actions output file
-
-Examples:
-  ${SCRIPT_NAME} 123                    # Generate from issue #123
-  ${SCRIPT_NAME} --source changelog     # Generate from CHANGELOG.md
-  ${SCRIPT_NAME} --dry-run              # Preview without output
-
-Exit codes:
-  0  - Success (content generated)
-  1  - Failed to generate
-  10 - Precondition failed (no CHANGELOG or idea file)
-
-Note: Outputs to GITHUB_OUTPUT if set, otherwise prints to console.
-`);
-      process.exit(0);
-    }
 
     // Generate content
     const { title, body } = await generatePRContent(args, log);
