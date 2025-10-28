@@ -72,6 +72,6 @@ Update agent instructions to:
 ## References
 
 - Compliance guide: `guides/CHANGELOG-GUIDE.md` lines 49-53
-- Related scripts: `scripts/consolidate-changelog.mjs` (expects tags)
+- Related scripts: `scripts/ops/consolidate-changelog.mjs` (expects tags)
 - Pre-commit: `scripts/pre-commit-changelog.mjs`
 - Git history: Check recent commits for format examples
