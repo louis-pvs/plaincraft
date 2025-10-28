@@ -300,26 +300,8 @@ async function main() {
   const flags = parseFlags();
   const log = new Logger(flags.logLevel);
 
-  try {
-    // Check for environment variables (GitHub Actions mode)
-    const envIssueNumber = process.env.ISSUE_NUMBER;
-    const issueNumber = envIssueNumber
-      ? parseInt(envIssueNumber, 10)
-      : parseInt(flags._?.[0], 10);
-
-    if (!issueNumber || isNaN(issueNumber)) {
-      throw new Error(
-        "Issue number required (as argument or ISSUE_NUMBER env var)",
-      );
-    }
-
-    const args = ArgsSchema.parse({
-      ...flags,
-      issueNumber,
-      autoCommit: flags.autoCommit || !!process.env.GITHUB_ACTIONS,
-    });
-
-    if (args.help) {
+  // Show help first, before any validation
+  if (flags.help) {
       console.log(`
 Usage: ${SCRIPT_NAME} <issue-number> [options]
 
@@ -346,12 +328,31 @@ Examples:
 
 Exit codes:
   0  - Success (archived)
-  2  - Skipped (safety checks, no idea file)
+  2  - Noop (skipped, already archived, keep-idea label)
   10 - Precondition failed (gh not authenticated)
   11 - Validation failed
 `);
-      process.exit(0);
+    process.exit(0);
+  }
+
+  try {
+    // Check for environment variables (GitHub Actions mode)
+    const envIssueNumber = process.env.ISSUE_NUMBER;
+    const issueNumber = envIssueNumber
+      ? parseInt(envIssueNumber, 10)
+      : parseInt(flags._?.[0], 10);
+
+    if (!issueNumber || isNaN(issueNumber)) {
+      throw new Error(
+        "Issue number required (as argument or ISSUE_NUMBER env var)",
+      );
     }
+
+    const args = ArgsSchema.parse({
+      ...flags,
+      issueNumber,
+      autoCommit: flags.autoCommit || !!process.env.GITHUB_ACTIONS,
+    });
 
     // Check gh CLI
     try {

@@ -131,17 +131,9 @@ async function main() {
   const flags = parseFlags();
   const log = new Logger(flags.logLevel);
 
-  try {
-    // Get name from positional arg or flag
-    const name = flags._?.[0] || flags.name;
-
-    const args = ArgsSchema.parse({
-      ...flags,
-      name,
-    });
-
-    if (args.help) {
-      console.log(`
+  // Show help first, before any validation
+  if (flags.help) {
+    console.log(`
 Usage: ${SCRIPT_NAME} <PascalCaseName> [options]
 
 Create new snippet from template with all required files.
@@ -174,14 +166,20 @@ Template Structure:
     ├── useTemplateSnippetController.ts  Controller hook
     ├── TemplateSnippet.spec.tsx         Tests
     ├── TemplateSnippet.stories.tsx      Storybook stories
-    └── TemplateSnippet.mdx              Documentation
-
-All files are copied and placeholders replaced with your snippet name.
-
-See: /templates/script/ for script templates
+    ├── TemplateSnippet.mdx              Documentation
+    └── ADOPTION.md                      Adoption guide
 `);
-      process.exit(0);
-    }
+    process.exit(0);
+  }
+
+  try {
+    // Get name from positional arg or flag
+    const name = flags._?.[0] || flags.name;
+
+    const args = ArgsSchema.parse({
+      ...flags,
+      name,
+    });
 
     // Create snippet
     const result = createSnippet(args.name, args.dryRun, log);
