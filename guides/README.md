@@ -5,9 +5,10 @@ Template-first documentation for reproducible workflows. Guides are thin wrapper
 ## Active Guides (4/12 limit)
 
 - **[guide-changelog.md](./guide-changelog.md)** - Release notes and commit message conventions
-- **[guide-ideas.md](./guide-ideas.md)** - Creating idea files that populate GitHub Issues
 - **[guide-roadmap-setup.md](./guide-roadmap-setup.md)** - Bootstrapping Plaincraft Roadmap project
 - **[guide-user-story.md](./guide-user-story.md)** - Translating ideas to backlog-ready tickets
+- **[guide-scripts.md](./guide-scripts.md)** - Script guardrails and CI enforcement
+- **[guide-workflow.md](./guide-workflow.md)** - Idea to Issue to PR workflow
 
 ## Governance Rules
 
