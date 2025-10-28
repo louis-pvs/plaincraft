@@ -1,0 +1,39 @@
+{
+  "id": "ideas",
+  "name": "ideas",
+  "version": "0.1.0",
+  "category": "workflow",
+  "entrypoint": "idea-unit-template.md",
+  "created": "2025-10-28",
+  "updated": "2025-10-28",
+  "owner": "@louis-pvs",
+  "usage_ref": "/templates/ideas/USAGE.md",
+  "scaffold_command": "cp templates/ideas/idea-{type}-template.md ideas/{prefix}-{slug}.md",
+  "artifact_ids": ["ARCH-ideas-folder-pipeline"],
+  "templates": [
+    {
+      "file": "idea-unit-template.md",
+      "description": "Template for Unit (U-) ideas",
+      "type": "unit"
+    },
+    {
+      "file": "idea-composition-template.md",
+      "description": "Template for Composition (C-) ideas",
+      "type": "composition"
+    },
+    {
+      "file": "idea-brief-template.md",
+      "description": "Template for Architecture/Brief ideas",
+      "type": "brief"
+    }
+  ],
+  "validation": {
+    "required_sections": [
+      "Purpose",
+      "Problem",
+      "Proposal",
+      "Acceptance Checklist"
+    ],
+    "naming_pattern": "^(U-|C-|ARCH-|PB-|B-)[a-z0-9-]+\\.md$"
+  }
+}
