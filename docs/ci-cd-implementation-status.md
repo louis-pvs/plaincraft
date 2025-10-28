@@ -238,6 +238,9 @@ B-*       # Bug (when needed)
    - ~~`scripts/ops/remove-worktree.mjs` - Cleanup after merge~~ ✅ Implemented 2025-10-28 (auto-invoked from `merge-subissue-to-parent.mjs`)
    - `scripts/checks/validate-idea.mjs` - CLI validator (currently workflow-only)
 
+3. **Known Bugs:**
+   - ⚠️ `scripts/ops/create-worktree-pr.mjs` - Bug in line 355: passes `args.baseBranch` as `cwd` parameter to `createWorktree()` instead of `root`. This causes git command to fail with ENOENT when base branch is not "main". **Workaround:** Create worktree manually with `git worktree add -b <branch> <path> <base-branch>` and PR with `gh pr create`. **Fix needed:** Change `await createWorktree(worktreePath, branchName, args.baseBranch)` to `await createWorktree(worktreePath, branchName, root)` and modify `createWorktree()` signature to accept base branch parameter properly.
+
 ### Medium Priority (Nice to Have)
 
 1. **Release automation:**
