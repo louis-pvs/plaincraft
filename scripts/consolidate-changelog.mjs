@@ -91,8 +91,9 @@ async function parseSummaryFile(filePath) {
 /**
  * Find idea file for a given PR title or issue number
  * Tries multiple strategies to locate the corresponding idea file
+ * @deprecated - Keep for future use
  */
-async function findIdeaFileForPR(prTitle) {
+async function _findIdeaFileForPR(prTitle) {
   if (!existsSync(IDEAS_DIR)) {
     return null;
   }
@@ -135,8 +136,9 @@ async function findIdeaFileForPR(prTitle) {
 
 /**
  * Parse idea file and extract changelog-relevant content
+ * @deprecated - Keep for future use
  */
-async function parseIdeaFile(filePath) {
+async function _parseIdeaFile(filePath) {
   const content = await readFile(filePath, "utf-8");
 
   // Extract title
@@ -173,8 +175,9 @@ async function parseIdeaFile(filePath) {
 
 /**
  * Generate changelog entry from idea file
+ * @deprecated - Keep for future use
  */
-function generateChangelogFromIdea(ideaData) {
+function _generateChangelogFromIdea(ideaData) {
   let entry = `### ${ideaData.title}\n\n`;
 
   if (ideaData.purpose) {
