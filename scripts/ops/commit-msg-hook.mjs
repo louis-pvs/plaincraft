@@ -96,17 +96,9 @@ async function main() {
   const flags = parseFlags();
   const log = new Logger(flags.logLevel);
 
-  try {
-    // Get commit message file from positional arg or flag
-    const commitMsgFile = flags._?.[0] || flags.commitMsgFile;
-
-    const args = ArgsSchema.parse({
-      ...flags,
-      commitMsgFile,
-    });
-
-    if (args.help) {
-      console.log(`
+  // Show help first, before any validation
+  if (flags.help) {
+    console.log(`
 Usage: ${SCRIPT_NAME} <commit-msg-file>
 
 Git commit-msg hook to enforce ticket ID prefix conventions.
@@ -119,31 +111,35 @@ Options:
   --output <fmt>            Output format: text (default), json
   --log-level <lvl>         Log level: error, warn, info (default), debug, trace
 
-Valid Ticket Prefixes:
-  [U-slug]                  Unit component
-  [C-slug]                  Composition
-  [B-slug]                  Bug fix
-  [ARCH-slug]               Architecture
-  [PB-slug]                 Playbook/Documentation
+Enforces:
+  - Commit messages start with [ticket-id] prefix
+  - Ticket ID must be numeric
+  - Allows [MAJOR], [MINOR], [PATCH] version markers
+  - Allows conventional commit types (feat:, fix:, etc.)
+  - Merge commits bypass validation
 
 Examples:
   ${SCRIPT_NAME} .git/COMMIT_EDITMSG
-  [U-button] Add accessible button component
-  [ARCH-ci-split] Implement Playbook build track
 
 Exit codes:
-  0  - Valid commit message
-  1  - Invalid commit message
-  11 - Validation failed
+  0  - Success (message valid or bypassed)
+  11 - Validation failed (invalid format)
 
-Installation:
-  ln -s ../../scripts/ops/${SCRIPT_NAME}.mjs .git/hooks/commit-msg
-  chmod +x .git/hooks/commit-msg
-
-See: guides/CHANGELOG-GUIDE.md for conventions
+Note:
+  This is called automatically by Git during commit.
+  Install via: pnpm install-hooks
 `);
-      process.exit(0);
-    }
+    process.exit(0);
+  }
+
+  try {
+    // Get commit message file from positional arg or flag
+    const commitMsgFile = flags._?.[0] || flags.commitMsgFile;
+
+    const args = ArgsSchema.parse({
+      ...flags,
+      commitMsgFile,
+    });
 
     // Read commit message
     let commitMsg;

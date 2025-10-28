@@ -16,6 +16,7 @@
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 import { z } from "zod";
+import { execa } from "execa";
 import {
   Logger,
   parseFlags,
@@ -24,7 +25,7 @@ import {
   repoRoot,
   atomicWrite,
 } from "../_lib/core.mjs";
-import { createWorktree, removeWorktree, execCommand } from "../_lib/git.mjs";
+import { createWorktree, removeWorktree } from "../_lib/git.mjs";
 import { getIssue, createPR } from "../_lib/github.mjs";
 import { findIdeaFiles, parseIdeaFile } from "../_lib/ideas.mjs";
 
@@ -219,8 +220,8 @@ You can safely delete this file or amend this commit once you've added your actu
     await writeFile(filePath, content, "utf-8");
 
     // Stage and commit
-    await execCommand("git", ["add", bootstrapFile], { cwd: worktreePath });
-    await execCommand(
+    await execa("git", ["add", bootstrapFile], { cwd: worktreePath });
+    await execa(
       "git",
       [
         "commit",
@@ -231,7 +232,7 @@ You can safely delete this file or amend this commit once you've added your actu
     );
 
     // Push with upstream tracking
-    await execCommand("git", ["push", "--set-upstream", "origin", branchName], {
+    await execa("git", ["push", "--set-upstream", "origin", branchName], {
       cwd: worktreePath,
     });
 
@@ -258,7 +259,7 @@ async function runPostCheckout(worktreePath, log) {
       "post-checkout.mjs",
     );
 
-    await execCommand("node", [postCheckoutScript], {
+    await execa("node", [postCheckoutScript], {
       cwd: worktreePath,
       env: { ...process.env, SKIP_SIMPLE_GIT_HOOKS: "1" },
     });
@@ -281,7 +282,7 @@ async function runPostCheckout(worktreePath, log) {
  */
 async function hasCommits(branchName, baseBranch, cwd) {
   try {
-    const { stdout } = await execCommand(
+    const { stdout } = await execa(
       "git",
       ["rev-list", "--count", `${baseBranch}..${branchName}`],
       { cwd },
@@ -341,7 +342,7 @@ async function executeWorkflow(args, log) {
 
     // Delete branch if exists
     try {
-      await execCommand("git", ["branch", "-D", branchName], { cwd: root });
+      await execa("git", ["branch", "-D", branchName], { cwd: root });
       log.debug("Deleted existing branch");
     } catch {
       // Ignore errors
@@ -424,24 +425,9 @@ async function main() {
   const flags = parseFlags();
   const log = new Logger(flags.logLevel);
 
-  try {
-    // Parse issue number from positional arg
-    const issueNumber = parseInt(flags._?.[0], 10);
-    if (!issueNumber || isNaN(issueNumber)) {
-      throw new Error("Issue number required as first argument");
-    }
-
-    const args = ArgsSchema.parse({
-      ...flags,
-      issueNumber,
-      worktreeDir: flags.dir,
-      baseBranch: flags.base || "main",
-      draft: !flags.noDraft,
-      bootstrap: !flags.noBootstrap,
-    });
-
-    if (args.help) {
-      console.log(`
+  // Show help first, before any validation
+  if (flags.help) {
+    console.log(`
 Usage: ${SCRIPT_NAME} <issue-number> [options]
 
 Create git worktree with branch and draft PR from GitHub issue.
@@ -469,10 +455,25 @@ Exit codes:
   0  - Success
   10 - Precondition failed (gh not authenticated, git not clean)
   11 - Validation failed
-  13 - Unsafe operation
 `);
-      process.exit(0);
+    process.exit(0);
+  }
+
+  try {
+    // Parse issue number from positional arg
+    const issueNumber = parseInt(flags._?.[0], 10);
+    if (!issueNumber || isNaN(issueNumber)) {
+      throw new Error("Issue number required as first argument");
     }
+
+    const args = ArgsSchema.parse({
+      ...flags,
+      issueNumber,
+      worktreeDir: flags.dir,
+      baseBranch: flags.base || "main",
+      draft: !flags.noDraft,
+      bootstrap: !flags.noBootstrap,
+    });
 
     // Execute workflow
     const result = await executeWorkflow(args, log);

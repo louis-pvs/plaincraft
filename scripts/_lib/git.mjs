@@ -112,3 +112,14 @@ export async function listWorktrees(cwd = process.cwd()) {
   if (current.path) worktrees.push(current);
   return worktrees;
 }
+
+/**
+ * Execute a command (alias for execa)
+ * @param {string} command - Command to execute
+ * @param {string[]} args - Command arguments
+ * @param {object} options - Options
+ * @returns {Promise<{stdout: string, stderr: string}>} Result
+ */
+export async function execCommand(command, args, options = {}) {
+  return await execa(command, args, options);
+}

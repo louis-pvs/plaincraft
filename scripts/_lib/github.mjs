@@ -159,3 +159,52 @@ export async function createLabel(label, cwd = process.cwd()) {
 
   await execa("gh", args, { cwd });
 }
+
+/**
+ * Create a new issue
+ * @param {string} title - Issue title
+ * @param {string} body - Issue body
+ * @param {boolean} assignToMe - Assign to current user
+ * @param {string[]} labels - Labels to add
+ * @param {string} cwd - Working directory
+ * @returns {Promise<string>} Issue URL
+ */
+export async function createIssue(
+  title,
+  body,
+  assignToMe = false,
+  labels = [],
+  cwd = process.cwd(),
+) {
+  const args = ["issue", "create", "--title", title, "--body", body];
+
+  if (assignToMe) {
+    args.push("--assignee", "@me");
+  }
+
+  if (labels.length > 0) {
+    args.push("--label", labels.join(","));
+  }
+
+  const { stdout } = await execa("gh", args, { cwd });
+  return stdout.trim();
+}
+
+/**
+ * Update an issue
+ * @param {number} issueNumber - Issue number
+ * @param {object} updates - Fields to update
+ * @param {string} cwd - Working directory
+ * @returns {Promise<void>}
+ */
+export async function updateIssue(issueNumber, updates, cwd = process.cwd()) {
+  const args = ["issue", "edit", String(issueNumber)];
+
+  if (updates.title) args.push("--title", updates.title);
+  if (updates.body) args.push("--body", updates.body);
+  if (updates.addLabels) args.push("--add-label", updates.addLabels.join(","));
+  if (updates.removeLabels)
+    args.push("--remove-label", updates.removeLabels.join(","));
+
+  await execa("gh", args, { cwd });
+}

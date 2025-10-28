@@ -10,8 +10,8 @@
  */
 
 import { z } from "zod";
+import { execa } from "execa";
 import { Logger, parseFlags, fail, succeed } from "../_lib/core.mjs";
-import { execCommand } from "../_lib/git.mjs";
 
 const SCRIPT_NAME = "prepare-gh";
 
@@ -31,7 +31,7 @@ const ArgsSchema = z.object({
  */
 async function checkGhInstalled(log) {
   try {
-    const { stdout } = await execCommand("gh", ["--version"]);
+    const { stdout } = await execa("gh", ["--version"]);
     const version = stdout.split("\n")[0];
     log.info("GitHub CLI installed");
     log.debug(version);
@@ -52,7 +52,7 @@ async function checkGhInstalled(log) {
  */
 async function checkGhAuth(log) {
   try {
-    const { stdout } = await execCommand("gh", ["auth", "status"]);
+    const { stdout } = await execa("gh", ["auth", "status"]);
     const lines = stdout.split("\n");
     const accountLine = lines.find((line) => line.includes("Logged in to"));
     log.info("GitHub CLI authenticated");
@@ -76,7 +76,7 @@ async function checkGhAuth(log) {
  */
 async function checkRepoAccess(log) {
   try {
-    const { stdout } = await execCommand("gh", [
+    const { stdout } = await execa("gh", [
       "repo",
       "view",
       "--json",
@@ -102,7 +102,7 @@ async function testCiCommands(log) {
   log.info("Testing CI monitoring commands...");
 
   try {
-    const { stdout } = await execCommand("gh", [
+    const { stdout } = await execa("gh", [
       "run",
       "list",
       "--limit",

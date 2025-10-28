@@ -184,23 +184,28 @@ export function formatOutput(data, mode = "text") {
 
 /**
  * Exit with structured error
- * @param {number} code - Exit code
- * @param {string} reason - Error reason
- * @param {*} details - Additional details
- * @param {string} output - Output mode
+ * @param {object} options - Options
+ * @param {number} options.exitCode - Exit code
+ * @param {string} options.message - Error message
+ * @param {*} options.error - Error details
+ * @param {string} options.output - Output mode
+ * @param {string} options.script - Script name
  */
-export function fail(code, reason, details, output = "text") {
-  const result = { ok: false, reason, details };
+export function fail(options) {
+  const { exitCode = 1, message, error, output = "text", script } = options;
+  const result = { ok: false, script, message, error };
   process.stdout.write(formatOutput(result, output));
-  process.exit(code);
+  process.exit(exitCode);
 }
 
 /**
  * Exit with success
- * @param {object} data - Success data
- * @param {string} output - Output mode
+ * @param {object} options - Options
+ * @param {string} options.output - Output mode
+ * @param {object} options - Additional data to include
  */
-export function succeed(data, output = "text") {
+export function succeed(options) {
+  const { output = "text", ...data } = options;
   const result = { ok: true, ...data };
   process.stdout.write(formatOutput(result, output));
   process.exit(0);
