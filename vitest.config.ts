@@ -12,6 +12,6 @@ export default defineConfig({
     },
     environment: "jsdom",
     globals: true,
-    include: ["snippets/**/*.spec.{ts,tsx}"],
+    include: ["snippets/**/*.spec.{ts,tsx}", "scripts/**/*.spec.mjs"],
   },
 });
