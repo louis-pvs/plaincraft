@@ -556,7 +556,7 @@ B-*       # Bug (when needed)
 
 - CI Workflow: `.github/workflows/ci.yml`
 - Deploy Workflow: `.github/workflows/deploy.yml`
-- Scripts Architecture: `docs/scripts-architecture.md`
+- Scripts Architecture: archived (see `docs/_archive/2025/scripts-architecture.md`); current index lives in `docs/scripts-reference.md`
 - Script Guardrails: `scripts/GUARDRAILS.md`
 - Template Enforcement: `docs/template-first-enforcement-roadmap.md`
 - Ideas Validation: `.github/workflows/ideas.yml`
