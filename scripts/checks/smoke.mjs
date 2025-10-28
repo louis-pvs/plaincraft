@@ -167,12 +167,13 @@ async function testHelp(scriptPath, timeout) {
  */
 async function testDryRun(scriptPath, timeout) {
   try {
-    const { stdout, exitCode } = await execa(
+    const { stdout, all, exitCode } = await execa(
       "node",
       [scriptPath, "--dry-run", "--output", "json"],
       {
         timeout,
         reject: false,
+        all: true,
       },
     );
 
@@ -182,7 +183,7 @@ async function testDryRun(scriptPath, timeout) {
     // Try to parse JSON output
     let jsonValid = false;
     try {
-      const jsonCandidate = extractJson(stdout);
+      const jsonCandidate = extractJson(stdout || all || "");
       if (jsonCandidate) {
         JSON.parse(jsonCandidate);
         jsonValid = true;

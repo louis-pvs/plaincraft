@@ -194,8 +194,9 @@ export function formatOutput(data, mode = "text") {
 export function fail(options) {
   const { exitCode = 1, message, error, output = "text", script } = options;
   const result = { ok: false, script, message, error };
-  process.stdout.write(formatOutput(result, output));
-  process.exit(exitCode);
+  process.stdout.write(formatOutput(result, output), () =>
+    process.exit(exitCode),
+  );
 }
 
 /**
@@ -207,8 +208,7 @@ export function fail(options) {
 export function succeed(options) {
   const { output = "text", ...data } = options;
   const result = { ok: true, ...data };
-  process.stdout.write(formatOutput(result, output));
-  process.exit(0);
+  process.stdout.write(formatOutput(result, output), () => process.exit(0));
 }
 
 /**
