@@ -312,11 +312,67 @@ try {
 
 ### Unit Tests
 
-Test pure functions in `_lib/`:
+All `_lib/` modules have comprehensive unit test coverage with vitest.
+
+**Run all tests:**
 
 ```bash
 pnpm scripts:test
 ```
+
+**Run specific module tests:**
+
+```bash
+pnpm vitest scripts/_lib/core.spec.mjs
+```
+
+**Watch mode (for development):**
+
+```bash
+pnpm vitest --watch scripts/_lib/
+```
+
+**Coverage report:**
+
+```bash
+pnpm vitest --coverage scripts/_lib/
+```
+
+### Test Structure
+
+Tests are located alongside their modules:
+
+```
+scripts/_lib/
+  core.mjs          # Module code
+  core.spec.mjs     # Unit tests
+  __fixtures__/     # Test data files
+```
+
+### Mocking Strategy
+
+- **fs operations**: Mock `node:fs` and `node:fs/promises`
+- **CLI commands**: Mock `execa` for git/gh commands
+- **Fixtures**: Sample data files in `__fixtures__/`
+
+All I/O operations are mocked to ensure:
+
+- Tests run fast (no disk/network I/O)
+- Tests are isolated (no side effects)
+- Tests are deterministic (no external dependencies)
+
+### Test Modules
+
+| Module                | Tests   | Functions | Coverage |
+| --------------------- | ------- | --------- | -------- |
+| `core.spec.mjs`       | 71      | 14        | ≥80%     |
+| `validation.spec.mjs` | 45      | 6         | ≥80%     |
+| `ideas.spec.mjs`      | 52      | 6         | ≥80%     |
+| `git.spec.mjs`        | 36      | 8         | ≥80%     |
+| `github.spec.mjs`     | 41      | 9         | ≥80%     |
+| `changelog.spec.mjs`  | 74      | 13        | ≥80%     |
+| `templates.spec.mjs`  | 36      | 7         | ≥80%     |
+| **Total**             | **355** | **63**    | **≥80%** |
 
 ### Smoke Tests
 

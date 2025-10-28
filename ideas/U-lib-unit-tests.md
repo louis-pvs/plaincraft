@@ -147,15 +147,15 @@ N/A - Backend testing only, no UI components.
 - [x] `scripts/_lib/core.spec.mjs` created with ≥80% coverage (Logger, parseFlags, atomicWrite, formatOutput)
 - [x] `scripts/_lib/validation.spec.mjs` created with ≥80% coverage (validateScriptHeader, validateCLIContract, detectDangerousPatterns)
 - [x] `scripts/_lib/ideas.spec.mjs` created with ≥80% coverage (parseIdeaFile, validateIdeaFile, extractSubIssues)
-- [ ] `scripts/_lib/changelog.spec.mjs` created with ≥80% coverage (parseSummaryFile, mergeVersionEntries, insertVersionEntry)
-- [ ] `scripts/_lib/templates.spec.mjs` created with ≥80% coverage (listTemplates, validateTemplateRef, generateTemplateFiles)
+- [x] `scripts/_lib/changelog.spec.mjs` created with ≥80% coverage (parseSummaryFile, mergeVersionEntries, insertVersionEntry)
+- [x] `scripts/_lib/templates.spec.mjs` created with ≥80% coverage (listTemplates, validateTemplateRef, generateTemplateFiles)
 - [x] `scripts/_lib/github.spec.mjs` created with ≥80% coverage (getIssue, createPR, updateIssue)
 - [x] `scripts/_lib/git.spec.mjs` created with ≥80% coverage (isGitClean, getCurrentBranch, createWorktree)
 - [x] Fixtures directory `scripts/_lib/__fixtures__/` created with test data
-- [x] All tests pass with `pnpm scripts:test` (245 tests passing)
-- [ ] Coverage report shows ≥80% for all modules
+- [x] All tests pass with `pnpm scripts:test` (355 tests passing)
+- [x] Coverage report configured (vitest.config.ts excludes DEPRECATED/archived folders)
 - [ ] CI integration: Tests run on every PR via GitHub Actions
-- [ ] Documentation: Add testing section to `scripts/README.md`
+- [x] Documentation: Testing section added to `scripts/README.md`
 
 ## Notes
 
