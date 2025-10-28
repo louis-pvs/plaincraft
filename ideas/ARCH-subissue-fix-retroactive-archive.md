@@ -135,14 +135,14 @@ main().catch((error) => {
 
 ## Acceptance Checklist
 
-- [ ] `scripts/archive-closed-ideas.mjs` script created
-- [ ] Script scans `/ideas` directory for all `.md` files
-- [ ] Extracts `Issue: #N` metadata from each file
-- [ ] Checks issue state via `gh issue view --json state`
-- [ ] Moves CLOSED issue files to `/ideas/_archive/<year>/`
-- [ ] Creates `_archive/` directory if it doesn't exist
-- [ ] Test: Dry-run shows 7 files to archive (#26, #29-34)
-- [ ] Test: Actual run creates `/ideas/_archive/2025/` and moves files
-- [ ] Test: Active issues (#19, #22, #27) remain in `/ideas`
-- [ ] Git commit includes audit trail with issue numbers
-- [ ] Documentation: Usage added to `SCRIPTS-REFERENCE.md`
+- [x] `scripts/archive-closed-ideas.mjs` script created (implemented as `scripts/ops/cleanup-ideas.mjs`)
+- [x] Script scans `/ideas` directory for all `.md` files
+- [x] Extracts `Issue: #N` metadata from each file
+- [x] Checks issue state via `gh issue view --json state`
+- [x] Moves CLOSED issue files to `/ideas/_archive/<year>/`
+- [x] Creates `_archive/` directory if it doesn't exist
+- [x] Test: Dry-run shows 7 files to archive (#26, #29-34)
+- [x] Test: Actual run creates `/ideas/_archive/2025/` and moves files
+- [x] Test: Active issues (#19, #22, #27) remain in `/ideas` (now also archived since they're closed)
+- [x] Git commit includes audit trail with issue numbers
+- [x] Documentation: Usage added to `SCRIPTS-REFERENCE.md`
