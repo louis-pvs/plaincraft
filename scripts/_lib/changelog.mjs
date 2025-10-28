@@ -253,3 +253,152 @@ export function insertVersionEntry(existingChangelog, newEntry, version) {
   const combined = `${before}\n${newEntry.trimEnd()}\n\n${after}`;
   return deduplicateChangelog(combined).trimEnd() + "\n";
 }
+
+/**
+ * Parse changelog markdown content into structured entries.
+ * @param {string} content - Raw changelog markdown.
+ * @returns {Array<object>} Parsed changelog entries.
+ */
+export function parseChangelogContent(content) {
+  const lines = content.split("\n");
+  const entries = [];
+  let currentVersion = null;
+  let currentSection = null;
+  let buffer = [];
+
+  for (const line of lines) {
+    const versionMatch = line.match(/^## \[([^\]]+)\] - (.+)$/);
+    if (versionMatch) {
+      flushSection();
+      flushVersion();
+
+      currentVersion = {
+        version: versionMatch[1],
+        date: versionMatch[2],
+        sections: [],
+      };
+      continue;
+    }
+
+    const sectionMatch = line.match(/^### (.+)$/);
+    if (sectionMatch && currentVersion) {
+      flushSection();
+      currentSection = {
+        title: sectionMatch[1],
+        content: [],
+      };
+      continue;
+    }
+
+    if (currentSection) {
+      buffer.push(line);
+    }
+  }
+
+  flushSection();
+  flushVersion();
+
+  function flushSection() {
+    if (!currentSection) return;
+    currentSection.content = buffer.join("\n").trim();
+    currentVersion.sections.push(currentSection);
+    currentSection = null;
+    buffer = [];
+  }
+
+  function flushVersion() {
+    if (!currentVersion) return;
+    entries.push(currentVersion);
+    currentVersion = null;
+  }
+
+  return entries;
+}
+
+/**
+ * Parse changelog file from disk.
+ * @param {string} changelogPath - Path to changelog file.
+ * @returns {Promise<Array<object>>} Parsed entries.
+ */
+export async function parseChangelogFile(changelogPath) {
+  const content = await readFile(changelogPath, "utf-8");
+  return parseChangelogContent(content);
+}
+
+/**
+ * Filter changelog entries by version.
+ * @param {Array<object>} entries - Changelog entries.
+ * @param {string} version - Target version.
+ * @returns {Array<object>} Filtered entries.
+ */
+export function filterChangelogByVersion(entries, version) {
+  if (!version) return entries;
+  return entries.filter((entry) => entry.version === version);
+}
+
+const LANE_LABELS = {
+  U: "lane-A",
+  C: "lane-C",
+  ARCH: "lane-C",
+  B: "lane-B",
+  D: "lane-D",
+  PB: "lane-D",
+};
+
+/**
+ * Determine lane label from a changelog section title.
+ * @param {string} title - Section title (e.g., "[U-button] Add button").
+ * @returns {string|null} Lane label or null.
+ */
+export function laneLabelFromTitle(title) {
+  if (!title) return null;
+  const tagMatch = title.match(/^\[([^\]]+)\]/);
+  if (!tagMatch) return null;
+  const tag = tagMatch[1];
+  const prefix = tag.split("-")[0];
+  return LANE_LABELS[prefix] || null;
+}
+
+/**
+ * Normalize comma-separated section filters into tokens.
+ * @param {string|undefined} filterArg - Filter string.
+ * @returns {string[]} Filter tokens in lowercase.
+ */
+export function normalizeSectionFilters(filterArg) {
+  if (!filterArg) return [];
+  return String(filterArg)
+    .split(",")
+    .map((token) => token.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/**
+ * Extract sections from changelog entries applying optional filters.
+ * @param {Array<object>} entries - Changelog entries.
+ * @param {string[]} filters - Filter tokens.
+ * @returns {Array<object>} Sections with version metadata.
+ */
+export function extractSections(entries, filters = []) {
+  const collected = [];
+
+  for (const entry of entries) {
+    for (const section of entry.sections) {
+      if (!section.title) continue;
+      if (filters.length > 0) {
+        const matches = filters.some((token) =>
+          section.title.toLowerCase().includes(token),
+        );
+        if (!matches) continue;
+      }
+
+      collected.push({
+        version: entry.version,
+        date: entry.date,
+        title: section.title,
+        content: section.content,
+      });
+    }
+  }
+
+  return collected;
+}

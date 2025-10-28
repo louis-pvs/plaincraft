@@ -26,7 +26,7 @@
     "ideas:create": "node scripts/ideas-to-issues.mjs",
     "ideas:sync": "node scripts/sync-ideas-checklists.mjs",
     "ideas:validate": "node scripts/validate-ideas.mjs",
-    "issues:create": "node scripts/create-issues-from-changelog.mjs",
+    "issues:create": "node scripts/ops/create-issues-from-changelog.mjs",
     "lint:staged": "lint-staged",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
