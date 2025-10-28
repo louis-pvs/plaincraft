@@ -1,0 +1,89 @@
+name: Documentation Governance
+
+on:
+  pull_request:
+    paths:
+      - "guides/**"
+      - "templates/**"
+      - "docs/**"
+  push:
+    branches: [main]
+
+jobs:
+  docs-lint:
+    name: Lint Guides
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint guides
+        run: pnpm run docs:lint
+
+  template-coverage:
+    name: Check Template Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check template coverage
+        run: pnpm run docs:coverage
+
+  enforce-ratio:
+    name: Enforce 3:1 Ratio
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Enforce 3:1 ratio
+        run: |
+          pnpm run docs:coverage --check-ratio
+          if [ $? -ne 0 ]; then
+            echo "❌ Template:guide ratio must be >= 3:1"
+            echo "Current state violates template-first governance"
+            exit 1
+          fi
