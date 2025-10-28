@@ -130,6 +130,29 @@ node scripts/sync-issue-to-card.mjs 42
 - Auto-link related issues and PRs during consolidation
 - Provide richer summary metadata for docs automation
 
+### `node scripts/ops/create-issues-from-changelog.mjs`
+
+**Purpose:** Generate GitHub issues for each changelog section with guardrail defaults
+
+**Status:** **Migrated** - Guardrails-compliant orchestrator with dry-run JSON output
+
+**Current behavior:**
+
+- Default dry-run with structured JSON output (`--yes` flips to execution)
+- Normalizes lane labels to the new `lane-*` taxonomy when tags are present
+- Supports `--version`, `--filter`, and `--max` to target specific releases or sections
+- Optionally assigns created issues to `@me` with `--assign`
+
+**Usage:**
+
+```bash
+# Preview issues for the latest release
+node scripts/ops/create-issues-from-changelog.mjs --dry-run --output json
+
+# Create real issues for version 0.4.0 and assign to yourself
+node scripts/ops/create-issues-from-changelog.mjs --version 0.4.0 --yes --assign
+```
+
 ## Setup & Environment
 
 ### `pnpm gh:prepare`

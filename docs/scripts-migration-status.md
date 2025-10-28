@@ -1,6 +1,6 @@
 # Script Migration Status
 
-## Completed Migrations (22/27 = 81%)
+## Completed Migrations (23/27 = 85%)
 
 ### Core Libraries Created
 
@@ -13,7 +13,7 @@
 
 ### Migrated Scripts
 
-#### ops/ (13)
+#### ops/ (20)
 
 1. ✅ `setup-labels.mjs` - Create/update repository lane labels
    - Status: Complete
@@ -105,7 +105,11 @@
     - Status: Complete
     - Features: Date-based archival
 
-#### Lower Priority / Specialized (7)
+20. ✅ `create-issues-from-changelog.mjs` - Create GitHub issues from changelog sections
+    - Status: Complete (guardrails-compliant)
+    - Features: Dry-run JSON output, lane label normalization (`lane-*`), GitHub CLI integration
+
+#### Lower Priority / Specialized (6)
 
 20. ✅ `record-stories.mjs` - Record Storybook stories with Playwright
     - Status: Complete (fully migrated)
@@ -120,19 +124,15 @@
     - Status: Complete (guardrails-compliant)
     - Features: Dry-run by default, JSON/text output, temp file cleanup, changelog dedupe
 
-23. ✅ `create-issues-from-changelog.mjs` - Create issues from changelog
-    - Status: Basic migration (--help support)
-    - Note: Specialized tool for changelog-driven issue creation
-
-24. ✅ `pre-commit-changelog.mjs` - Pre-commit changelog validation
+23. ✅ `pre-commit-changelog.mjs` - Pre-commit changelog validation
     - Status: Basic migration (--help support)
     - Note: Git hook, works with consolidate-changelog.mjs
 
-25. ✅ `setup-project.mjs` - GitHub Project setup automation
+24. ✅ `setup-project.mjs` - GitHub Project setup automation
     - Status: Basic migration (--help support)
     - Note: One-time setup tool for GitHub Projects v2
 
-26. ✅ `test-storybook.mjs` - Storybook test runner with server management
+25. ✅ `test-storybook.mjs` - Storybook test runner with server management
     - Status: Basic migration (--help support)
     - Note: Requires Storybook and test infrastructure
 
@@ -172,7 +172,7 @@ None currently
 ### Lower Priority - All Complete! ✅
 
 - ✅ `consolidate-changelog.mjs` - Consolidate changelog entries (full guardrails)
-- ✅ `create-issues-from-changelog.mjs` - Create issues from changelog (basic --help added)
+- ✅ `create-issues-from-changelog.mjs` - Create issues from changelog (full guardrails)
 - ✅ `pre-commit-changelog.mjs` - Pre-commit changelog validation (basic --help added)
 - ✅ `generate-gh-pages-index.mjs` - Generate GitHub Pages index (fully migrated)
 - ✅ `record-stories.mjs` - Record Storybook stories (fully migrated)
@@ -187,14 +187,14 @@ None currently
 ## Migration Statistics
 
 **Total Scripts**: 27
-**Fully Migrated**: 22 (81%)
-**Basic --help Added**: 5 (19%)
+**Fully Migrated**: 23 (85%)
+**Basic --help Added**: 4 (15%)
 **All Scripts Functional**: 27 (100%) ✅
 
 **By Category**:
 
 - Core Libraries: 6/6 (100%)
-- Operations: 16/16 (100%)
+- Operations: 20/20 (100%)
 - Checks: 4/4 in use + 4 enforcement tools (100%)
 - Lower Priority: 7/7 (100%) ✅
 - Templates: 2/2 (100%) ✅

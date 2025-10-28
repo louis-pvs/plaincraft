@@ -198,16 +198,17 @@ Scripts that should run once or are specific to a point in time:
 ### Phase 4: Migrate Medium Priority Scripts
 
 6. `consolidate-changelog.mjs` → `ops/consolidate-changelog.mjs` ✅
-7. `generate-pr-content.mjs` → `ops/generate-pr-content.mjs`
-8. `sync-ideas-checklists.mjs` → `ops/sync-ideas-checklists.mjs`
-9. `setup-project.mjs` → `ops/setup-project.mjs`
-10. `auto-tag.mjs` → `ops/auto-tag.mjs`
+7. `create-issues-from-changelog.mjs` → `ops/create-issues-from-changelog.mjs` ✅
+8. `generate-pr-content.mjs` → `ops/generate-pr-content.mjs`
+9. `sync-ideas-checklists.mjs` → `ops/sync-ideas-checklists.mjs`
+10. `setup-project.mjs` → `ops/setup-project.mjs`
+11. `auto-tag.mjs` → `ops/auto-tag.mjs`
 
 ### Phase 5: Migrate Low Priority / One-offs
 
-11. `cleanup-ideas.mjs` → `migration/cleanup-ideas.mjs`
-12. `archive-idea-for-issue.mjs` → `migration/archive-idea-for-issue.mjs`
-13. Remaining scripts as needed
+12. `cleanup-ideas.mjs` → `migration/cleanup-ideas.mjs`
+13. `archive-idea-for-issue.mjs` → `migration/archive-idea-for-issue.mjs`
+14. Remaining scripts as needed
 
 ### Phase 6: Deprecation & Cleanup
 

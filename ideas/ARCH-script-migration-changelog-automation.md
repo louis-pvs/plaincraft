@@ -32,7 +32,7 @@ The scripts alignment initiative delivered new changelog tooling (`scripts/_lib/
 - [ ] PR branch created via `scripts/ops/create-worktree-pr.mjs` referencing the issue
 - [ ] `_lib/changelog.mjs` and `ops/consolidate-changelog.mjs` covered by smoke test run (`pnpm scripts:smoke`)
 - [ ] Template catalog automation (`scripts/ops/generate-template-catalog.mjs`, `templates/INDEX.md`) documented in `docs/scripts-reference.md`
-- [ ] `docs/scripts-migration-status.md` reflects the consolidated changelog migration progress
+- [x] `docs/scripts-migration-status.md` reflects the consolidated changelog migration progress
 - [ ] Release notes drafted in `CHANGELOG.md` for the automation bundle once merged
 - [ ] All commits on the PR prefixed with `[ARCH-script-migration]`
 
