@@ -1,0 +1,54 @@
+{
+  "id": "issue-composition",
+  "name": "Issue (Composition)",
+  "version": "0.1.0",
+  "category": "workflow",
+  "author": "plaincraft-doc-alignment",
+  "created": "2025-01-28",
+  "description": "Multi-component issue template for complex features with sub-tasks",
+  "entrypoint": "issue-composition.md",
+  "variables": [
+    {
+      "name": "FEATURE_TITLE",
+      "description": "High-level feature or project description",
+      "required": true,
+      "example": "Implement dark mode across application"
+    },
+    {
+      "name": "COMPONENTS_AFFECTED",
+      "description": "List of components, files, or areas affected",
+      "required": true,
+      "example": ["ThemeContext.tsx", "components/*", "Settings.tsx"]
+    },
+    {
+      "name": "SUB_TASKS",
+      "description": "Checklist of individual tasks with issue references",
+      "required": true
+    },
+    {
+      "name": "DEPENDENCIES",
+      "description": "External blockers or task ordering constraints",
+      "required": false
+    },
+    {
+      "name": "COORDINATION_NOTES",
+      "description": "Team sync requirements or milestones",
+      "required": false
+    }
+  ],
+  "references": {
+    "guide": "guides/guide-workflow.md",
+    "scripts": [
+      "scripts/create-worktree-pr.mjs",
+      "scripts/merge-subissue-to-parent.mjs",
+      "scripts/sync-issue-to-card.mjs"
+    ],
+    "related_templates": ["issue-unit", "pull-request"]
+  },
+  "constraints": {
+    "min_scope_hours": 4,
+    "requires_subtasks": true,
+    "min_subtasks": 2,
+    "single_component": false
+  }
+}

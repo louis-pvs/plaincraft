@@ -1,0 +1,50 @@
+{
+  "id": "test-integration",
+  "name": "Test (Integration)",
+  "version": "0.1.0",
+  "category": "testing",
+  "author": "plaincraft-doc-alignment",
+  "created": "2025-01-28",
+  "description": "Integration test template for multi-component and API interaction testing",
+  "entrypoint": "test-integration.spec.tsx",
+  "variables": [
+    {
+      "name": "FEATURE_NAME",
+      "description": "Name of feature or workflow being tested",
+      "required": true,
+      "example": "UserProfile"
+    },
+    {
+      "name": "COMPONENTS",
+      "description": "List of components involved in integration",
+      "required": true,
+      "example": ["UserProfile", "EditForm", "SaveButton"]
+    },
+    {
+      "name": "API_ENDPOINTS",
+      "description": "API endpoints to mock",
+      "required": false
+    },
+    {
+      "name": "TEST_SCENARIOS",
+      "description": "User workflows to verify",
+      "required": true
+    }
+  ],
+  "references": {
+    "guide": "guides/guide-scripts.md",
+    "scripts": ["scripts/test-storybook.mjs"],
+    "related_templates": ["test-unit"]
+  },
+  "framework": {
+    "test_runner": "vitest",
+    "testing_library": "@testing-library/react",
+    "mocking": "msw",
+    "environment": "jsdom"
+  },
+  "constraints": {
+    "requires_external_dependencies": true,
+    "max_execution_time_ms": 5000,
+    "isolated": false
+  }
+}

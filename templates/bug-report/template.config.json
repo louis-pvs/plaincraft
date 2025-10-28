@@ -1,0 +1,51 @@
+{
+  "id": "bug-report",
+  "name": "Bug Report",
+  "version": "0.1.0",
+  "category": "workflow",
+  "author": "plaincraft-doc-alignment",
+  "created": "2025-01-28",
+  "description": "Structured bug report template for consistent issue reporting",
+  "entrypoint": "bug-report.md",
+  "variables": [
+    {
+      "name": "BUG_DESCRIPTION",
+      "description": "Brief summary of the issue",
+      "required": true,
+      "example": "Profile image not loading in Safari"
+    },
+    {
+      "name": "REPRODUCTION_STEPS",
+      "description": "Numbered steps to reproduce the bug",
+      "required": true
+    },
+    {
+      "name": "EXPECTED_BEHAVIOR",
+      "description": "What should happen",
+      "required": true
+    },
+    {
+      "name": "ACTUAL_BEHAVIOR",
+      "description": "What actually happens",
+      "required": true
+    },
+    {
+      "name": "ENVIRONMENT",
+      "description": "Browser, OS, app version details",
+      "required": true,
+      "example": "Chrome 120, Windows 11, v2.3.0"
+    },
+    {
+      "name": "IMPACT",
+      "description": "Severity and user impact",
+      "required": true,
+      "example": "Critical - blocks all users"
+    }
+  ],
+  "references": {
+    "guide": "guides/guide-workflow.md",
+    "scripts": ["scripts/validate-ideas.mjs", "scripts/create-worktree-pr.mjs"],
+    "related_templates": ["issue-unit", "issue-composition"]
+  },
+  "impact_levels": ["Critical", "High", "Medium", "Low"]
+}

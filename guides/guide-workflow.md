@@ -70,8 +70,9 @@ last_verified: 2025-10-28
 
 # Links
 
-- Templates: `/templates/ideas/`, `/templates/user-story-template.md`
+- Templates: `/templates/ideas/`, `/templates/issue-unit/`, `/templates/issue-composition/`, `/templates/pull-request/`
 - Validator: `/scripts/validate-ideas.mjs`
 - Issue creator: `/scripts/ideas-to-issues.mjs`
 - Worktree: `/scripts/create-worktree-pr.mjs`
 - Sync: `/scripts/sync-ideas-checklists.mjs`
+- PR generator: `/scripts/generate-pr-content.mjs`

@@ -1,0 +1,63 @@
+{
+  "id": "pull-request",
+  "name": "Pull Request",
+  "version": "0.1.0",
+  "category": "workflow",
+  "author": "plaincraft-doc-alignment",
+  "created": "2025-01-28",
+  "description": "Standard PR description template with context, changes, and verification checklist",
+  "entrypoint": "pull-request.md",
+  "variables": [
+    {
+      "name": "PR_TITLE",
+      "description": "Descriptive title matching related issue",
+      "required": true,
+      "example": "Implement dark mode toggle"
+    },
+    {
+      "name": "ISSUE_NUMBER",
+      "description": "Reference to issue being closed",
+      "required": true,
+      "example": "123"
+    },
+    {
+      "name": "CONTEXT",
+      "description": "Why these changes are needed",
+      "required": true
+    },
+    {
+      "name": "CHANGES_MADE",
+      "description": "Bullet list of files/components changed",
+      "required": true
+    },
+    {
+      "name": "TESTING_STEPS",
+      "description": "How reviewers can verify changes",
+      "required": true
+    },
+    {
+      "name": "VERIFICATION_CHECKLIST",
+      "description": "Pre-merge checks completed",
+      "required": true
+    }
+  ],
+  "references": {
+    "guide": "guides/guide-workflow.md",
+    "scripts": [
+      "scripts/generate-pr-content.mjs",
+      "scripts/create-worktree-pr.mjs",
+      "scripts/manual-update-pr-checkboxes.mjs"
+    ],
+    "related_templates": ["issue-unit", "issue-composition"]
+  },
+  "auto_generation": {
+    "supported": true,
+    "script": "scripts/generate-pr-content.mjs",
+    "populated_fields": [
+      "issue_reference",
+      "changed_files",
+      "commit_history",
+      "linked_issues"
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "test-unit",
+  "name": "Test (Unit)",
+  "version": "0.1.0",
+  "category": "testing",
+  "author": "plaincraft-doc-alignment",
+  "created": "2025-01-28",
+  "description": "Unit test template for component and function testing with Vitest",
+  "entrypoint": "test-unit.spec.tsx",
+  "variables": [
+    {
+      "name": "COMPONENT_NAME",
+      "description": "Name of component or module being tested",
+      "required": true,
+      "example": "Button"
+    },
+    {
+      "name": "IMPORT_PATH",
+      "description": "Import path to component/module",
+      "required": true,
+      "example": "@/components/Button"
+    },
+    {
+      "name": "TEST_CASES",
+      "description": "Specific test scenarios to cover",
+      "required": true
+    }
+  ],
+  "references": {
+    "guide": "guides/guide-scripts.md",
+    "scripts": ["scripts/test-storybook.mjs"],
+    "related_templates": ["test-integration"]
+  },
+  "framework": {
+    "test_runner": "vitest",
+    "testing_library": "@testing-library/react",
+    "environment": "jsdom"
+  },
+  "constraints": {
+    "no_external_dependencies": true,
+    "max_execution_time_ms": 100,
+    "isolated": true
+  }
+}
