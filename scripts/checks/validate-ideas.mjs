@@ -13,6 +13,8 @@
  */
 
 import path from "node:path";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { Logger, parseFlags, fail, succeed, repoRoot } from "../_lib/core.mjs";
 import {
@@ -41,21 +43,42 @@ const ArgsSchema = z.object({
  * @param {Logger} log - Logger instance
  * @returns {Promise<object>} Validation results
  */
-async function validateIdeas(args, log) {
+export async function validateIdeas(args, log) {
   const root = await repoRoot(args.cwd);
   const ideasDir = path.join(root, "ideas");
+
+  if (!existsSync(ideasDir)) {
+    const message =
+      "Ideas workspace not found. Run `pnpm ideas:init --yes` to scaffold starter templates.";
+    log.warn(message);
+    return {
+      total: 0,
+      valid: 0,
+      invalid: 0,
+      warnings: 1,
+      files: [],
+      status: "missing",
+      message,
+    };
+  }
 
   log.info(`Scanning ideas directory: ${ideasDir}`);
 
   const ideaFiles = await findIdeaFiles(ideasDir, args.filter);
 
   if (ideaFiles.length === 0) {
+    const message = args.filter
+      ? `No ideas matching filter: ${args.filter}`
+      : "No idea files found in /ideas. Run `pnpm ideas:init --yes` to scaffold starter templates.";
+    log.warn(message);
     return {
       total: 0,
       valid: 0,
       invalid: 0,
-      warnings: 0,
+      warnings: 1,
       files: [],
+      status: "empty",
+      message,
     };
   }
 
@@ -67,6 +90,7 @@ async function validateIdeas(args, log) {
     invalid: 0,
     warnings: 0,
     files: [],
+    status: "ok",
   };
 
   for (const filename of ideaFiles) {
@@ -93,6 +117,12 @@ async function validateIdeas(args, log) {
         log.warn(`  ⚠ ${warning}`);
       }
     }
+  }
+
+  if (results.invalid > 0) {
+    results.status = "error";
+  } else if (results.warnings > 0) {
+    results.status = "warn";
   }
 
   return results;
@@ -152,15 +182,19 @@ Validation checks:
 
     // No ideas found
     if (results.total === 0) {
+      const message =
+        results.message ||
+        (args.filter
+          ? `No ideas matching filter: ${args.filter}`
+          : "No idea files found");
       succeed({
         script: SCRIPT_NAME,
-        message: args.filter
-          ? `No ideas matching filter: ${args.filter}`
-          : "No idea files found",
+        message,
         exitCode: 2,
         output: args.output,
         data: results,
       });
+      return;
     }
 
     // Check for failures
@@ -209,4 +243,9 @@ Validation checks:
   }
 }
 
-main();
+const entryPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
+const modulePath = fileURLToPath(import.meta.url);
+
+if (entryPath === modulePath) {
+  main();
+}

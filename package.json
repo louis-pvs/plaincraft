@@ -24,6 +24,7 @@
     "gh:worktree": "node scripts/ops/create-worktree-pr.mjs",
     "postcheckout": "node scripts/ops/post-checkout.mjs",
     "ideas:create": "node scripts/ops/ideas-to-issues.mjs",
+    "ideas:init": "node scripts/ops/init-ideas.mjs",
     "ideas:sync": "node scripts/ops/sync-ideas-checklists.mjs",
     "ideas:validate": "node scripts/checks/validate-ideas.mjs",
     "issues:create": "node scripts/ops/create-issues-from-changelog.mjs",

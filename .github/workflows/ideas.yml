@@ -141,25 +141,56 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check ideas workspace
+        id: workspace
+        run: |
+          if [ ! -d ideas ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          else
+            count=$(find ideas -maxdepth 1 -type f -name "*.md" -not -name "_*" | wc -l | tr -d '[:space:]')
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            if [ "$count" -eq 0 ]; then
+              echo "has_files=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "has_files=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Ideas workspace summary
+        if: steps.workspace.outputs.has_files != 'true'
+        run: |
+          echo "## Ideas Workspace Check" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.workspace.outputs.exists }}" != "true" ]; then
+            echo "- ⚠️ \`/ideas\` directory missing." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- ⚠️ \`/ideas\` directory exists but no idea cards detected." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "- Run \`pnpm ideas:init --yes\` locally to scaffold starter templates." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Setup Node.js
+        if: steps.workspace.outputs.has_files == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
       - name: Setup pnpm
+        if: steps.workspace.outputs.has_files == 'true'
         uses: pnpm/action-setup@v4
         with:
           version: 9.0.0
 
       - name: Install dependencies
+        if: steps.workspace.outputs.has_files == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Validate idea files
+        if: steps.workspace.outputs.has_files == 'true'
         run: |
           node scripts/checks/validate-ideas.mjs ${{ github.event.inputs.idea_file }}
 
       - name: Generate validation report
-        if: always()
+        if: steps.workspace.outputs.has_files == 'true' && always()
         run: |
           echo "## Ideas Validation Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

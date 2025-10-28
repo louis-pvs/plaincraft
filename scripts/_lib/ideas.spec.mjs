@@ -69,8 +69,13 @@ describe("getIdeaType", () => {
     expect(getIdeaType("B-validation-error.md")).toBe("bug");
   });
 
-  it("should return null for invalid filename", () => {
-    expect(getIdeaType("invalid-idea.md")).toBeNull();
+  it("should detect brief type from lowercase slug", () => {
+    expect(getIdeaType("creator-onboarding-bridge.md")).toBe("brief");
+    expect(getIdeaType("initiative-brief.md")).toBe("brief");
+  });
+
+  it("should handle filenames without known prefix", () => {
+    expect(getIdeaType("invalid-idea.md")).toBe("brief");
     expect(getIdeaType("README.md")).toBeNull();
     expect(getIdeaType("X-unknown.md")).toBeNull();
   });
@@ -207,7 +212,7 @@ Test behaviors
     const content = "# Invalid";
     readFile.mockResolvedValue(content);
 
-    const result = await validateIdeaFile("/path/to/invalid-idea.md");
+    const result = await validateIdeaFile("/path/to/X-invalid.md");
 
     expect(result.valid).toBe(false);
     expect(result.type).toBeNull();

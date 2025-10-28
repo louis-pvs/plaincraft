@@ -27,6 +27,9 @@ last_verified: 2025-10-28
 1. **Create idea file:**
 
    ```bash
+   # Seed reusable templates (run once per clone)
+   pnpm ideas:init --yes
+
    # Copy appropriate template
    cp templates/ideas/idea-unit-template.md ideas/U-your-slug.md
    # or
@@ -61,6 +64,7 @@ last_verified: 2025-10-28
 - **List open issues:** `gh issue list --state open --json number,title,state` (filter with `--label lane:C`, etc.)
 - **View current PR details:** `gh pr view --json title,body,labels` (append `--web` to open in browser)
 - **Stream workflow/job logs:** `gh run view <run> --log` (handles pagination + auth)
+- **Seed idea workspace templates:** `pnpm ideas:init` (use `--yes` to write files)
 - **Convert idea to tracked issue:** `pnpm ideas:create <idea-file>` (wraps `scripts/ops/ideas-to-issues.mjs`)
 - **Sync idea checklist with Issue:** `pnpm ideas:sync` (mirrors checklist state both directions)
 
@@ -72,6 +76,7 @@ last_verified: 2025-10-28
 # Requirements
 
 - Idea file must exist BEFORE creating Issue
+- Seed `ideas/_templates/` via `pnpm ideas:init --yes` on fresh clones to avoid manual copying
 - Naming: `U-<slug>.md`, `C-<slug>.md`, `ARCH-<slug>.md`, `PB-<slug>.md`
 - Required sections: Purpose, Problem, Proposal, Acceptance Checklist
 - Lane metadata (A/B/C/D) specified
