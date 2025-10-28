@@ -2,10 +2,11 @@
 
 Template-first documentation for reproducible workflows. Guides are thin wrappers that point to templates and scripts, not replace them.
 
-## Active Guides (4/12 limit)
+## Active Guides (5/12 limit)
 
 - **[guide-changelog.md](./guide-changelog.md)** - Release notes and commit message conventions
 - **[guide-roadmap-setup.md](./guide-roadmap-setup.md)** - Bootstrapping Plaincraft Roadmap project
+- **[guide-scripts.md](./guide-scripts.md)** - Script guardrails and CI enforcement
 - **[guide-user-story.md](./guide-user-story.md)** - Translating ideas to backlog-ready tickets
 - **[guide-scripts.md](./guide-scripts.md)** - Script guardrails and CI enforcement
 - **[guide-workflow.md](./guide-workflow.md)** - Idea to Issue to PR workflow
