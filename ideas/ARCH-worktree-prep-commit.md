@@ -12,6 +12,8 @@ Issue: #27
 
 Guarantee that `pnpm gh:worktree` produces a branch with at least one staged change so subsequent commit and PR creation flows succeed without manual priming.
 
+**Related**: ARCH-worktree-pr-fix (#20) - Parent issue that fixed PR creation; this extends it with bootstrap commits
+
 ## Problem
 
 The worktree helper currently hands developers an empty branch. When they immediately try to commit or invoke PR automation, Git reports “nothing to commit” and downstream scripts bail:
@@ -29,7 +31,7 @@ The worktree helper currently hands developers an empty branch. When they immedi
 
 ## Acceptance Checklist
 
-- [ ] File path configurable via env/flag, defaulting to `.worktree-bootstrap.md` in repo root.
-- [ ] Opt-out flag (`--no-bootstrap`) documented and honored.
-- [ ] CI/Docs updated with instructions for cleaning up or amending the bootstrap commit.
-- [ ] Tests or dry-run output prove PR creation succeeds on a pristine branch.
+- [x] File path configurable via env/flag, defaulting to `.worktree-bootstrap.md` in repo root.
+- [x] Opt-out flag (`--no-bootstrap`) documented and honored.
+- [x] CI/Docs updated with instructions for cleaning up or amending the bootstrap commit.
+- [x] Tests or dry-run output prove PR creation succeeds on a pristine branch.

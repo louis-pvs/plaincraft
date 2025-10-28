@@ -96,8 +96,8 @@ if (!hasCommits) {
 - [x] Clear instructions provided to user
 - [x] Added `writeFile` import from `node:fs/promises`
 - [x] Linting passes
-- [ ] Tested with branch containing commits
-- [ ] Documentation updated if needed
+- [x] Tested with branch containing commits
+- [x] Documentation updated if needed
 
 ## Files Changed
 

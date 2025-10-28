@@ -59,13 +59,13 @@ graph LR
 
 ## Acceptance Checklist
 
-- [ ] Auto-detects missing/invalid project configuration
-- [ ] Creates project with proper fields and views
-- [ ] Commits config updates automatically
-- [ ] Downstream `create-issues-from-ideas` job depends on project existence
-- [ ] Job summary shows whether project was created or reused
-- [ ] CI-STRATEGY.md updated with automation documentation
-- [ ] Zero manual setup required for first-time users
+- [x] Auto-detects missing/invalid project configuration
+- [x] Creates project with proper fields and views
+- [x] Commits config updates automatically
+- [x] Downstream `create-issues-from-ideas` job depends on project existence
+- [x] Job summary shows whether project was created or reused
+- [x] CI-STRATEGY.md updated with automation documentation
+- [x] Zero manual setup required for first-time users
 
 ## Rollout Notes
 

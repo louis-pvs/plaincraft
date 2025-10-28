@@ -73,7 +73,8 @@ Key features:
 - Evaluate conditional execution for documentation builds once metrics baseline is captured
 - Establish alerting beyond GitHub's default notification emails for failed CI/CD runs
 - Ensure README and folder-level docs signpost the new guides and lane tags (`lane:C`) so developers can navigate the workflow quickly
-- Validate workflow script references - Audit all GitHub Actions workflows to ensure script paths match actual locations (idea-lifecycle.yml was referencing `scripts/archive-idea-for-issue.mjs` instead of `scripts/ops/archive-idea-for-issue.mjs`, causing zero automated runs since creation)
+- **Validate workflow script references** - Audit all GitHub Actions workflows to ensure script paths match actual locations (idea-lifecycle.yml was referencing `scripts/archive-idea-for-issue.mjs` instead of `scripts/ops/archive-idea-for-issue.mjs`, causing zero automated runs since creation)
+- **Fix archive script dry-run behavior** - `scripts/ops/archive-idea-for-issue.mjs` appears to always run in dry-run mode even when `--no-dry-run` is passed; the parseFlags or boolean handling may be incorrect, preventing manual archival via CLI (workaround: use git mv directly)
 
 ## Deliverables
 
