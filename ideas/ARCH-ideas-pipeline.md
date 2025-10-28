@@ -1,12 +1,26 @@
 # ARCH-ideas-pipeline
 
-Lane: C
-Purpose: Automate project creation and issue linking when converting ideas to GitHub issues.
+Lane: C (DevOps & Automation)
 Issue: #19
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, pipeline
+
+## Purpose
+
+Automate GitHub project provisioning so idea cards convert to issues with consistent project placement and configuration.
 
 ## Problem
 
-## Solution
+Teams running `ideas.yml` on new repositories must manually create the target project and configure views before the workflow succeeds. The lack of automation means:
+
+- First-time runs fail when `pipeline-config.json` references a non-existent project.
+- Manual setup drifts from the scripted expectations, breaking automation.
+- There's no self-healing path if the project is renamed or deleted.
+
+## Proposal
 
 Add automated project creation to the `ideas.yml` workflow that:
 

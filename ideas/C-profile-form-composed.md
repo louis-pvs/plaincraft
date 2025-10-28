@@ -1,9 +1,16 @@
 # C-profile-form-composed
 
-- **Lane**: A (Component development - Pair A owns implementation)
-- **Metric Hypothesis**: Demonstrate composition pattern combining multiple form fields. Measure adoption through Storybook interaction test coverage and nightly recording success rate.
-- **Invariants**: Form validation must be accessible (ARIA labels, error announcements), keyboard shortcuts documented (Cmd/Ctrl+Enter to save, Esc to reset), all fields must respect max-length constraints.
-- **Issue**: #53
+Lane: A (Component development - Pair A owns implementation)
+Issue: #53
+
+## Lane
+
+- **Primary Lane:** A (Component Development)
+- **Collaboration:** Coordinate with Design Systems for cross-form consistency.
+
+## Metric Hypothesis
+
+Demonstrate a composition pattern that combines multiple form fields, measured by Storybook interaction test coverage and nightly recording success rate.
 
 ## Units In Scope
 
@@ -24,6 +31,12 @@ Create a composition example demonstrating how multiple form fields work togethe
 - Accessible error messaging
 
 This serves as a reference implementation for the "Composition Pattern" documented in the Playbook.
+
+## Invariants
+
+- Form validation must be accessible (ARIA labels, error announcements).
+- Keyboard shortcuts documented (Cmd/Ctrl+Enter to save, Esc to reset).
+- All fields must respect max-length constraints.
 
 ## Acceptance Checklist
 

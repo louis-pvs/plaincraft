@@ -1,8 +1,16 @@
 # ARCH-subissue-fix-pr-context
 
-Lane: C
-Purpose: Add parent issue context to sub-issue PRs so reviewers understand the relationship to larger architectural work.
+Lane: C (DevOps & Automation)
 Parent: ARCH-subissue-pipeline-repair
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, sub-issues
+
+## Purpose
+
+Add parent issue context to sub-issue PRs so reviewers immediately see how the work maps to the larger architectural effort.
 
 ## Problem
 

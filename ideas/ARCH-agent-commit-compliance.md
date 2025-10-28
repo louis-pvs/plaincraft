@@ -1,8 +1,17 @@
 # ARCH: AI Agent Should Follow Commit Message Compliance
 
-**Tag:** `ARCH-agent-commit-compliance`  
-**Lane:** C (DevOps & Automation)  
-**Created:** 2025-10-27
+Lane: C (DevOps & Automation)
+Created: 2025-10-27
+Tag: `ARCH-agent-commit-compliance`
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, guardrails
+
+## Purpose
+
+Codify commit message guardrails for the AI agent so changelog tooling, pre-commit checks, and filtered history all continue to work as designed.
 
 ## Problem
 

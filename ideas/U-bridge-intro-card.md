@@ -1,8 +1,18 @@
 # U-bridge-intro-card
 
-- **Lane**: D
-- **Linked Composition**: `C-creator-onboarding-bridge`
-- **Contracts**: Surfaces the three onboarding steps and routes to each Unit.
+Lane: D
+Linked Composition: `C-creator-onboarding-bridge`
+
+## Lane
+
+- **Primary Lane:** D (Experience & Narrative)
+- **Handoff:** Coordinate with Composition `C-creator-onboarding-bridge` for copy and analytics.
+
+## Contracts
+
+- Surface the three onboarding steps and route to each Unit.
+- Maintain a single source of truth for checklist completion state.
+- Emit analytics events whenever the CTA is displayed or triggered.
 
 ## Props + Shape
 

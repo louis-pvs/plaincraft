@@ -1,8 +1,16 @@
 # ARCH-subissue-fix-retroactive-archive
 
-Lane: C
-Purpose: One-time cleanup to archive 7 orphaned idea files for closed issues, leaving /ideas directory with only active work.
+Lane: C (DevOps & Automation)
 Parent: ARCH-subissue-pipeline-repair
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, cleanup
+
+## Purpose
+
+Perform a one-time cleanup that archives orphaned idea files for already-closed issues so `/ideas` only contains active work.
 
 ## Problem
 

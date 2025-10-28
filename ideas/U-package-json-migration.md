@@ -11,6 +11,24 @@ Lane: C
 - **Primary Lane:** C (DevOps & Automation)
 - **Labels:** automation, scripts, migration
 
+## Contracts
+
+- Every `pnpm` script in `package.json` references the migrated `scripts/ops` or `scripts/checks` paths.
+- CI-critical commands (`ci:check`, `test`, `lint`, `typecheck`) resolve without manual shims.
+- Developer shortcuts (`ideas:*`, `gh:*`, `scripts:*`) remain available with updated locations.
+
+## Props + Shape
+
+- `packageScripts` (object) — key/value map of script names to commands that must be updated.
+- `scriptPathMap` (array of `{ from: string, to: string }`) — authoritative mapping between legacy and migrated script paths.
+- `dryRun` (boolean flag) — when true, prints planned replacements without writing changes.
+
+## Behaviors
+
+- Audit the existing `package.json` to detect outdated script paths.
+- Apply the mapping so every legacy `node scripts/...` entry points at the new location.
+- Provide verification guidance (running `--help` variants) so the migration can be proved locally.
+
 ## Purpose
 
 Update package.json to align with the new scripts directory structure after migration, ensuring all pnpm commands reference correct paths.

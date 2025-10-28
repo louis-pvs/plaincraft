@@ -1,8 +1,16 @@
 # ARCH-subissue-fix-parent-pr-update
 
-Lane: C
-Purpose: Auto-update parent PR body after sub-issue merges to show progress and keep acceptance checklist current.
+Lane: C (DevOps & Automation)
 Parent: ARCH-subissue-pipeline-repair
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, sub-issues
+
+## Purpose
+
+Auto-update parent PR bodies after sub-issue merges so reviewers can see progress and checklist state without manual edits.
 
 ## Problem
 

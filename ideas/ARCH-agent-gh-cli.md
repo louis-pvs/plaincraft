@@ -1,8 +1,17 @@
 # ARCH: AI Agent Should Use gh CLI Over curl
 
-**Tag:** `ARCH-agent-gh-cli`  
-**Lane:** C (DevOps & Automation)  
-**Created:** 2025-10-27
+Lane: C (DevOps & Automation)
+Created: 2025-10-27
+Tag: `ARCH-agent-gh-cli`
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, tooling
+
+## Purpose
+
+Ensure the agent defaults to the GitHub CLI and existing scripts so automation stays reliable, error handling is consistent, and raw API calls remain a last resort.
 
 ## Problem
 

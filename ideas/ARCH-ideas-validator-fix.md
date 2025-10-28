@@ -1,7 +1,15 @@
 # ARCH-ideas-validator-fix
 
-Lane: C
-Purpose: Fix validate-ideas.mjs to support ARCH-, PB-, and brief files that actually exist in the repository.
+Lane: C (DevOps & Automation)
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, quality
+
+## Purpose
+
+Fix `validate-ideas.mjs` so it reflects the real idea types in the repo (ARCH, PB, briefs) and keeps the automation trustworthy.
 
 ## Problem
 

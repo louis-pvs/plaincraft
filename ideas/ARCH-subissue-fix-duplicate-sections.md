@@ -1,8 +1,16 @@
 # ARCH-subissue-fix-duplicate-sections
 
-Lane: C
-Purpose: Prevent duplicate Sub-Issues sections in parent issues by replacing instead of appending.
+Lane: C (DevOps & Automation)
 Parent: ARCH-subissue-pipeline-repair
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, sub-issues
+
+## Purpose
+
+Prevent duplicate `## Sub-Issues` sections in parent issues so sync scripts only ever manage a single canonical checklist.
 
 ## Problem
 

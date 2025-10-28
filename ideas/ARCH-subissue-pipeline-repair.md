@@ -1,7 +1,15 @@
 # ARCH-subissue-pipeline-repair
 
-Lane: C
-Purpose: Fix the five broken links in the sub-issue pipeline so idea cards, Issues, PRs, and merges stay in sync.
+Lane: C (DevOps & Automation)
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, sub-issues
+
+## Purpose
+
+Fix the five broken links in the sub-issue pipeline so idea cards, GitHub issues, PRs, and merges stay in sync.
 
 ## Problem
 

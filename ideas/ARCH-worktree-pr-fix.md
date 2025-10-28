@@ -1,9 +1,17 @@
 # ARCH-worktree-pr-fix
 
-- **Lane**: C
-- **Type**: Bug
-- **Purpose**: Fix worktree script PR creation failures when branches have no commits
-  Issue: #20
+Lane: C (DevOps & Automation)
+Issue: #20
+Type: Bug
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, worktree
+
+## Purpose
+
+Fix worktree PR creation failures when branches have no commits so the helper script provides a predictable, frustration-free flow.
 
 ## Problem
 
@@ -21,7 +29,7 @@ GraphQL: No commits between main and feat/arch-ideas-pipeline
 2. **Escaping issues**: PR body uses inline string with quote escaping that breaks with multiline content
 3. **Misleading error**: Script exits with error even though worktree/branch creation succeeded
 
-## Solution
+## Proposal
 
 ### 1. Add Commit Detection
 

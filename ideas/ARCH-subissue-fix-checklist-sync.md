@@ -1,8 +1,16 @@
 # ARCH-subissue-fix-checklist-sync
 
-Lane: C
-Purpose: Auto-update parent issue checklist when sub-issues close to maintain source-of-truth integrity.
+Lane: C (DevOps & Automation)
 Parent: ARCH-subissue-pipeline-repair
+
+## Lane
+
+- **Primary Lane:** C (DevOps & Automation)
+- **Labels:** automation, sub-issues
+
+## Purpose
+
+Auto-update parent issue checklists when sub-issues close so the source-of-truth remains synchronized across cards, issues, and PRs.
 
 ## Problem
 
