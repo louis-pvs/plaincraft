@@ -14,6 +14,10 @@ export default [
       "storybook-static/**",
       "playbook-static/**",
       "**/*.mdx",
+      "**/*.md",
+      "**/*.json",
+      "**/DEPRECATED/**",
+      "**/_archive/**",
     ],
   },
 
@@ -57,6 +61,7 @@ export default [
         process: "readonly",
         __dirname: "readonly",
         __filename: "readonly",
+        URL: "readonly",
       },
     },
     plugins: {

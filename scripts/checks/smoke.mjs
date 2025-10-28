@@ -172,7 +172,9 @@ async function testDryRun(scriptPath, timeout) {
     try {
       JSON.parse(stdout);
       jsonValid = true;
-    } catch {}
+    } catch {
+      // JSON parsing failed, jsonValid remains false
+    }
 
     return {
       name: "--dry-run --output json",

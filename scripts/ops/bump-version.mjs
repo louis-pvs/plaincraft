@@ -6,10 +6,11 @@
  * Summary: Bump package.json version based on semantic versioning and commit analysis.
  */
 
+import path from "node:path";
+import { appendFile } from "node:fs/promises";
 import { z } from "zod";
 import {
   parseFlags,
-  formatOutput,
   fail,
   succeed,
   Logger,
@@ -17,11 +18,8 @@ import {
   generateRunId,
   readJSON,
   writeJSON,
-  atomicWrite,
-} from "./_lib/core.mjs";
-import { getRecentCommits } from "./_lib/git.mjs";
-import path from "node:path";
-import { appendFile } from "node:fs/promises";
+} from "../_lib/core.mjs";
+import { getRecentCommits } from "../_lib/git.mjs";
 
 const ArgsSchema = z.object({
   bumpType: z.enum(["major", "minor", "patch"]).optional(),
@@ -102,7 +100,7 @@ async function preflight(root) {
 
   try {
     await readJSON(packageJsonPath);
-  } catch (error) {
+  } catch {
     fail(
       10,
       "precondition_failed",

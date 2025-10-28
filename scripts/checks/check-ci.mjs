@@ -114,12 +114,12 @@ async function getLatestRun() {
 }
 
 /**
- * Print formatted text report
- * @param {object} run - Run details
- * @param {Array} jobs - Job details
- * @param {Logger} log - Logger instance
+ * Print text-based report
+ * @param {object} run - Workflow run data
+ * @param {Array} jobs - Job data
+ * @param {Logger} _log - Logger instance (unused)
  */
-function printTextReport(run, jobs, log) {
+function printTextReport(run, jobs, _log) {
   console.clear();
   console.log("╔════════════════════════════════════════════════════════════╗");
   console.log("║               GitHub Workflow Status Report                ║");
