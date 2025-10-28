@@ -1,6 +1,6 @@
 # Script Migration Status
 
-## Completed Migrations (15/27 = 56%)
+## Completed Migrations (19/27 = 70%)
 
 ### Core Libraries Created
 
@@ -12,7 +12,7 @@
 
 ### Migrated Scripts
 
-#### ops/ (11)
+#### ops/ (13)
 
 1. ✅ `setup-labels.mjs` - Create/update repository lane labels
    - Status: Complete
@@ -73,7 +73,22 @@
     - Original: `DEPRECATED/generate-pr-content.mjs`
     - Features: Multiple sources, template integration, GitHub Actions output
 
-#### checks/ (4)
+13. ✅ `commit-msg-hook.mjs` - Git commit message validation hook
+    - Status: Complete
+    - Original: `DEPRECATED/commit-msg-hook.mjs`
+    - Features: Ticket prefix validation, helpful error messages
+
+14. ✅ `new-snippet.mjs` - Create new snippet from template
+    - Status: Complete
+    - Original: `DEPRECATED/new-snippet.mjs`
+    - Features: PascalCase validation, template replacement
+
+15. ✅ `auto-tag.mjs` - Auto-tag releases from version changes
+    - Status: Complete
+    - Original: `DEPRECATED/auto-tag.mjs`
+    - Features: CHANGELOG extraction, GitHub releases, push tags
+
+#### checks/ (6)
 
 1. ✅ `validate-ideas.mjs` - Validate idea file structure
    - Status: Complete
@@ -90,36 +105,62 @@
    - Original: `DEPRECATED/pr-requirements.mjs`
    - Features: Create issues, verify PRs, apply labels, lane detection
 
-4. ✅ `policy-lint.mjs` - Enforce script guardrails (created earlier)
-5. ✅ `smoke.mjs` - Smoke test all scripts (created earlier)
-6. ✅ `lint-guides.mjs` - Validate guides (created earlier)
-7. ✅ `dedupe-guides.mjs` - Detect duplicate guides (created earlier)
+4. ✅ `prepare-gh.mjs` - GitHub CLI environment check
+   - Status: Complete
+   - Original: `DEPRECATED/prepare-gh.mjs`
+   - Features: Installation/auth checks, repo access verification
+
+5. ✅ `policy-lint.mjs` - Enforce script guardrails (created earlier)
+6. ✅ `smoke.mjs` - Smoke test all scripts (created earlier)
+7. ✅ `lint-guides.mjs` - Validate guides (created earlier)
+8. ✅ `dedupe-guides.mjs` - Detect duplicate guides (created earlier)
 
 ## In Progress (0)
 
 None currently
 
-## Remaining Scripts (16)
-
-### High Priority (Next Batch)
-
-None remaining - all high priority complete!
-
-### Medium Priority
-
-- [ ] `manual-update-pr-checkboxes.mjs` - Update PR checkboxes
-- [ ] `merge-subissue-to-parent.mjs` - Merge sub-issue to parent
-- [ ] `generate-pr-content.mjs` - Generate PR content from templates
-- [ ] `generate-pr-content.spec.mjs` - Tests for PR content generator
-- [ ] `pr-requirements.mjs` - Check PR requirements
+## Remaining Scripts (8)
 
 ### Lower Priority
 
-- [ ] `auto-tag.mjs` - Auto-tag releases
 - [ ] `consolidate-changelog.mjs` - Consolidate changelog entries
 - [ ] `create-issues-from-changelog.mjs` - Create issues from changelog
 - [ ] `pre-commit-changelog.mjs` - Pre-commit changelog validation
-- [ ] `commit-msg-hook.mjs` - Commit message hook
+- [ ] `generate-gh-pages-index.mjs` - Generate GitHub Pages index
+- [ ] `record-stories.mjs` - Record Storybook stories
+- [ ] `setup-project.mjs` - Project setup automation
+- [ ] `test-storybook.mjs` - Test Storybook components
+- [ ] `bump-version.mjs` - Already in root (may be duplicate - verify)
+
+### Templates (not migrated)
+
+- `_template-check.mjs` - Template for check scripts
+- `_template-ops.mjs` - Template for ops scripts
+
+## Migration Statistics
+
+**Total Scripts**: 27
+**Migrated**: 19 (70%)
+**Remaining**: 8 (30%)
+
+**By Category**:
+
+- Core Libraries: 5/5 (100%)
+- Operations: 15/15 (100%)
+- Checks: 4/4 in use + 4 enforcement tools (100%)
+- Lower Priority: 0/8 (0%)
+
+## Next Steps
+
+1. ✅ Complete high-priority scripts (done)
+2. ✅ Complete medium-priority scripts (done)
+3. ⏳ Complete lower-priority scripts (8 remaining)
+4. ⏳ Verify bump-version.mjs (may be duplicate)
+5. ⏳ Install dependencies (execa, zod) - DONE
+6. ⏳ Run smoke tests
+7. ⏳ Update package.json commands
+8. ⏳ Document new structure
+
 - [ ] `generate-gh-pages-index.mjs` - Generate GitHub Pages index
 - [ ] `prepare-gh.mjs` - Prepare GitHub environment
 - [ ] `new-snippet.mjs` - Create new snippet from template
