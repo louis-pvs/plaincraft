@@ -3,7 +3,7 @@ id: guide-scripts
 owner: @louis-pvs
 lane: D
 artifact_id: ARCH-scripts-guardrails
-scaffold_ref: /scripts/_lib@v0.1
+scaffold_ref: /templates/script@v0.1
 version: 0.1.0
 created: 2025-10-28
 ttl_days: 90

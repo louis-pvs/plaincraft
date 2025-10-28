@@ -3,7 +3,7 @@ id: guide-roadmap-setup
 owner: @louis-pvs
 lane: D
 artifact_id: ARCH-roadmap-project-setup
-scaffold_ref: /templates/roadmap-project-template.json@v0.1
+scaffold_ref: /templates/guide@v0.1
 version: 0.1.0
 created: 2025-10-28
 ttl_days: 90
