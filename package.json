@@ -1,6 +1,6 @@
 {
   "name": "plaincraft",
-  "version": "0.5.12",
+  "version": "0.5.13",
   "author": {
     "name": "Louis Phang",
     "email": "design.vincent.louis@gmail.com"
@@ -60,6 +60,8 @@
     "docs:lint": "node scripts/checks/lint-guides.mjs",
     "docs:coverage": "node scripts/checks/template-coverage.mjs",
     "docs:check": "pnpm docs:lint && pnpm docs:coverage",
+    "new:template": "node scripts/ops/new-template.mjs",
+    "new:guide": "node scripts/ops/new-guide.mjs",
     "guides:lint": "node scripts/checks/lint-guides.mjs",
     "guides:dedupe": "node scripts/checks/dedupe-guides.mjs",
     "guides:ttl": "node scripts/ops/archive-expired-guides.mjs",
