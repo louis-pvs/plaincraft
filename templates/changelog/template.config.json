@@ -1,0 +1,48 @@
+{
+  "name": "changelog",
+  "version": "0.1.0",
+  "description": "Changelog consolidation template with _tmp/ workflow",
+  "created": "2025-10-28",
+  "lastUpdated": "2025-10-28",
+  "schema": {
+    "files": {
+      "CHANGELOG.md": {
+        "required": true,
+        "format": "markdown",
+        "validation": {
+          "mustStartWith": "# Changelog",
+          "versionFormat": "## \\[\\d+\\.\\d+\\.\\d+\\] - \\d{4}-\\d{2}-\\d{2}"
+        }
+      },
+      "_tmp/*.md": {
+        "required": false,
+        "format": "markdown",
+        "validation": {
+          "mustStartWith": "# ",
+          "namingPattern": "^\\d{3}-[a-z0-9-]+\\.md$"
+        }
+      }
+    },
+    "sections": [
+      "Highlights",
+      "Added",
+      "Changed",
+      "Deprecated",
+      "Removed",
+      "Fixed",
+      "Security",
+      "Tooling & Commands",
+      "Rollout Notes"
+    ]
+  },
+  "scripts": {
+    "consolidate": "node scripts/consolidate-changelog.mjs",
+    "validate": "node scripts/validate-changelog.mjs"
+  },
+  "relatedFiles": [
+    "/scripts/consolidate-changelog.mjs",
+    "/scripts/pre-commit-changelog.mjs",
+    "/scripts/commit-msg-hook.mjs",
+    "/guides/guide-changelog.md"
+  ]
+}

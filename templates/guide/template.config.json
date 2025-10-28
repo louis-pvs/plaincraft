@@ -1,0 +1,52 @@
+{
+  "name": "guide",
+  "version": "0.1.0",
+  "description": "Template-first guide template with frontmatter and TTL tracking",
+  "created": "2025-10-28",
+  "lastUpdated": "2025-10-28",
+  "schema": {
+    "frontmatter": {
+      "required": [
+        "id",
+        "owner",
+        "lane",
+        "artifact_id",
+        "scaffold_ref",
+        "version",
+        "created",
+        "ttl_days",
+        "last_verified"
+      ],
+      "format": "YAML between --- delimiters"
+    },
+    "sections": {
+      "required": [
+        "When to use",
+        "When not to use",
+        "Steps (all executable)",
+        "Rollback",
+        "Requirements",
+        "Links"
+      ]
+    },
+    "constraints": {
+      "maxWords": 600,
+      "maxGuides": 12,
+      "maxInProgress": 3,
+      "ttlDays": 90
+    }
+  },
+  "governance": {
+    "templateFirst": "Must reference existing template or script",
+    "executableSteps": "Every step must have runnable command",
+    "noDuplication": "Reference templates, don't reproduce content",
+    "singleOwner": "Exactly one owner per guide",
+    "ttlEnforced": "CI archives guides after ttl_days from last_verified"
+  },
+  "enforcedBy": [
+    "Manual review (CI coming)",
+    "Word count check",
+    "TTL archiver (planned)"
+  ],
+  "relatedFiles": ["/guides/README.md", "/guides/guide-*.md", "/templates/"]
+}

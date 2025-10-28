@@ -1,0 +1,44 @@
+{
+  "name": "script",
+  "version": "0.1.0",
+  "description": "Compliant script template with full CLI contract and guardrails",
+  "created": "2025-10-28",
+  "lastUpdated": "2025-10-28",
+  "schema": {
+    "requiredHeader": {
+      "tags": ["@since", "@version"],
+      "format": "JSDoc block comment at top of file"
+    },
+    "requiredFlags": [
+      "--help",
+      "--dry-run",
+      "--yes",
+      "--output",
+      "--log-level",
+      "--cwd"
+    ],
+    "exitCodes": {
+      "0": "Success",
+      "2": "Noop/idempotent",
+      "3": "Partial success",
+      "10": "Precondition failed",
+      "11": "Validation failed",
+      "13": "Unsafe environment"
+    },
+    "sizeLimits": {
+      "maxScriptLines": 300,
+      "maxFunctionLines": 60
+    }
+  },
+  "enforcedBy": [
+    "/scripts/checks/policy-lint.mjs",
+    "/scripts/checks/smoke.mjs",
+    "/scripts/checks/size-check.mjs"
+  ],
+  "relatedFiles": [
+    "/scripts/_lib/core.mjs",
+    "/scripts/_lib/validation.mjs",
+    "/scripts/GUARDRAILS.md",
+    "/guides/guide-scripts.md"
+  ]
+}
