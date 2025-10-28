@@ -153,6 +153,30 @@ node scripts/ops/create-issues-from-changelog.mjs --dry-run --output json
 node scripts/ops/create-issues-from-changelog.mjs --version 0.4.0 --yes --assign
 ```
 
+### `node scripts/ops/setup-project.mjs`
+
+**Purpose:** Provision the Plaincraft Roadmap GitHub Project (v2) with required fields and config
+
+**Status:** **Migrated** - Guardrails-compliant orchestrator (dry-run by default)
+
+**Current behavior:**
+
+- Validates GitHub CLI availability, auth, and project scope
+- Creates the project (or previews the plan on dry-run)
+- Adds standardized fields (ID, Lane, Acceptance, Units, Metric)
+- Updates `.github/pipeline-config.json` with project metadata
+- Emits a manual follow-up checklist for views/workflows/testing
+
+**Usage:**
+
+```bash
+# Preview setup plan only
+node scripts/ops/setup-project.mjs --dry-run --output json
+
+# Create the project and update pipeline config
+node scripts/ops/setup-project.mjs --yes --project-name "Plaincraft Roadmap"
+```
+
 ## Setup & Environment
 
 ### `pnpm gh:prepare`

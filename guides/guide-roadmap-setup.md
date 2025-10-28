@@ -76,7 +76,7 @@ last_verified: 2025-10-28
 # Links
 
 - Template: `/templates/roadmap-project-template.json`
-- Setup script: `/scripts/setup-project.mjs`
+- Setup script: `/scripts/ops/setup-project.mjs`
 - Labels script: `/scripts/setup-labels.mjs`
 - Compliance checklist: `/guides/ROADMAP-COMPLIANCE.md` (archived)
 - Pipeline config: `/.github/pipeline-config.json`

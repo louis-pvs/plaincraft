@@ -129,8 +129,8 @@
     - Note: Git hook, works with consolidate-changelog.mjs
 
 24. ✅ `setup-project.mjs` - GitHub Project setup automation
-    - Status: Basic migration (--help support)
-    - Note: One-time setup tool for GitHub Projects v2
+    - Status: Complete (guardrails-compliant)
+    - Features: Dry-run JSON output, GH auth checks, field provisioning, pipeline config update
 
 25. ✅ `test-storybook.mjs` - Storybook test runner with server management
     - Status: Basic migration (--help support)
@@ -176,7 +176,7 @@ None currently
 - ✅ `pre-commit-changelog.mjs` - Pre-commit changelog validation (basic --help added)
 - ✅ `generate-gh-pages-index.mjs` - Generate GitHub Pages index (fully migrated)
 - ✅ `record-stories.mjs` - Record Storybook stories (fully migrated)
-- ✅ `setup-project.mjs` - Project setup automation (basic --help added)
+- ✅ `setup-project.mjs` - Project setup automation (full guardrails)
 - ✅ `test-storybook.mjs` - Test Storybook components (basic --help added)
 
 ### Templates - Fixed! ✅

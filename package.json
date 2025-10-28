@@ -20,7 +20,7 @@
     "format": "prettier --write .",
     "gh:prepare": "node scripts/prepare-gh.mjs",
     "gh:setup-labels": "node scripts/setup-labels.mjs",
-    "gh:setup-project": "node scripts/setup-project.mjs",
+    "gh:setup-project": "node scripts/ops/setup-project.mjs",
     "gh:worktree": "node scripts/create-worktree-pr.mjs",
     "postcheckout": "node scripts/post-checkout.mjs",
     "ideas:create": "node scripts/ideas-to-issues.mjs",

@@ -33,7 +33,7 @@ graph LR
 ## Components
 
 - `.github/workflows/ideas.yml` - New `ensure-project` job
-- `scripts/setup-project.mjs` - Reused for creation
+- `scripts/ops/setup-project.mjs` - Reused for creation
 - `.github/pipeline-config.json` - Auto-committed config
 
 ## Invariants
