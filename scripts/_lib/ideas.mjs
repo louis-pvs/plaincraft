@@ -75,40 +75,163 @@ export function getIdeaType(filename) {
  * @param {string} content - File content
  * @returns {object} Parsed metadata
  */
-export function parseIdeaFile(content) {
+function normalizeSectionName(name) {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+}
+
+function mapSections(content) {
+  const sectionsByOriginal = {};
+  const sectionsByNormalized = {};
+  const sectionRegex = /^##\s+(.+?)\s*$/gm;
+  let match;
+  const headings = [];
+
+  while ((match = sectionRegex.exec(content)) !== null) {
+    headings.push({
+      name: match[1].trim(),
+      headingIndex: match.index,
+      contentStart: sectionRegex.lastIndex,
+    });
+  }
+
+  for (let i = 0; i < headings.length; i++) {
+    const current = headings[i];
+    const nextHeadingIndex =
+      i + 1 < headings.length ? headings[i + 1].headingIndex : content.length;
+    const sectionContent = content
+      .slice(current.contentStart, nextHeadingIndex)
+      .trim();
+    const normalized = normalizeSectionName(current.name);
+
+    sectionsByOriginal[current.name] = sectionContent;
+
+    if (!sectionsByNormalized[normalized]) {
+      sectionsByNormalized[normalized] = {
+        name: current.name,
+        content: sectionContent,
+      };
+    }
+  }
+
+  return { sectionsByOriginal, sectionsByNormalized };
+}
+
+function extractParentMetadata(rawParent) {
+  if (!rawParent) {
+    return { parent: null, parentIssue: null, parentSlug: null };
+  }
+
+  const trimmed = rawParent.trim();
+  const parentIssueMatch = trimmed.match(/#(\d+)/);
+  const parentIssue = parentIssueMatch
+    ? parseInt(parentIssueMatch[1], 10)
+    : null;
+
+  let parentSlug = null;
+  const slugMatch = trimmed.match(/\(([^)]+)\)/);
+  if (slugMatch) {
+    parentSlug = slugMatch[1].trim();
+  } else if (parentIssue) {
+    parentSlug = trimmed.replace(/#\d+\s*/, "").trim() || null;
+  } else if (trimmed && !trimmed.includes("#")) {
+    parentSlug = trimmed;
+  }
+
+  return {
+    parent: trimmed,
+    parentIssue,
+    parentSlug,
+  };
+}
+
+export function parseIdeaFile(content, options = {}) {
   const metadata = {
     title: null,
     lane: null,
     issueNumber: null,
+    issue: null,
+    parent: null,
+    parentIssue: null,
+    parentSlug: null,
     sections: {},
+    sectionsNormalized: {},
+    purpose: "",
+    problem: "",
+    proposal: "",
+    filename: options.filename || null,
+    type: options.filename
+      ? getIdeaType(path.basename(options.filename))
+      : null,
   };
 
-  // Extract title
   const titleMatch = content.match(/^#\s+(.+)$/m);
   if (titleMatch) {
     metadata.title = titleMatch[1].trim();
   }
 
-  // Extract lane
   const laneMatch = content.match(/Lane:\s*([A-D])/i);
   if (laneMatch) {
     metadata.lane = laneMatch[1].toUpperCase();
   }
 
-  // Extract issue number
   const issueMatch = content.match(/Issue:\s*#(\d+)/i);
   if (issueMatch) {
     metadata.issueNumber = parseInt(issueMatch[1], 10);
+    metadata.issue = metadata.issueNumber;
   }
 
-  // Extract sections
-  const sectionRegex = /^##\s+(.+)$/gm;
-  let match;
-  while ((match = sectionRegex.exec(content)) !== null) {
-    metadata.sections[match[1].trim()] = true;
+  const parentLineMatch = content.match(/^Parent:\s*(.+)$/m);
+  if (parentLineMatch) {
+    const parentMeta = extractParentMetadata(parentLineMatch[1]);
+    metadata.parent = parentMeta.parent;
+    metadata.parentIssue = parentMeta.parentIssue;
+    metadata.parentSlug = parentMeta.parentSlug;
   }
+
+  const { sectionsByOriginal, sectionsByNormalized } = mapSections(content);
+  metadata.sections = sectionsByOriginal;
+  metadata.sectionsNormalized = sectionsByNormalized;
+
+  const purposeSection =
+    sectionsByNormalized["purpose"]?.content ||
+    sectionsByNormalized["purpose-and-outcome"]?.content ||
+    "";
+  const problemSection =
+    sectionsByNormalized["problem"]?.content ||
+    sectionsByNormalized["opportunity"]?.content ||
+    "";
+  const proposalSection =
+    sectionsByNormalized["proposal"]?.content ||
+    sectionsByNormalized["solution"]?.content ||
+    "";
+
+  metadata.purpose = purposeSection.trim();
+  metadata.problem = problemSection.trim();
+  metadata.proposal = proposalSection.trim();
+  metadata.acceptanceSection =
+    sectionsByNormalized["acceptance-checklist"]?.content ||
+    sectionsByNormalized["acceptance"]?.content ||
+    "";
+  metadata.subIssuesSection =
+    sectionsByNormalized["sub-issues"]?.content ||
+    sectionsByNormalized["subissues"]?.content ||
+    sectionsByNormalized["subissue"]?.content ||
+    "";
 
   return metadata;
+}
+
+export async function loadIdeaFile(filePath) {
+  const content = await readFile(filePath, "utf-8");
+  const metadata = parseIdeaFile(content, {
+    filename: path.basename(filePath),
+  });
+  return { content, metadata, filePath };
 }
 
 /**
@@ -141,7 +264,7 @@ export async function validateIdeaFile(filePath) {
     }
 
     // Parse metadata
-    const metadata = parseIdeaFile(content);
+    const metadata = parseIdeaFile(content, { filename });
 
     // Check for title
     if (!metadata.title) {
@@ -235,22 +358,54 @@ export async function findIdeaFiles(ideasDir, filter = null) {
  * @param {string} content - Idea file content
  * @returns {Array<object>} Sub-issues with id and description
  */
-export function extractSubIssues(content) {
-  const subIssues = [];
-  const subIssuesMatch = content.match(
-    /## Sub-issues\s*([\s\S]*?)(?=\n##|\n$|$)/,
-  );
+export function extractSubIssues(source) {
+  let sectionContent = "";
 
-  if (subIssuesMatch) {
-    const lines = subIssuesMatch[1].split("\n");
-    for (const line of lines) {
-      const match = line.match(/^\d+\.\s+\*\*([A-Z]+-[\w-]+)\*\*\s*-\s*(.+)$/);
-      if (match) {
-        subIssues.push({
-          id: match[1],
-          description: match[2].trim(),
-        });
-      }
+  if (!source) return [];
+
+  if (typeof source === "string") {
+    const match = source.match(
+      /##\s*Sub[\s-]*Issues?\s*([\s\S]*?)(?=\n##|\n$|$)/i,
+    );
+    sectionContent = match ? match[1].trim() : "";
+  } else if (source.sectionsNormalized) {
+    const normalized = source.sectionsNormalized;
+    sectionContent =
+      normalized["sub-issues"]?.content ||
+      normalized["subissues"]?.content ||
+      normalized["subissue"]?.content ||
+      "";
+  } else if (source.subIssuesSection) {
+    sectionContent = source.subIssuesSection;
+  }
+
+  if (!sectionContent) return [];
+
+  const subIssues = [];
+  const lines = sectionContent.split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    const numberedMatch = trimmed.match(
+      /^(?:[-*]|\d+\.)\s*(?:\*\*|__)?([A-Z]+-[\w-]+)(?:\*\*|__)?(?:\s*[-:]\s*|\s+)(.+)?$/,
+    );
+    if (numberedMatch) {
+      subIssues.push({
+        id: numberedMatch[1],
+        description: (numberedMatch[2] || "").trim(),
+      });
+      continue;
+    }
+
+    const referenceMatch = trimmed.match(
+      /^(?:[-*]|\d+\.)\s*(?:\[[ xX]\]\s*)?#(\d+)\s*(.+)?$/,
+    );
+    if (referenceMatch) {
+      subIssues.push({
+        id: `#${referenceMatch[1]}`,
+        description: (referenceMatch[2] || "").trim(),
+      });
     }
   }
 
@@ -262,19 +417,34 @@ export function extractSubIssues(content) {
  * @param {string} content - Idea file content
  * @returns {Array<string>} Checklist items
  */
-export function extractChecklistItems(content) {
-  const items = [];
-  const checklistMatch = content.match(
-    /## Acceptance Checklist\s*([\s\S]*?)(?=\n##|\n$|$)/,
-  );
+export function extractChecklistItems(source) {
+  let sectionContent = "";
 
-  if (checklistMatch) {
-    const lines = checklistMatch[1].split("\n");
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith("- [ ]") || trimmed.startsWith("- [x]")) {
-        items.push(trimmed.substring(6).trim());
-      }
+  if (!source) return [];
+
+  if (typeof source === "string") {
+    const match = source.match(
+      /##\s*Acceptance Checklist\s*([\s\S]*?)(?=\n##|\n$|$)/i,
+    );
+    sectionContent = match ? match[1] : source;
+  } else if (source.sectionsNormalized) {
+    const normalized = source.sectionsNormalized;
+    sectionContent =
+      normalized["acceptance-checklist"]?.content ||
+      normalized["acceptance"]?.content ||
+      "";
+  } else if (source.acceptanceSection) {
+    sectionContent = source.acceptanceSection;
+  }
+
+  if (!sectionContent) return [];
+
+  const items = [];
+  const lines = sectionContent.split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (/^-\s*\[[x\s]\]/i.test(trimmed)) {
+      items.push(trimmed.replace(/^- \[[x\s]\]\s*/i, "").trim());
     }
   }
 

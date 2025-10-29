@@ -8,6 +8,6 @@
 import { exec } from "node:child_process";
 
 // Dangerous patterns
-const token = process.env.API_TOKEN;
+const _token = process.env.API_TOKEN;
 exec("sudo rm -rf /tmp/test");
 eval("console.log('dangerous')");

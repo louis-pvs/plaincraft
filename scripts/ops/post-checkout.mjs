@@ -182,8 +182,7 @@ async function executePostCheckout(args, log) {
   const root = await repoRoot(args.cwd);
 
   log.info("Post-checkout setup starting...");
-  const bootstrapped =
-    process.env.PLAINCRAFT_BOOTSTRAPPED_NODE_MODULES === "1";
+  const bootstrapped = process.env.PLAINCRAFT_BOOTSTRAPPED_NODE_MODULES === "1";
 
   // Get package.json
   const pkgPath = path.join(root, "package.json");

@@ -152,7 +152,7 @@ async function scanTemplates(templatesDir, log) {
 /**
  * Find which guides reference which templates
  */
-async function findGuideReferences(guidesDir, log) {
+async function findGuideReferences(guidesDir, _log) {
   const refs = {};
 
   if (!existsSync(guidesDir)) return refs;

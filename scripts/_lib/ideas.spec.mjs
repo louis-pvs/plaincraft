@@ -137,10 +137,11 @@ Some problem
 
     const result = parseIdeaFile(content);
 
-    expect(result.sections.Lane).toBe(true);
-    expect(result.sections.Purpose).toBe(true);
-    expect(result.sections.Problem).toBe(true);
-    expect(result.sections["Acceptance Checklist"]).toBe(true);
+    expect(result.sections.Lane).toBe("Lane: A");
+    expect(result.sections.Purpose).toBe("Some purpose");
+    expect(result.sections.Problem).toBe("Some problem");
+    expect(result.sections["Acceptance Checklist"]).toContain("- [ ] Item 1");
+    expect(result.sectionsNormalized["purpose"].content).toBe("Some purpose");
   });
 
   it("should return null values when content missing", () => {
@@ -165,6 +166,41 @@ Some problem
 
     expect(result.title).toBe("Title With Spaces");
     expect(result.lane).toBe("C");
+  });
+
+  it("should capture parent issue metadata", () => {
+    const content = `# Title
+
+Parent: #42 (ARCH-parent-idea)
+`;
+    const result = parseIdeaFile(content);
+
+    expect(result.parent).toBe("#42 (ARCH-parent-idea)");
+    expect(result.parentIssue).toBe(42);
+    expect(result.parentSlug).toBe("ARCH-parent-idea");
+  });
+
+  it("should capture sections for purpose/problem/proposal", () => {
+    const content = `# Title
+
+## Purpose
+
+Purpose line
+
+## Problem
+
+Problem context
+
+## Proposal
+
+Proposal details
+`;
+
+    const result = parseIdeaFile(content);
+
+    expect(result.purpose).toBe("Purpose line");
+    expect(result.problem).toBe("Problem context");
+    expect(result.proposal).toBe("Proposal details");
   });
 });
 
@@ -671,6 +707,20 @@ Not a numbered item
 
     expect(result[0].description).toBe("Description with spaces");
   });
+
+  it("should read sub-issues from parsed metadata", () => {
+    const content = `# Title
+
+## Sub-Issues
+
+1. **ARCH-sub** - Details here
+`;
+
+    const metadata = parseIdeaFile(content);
+    const result = extractSubIssues(metadata);
+
+    expect(result).toEqual([{ id: "ARCH-sub", description: "Details here" }]);
+  });
 });
 
 describe("extractChecklistItems", () => {
@@ -792,5 +842,20 @@ describe("extractChecklistItems", () => {
 
     expect(result).toHaveLength(2);
     expect(result).not.toContain("This should not be included");
+  });
+
+  it("should read checklist items from parsed metadata", () => {
+    const content = `# Title
+
+## Acceptance Checklist
+
+- [ ] One
+- [x] Two
+`;
+
+    const metadata = parseIdeaFile(content);
+    const result = extractChecklistItems(metadata);
+
+    expect(result).toEqual(["One", "Two"]);
   });
 });

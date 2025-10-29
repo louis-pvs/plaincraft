@@ -5,7 +5,7 @@
  * Large script for size compliance testing
  */
 
-function veryLargeFunction() {
+function _veryLargeFunction() {
   console.log("line 1");
   console.log("line 2");
   console.log("line 3");

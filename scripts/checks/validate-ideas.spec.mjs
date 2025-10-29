@@ -3,11 +3,11 @@
  * Regression tests for validateIdeas helper.
  */
 
-import { describe, it, expect } from "vitest";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { mkdtemp, mkdir, rm } from "node:fs/promises";
+import { describe, it, expect } from "vitest";
 import { validateIdeas } from "./validate-ideas.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

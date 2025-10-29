@@ -153,13 +153,58 @@ async function updateParentWithChildren(parentNumber, children, log) {
       return;
     }
 
+    const existingBody = parent.body || "";
+    const subIssuesRegex = /##\s*Sub-Issues\s*([\s\S]*?)(?=\n##|\n$|$)/i;
+
+    const previousStatuses = new Map();
+    const existingSectionMatch = existingBody.match(subIssuesRegex);
+    if (existingSectionMatch && existingSectionMatch[1]) {
+      const lines = existingSectionMatch[1].split("\n");
+      for (const line of lines) {
+        const statusMatch = line.match(/- \[(x|\s)\]\s+#(\d+)/i);
+        if (statusMatch) {
+          const issueId = parseInt(statusMatch[2], 10);
+          if (!Number.isNaN(issueId)) {
+            previousStatuses.set(
+              issueId,
+              statusMatch[1].trim().toLowerCase() === "x",
+            );
+          }
+        }
+      }
+    }
+
     // Build task list
     const taskList = children
-      .map((child) => `- [ ] #${child.number} ${child.title}`)
+      .map((child) => {
+        const issueNumber = Number(child.number);
+        const isComplete =
+          !Number.isNaN(issueNumber) && previousStatuses.get(issueNumber);
+        const checkbox = isComplete ? "x" : " ";
+        return `- [${checkbox}] #${child.number} ${child.title}`;
+      })
       .join("\n");
 
-    // Append to body
-    const updatedBody = `${parent.body || ""}\n\n## Sub-Issues\n\n${taskList}`;
+    const sectionHeader = "## Sub-Issues";
+    const sectionContent =
+      taskList.length > 0
+        ? `${sectionHeader}\n\n${taskList}`
+        : `${sectionHeader}\n`;
+
+    let updatedBody;
+    if (subIssuesRegex.test(existingBody)) {
+      updatedBody = existingBody.replace(subIssuesRegex, sectionContent);
+    } else {
+      const trimmed = existingBody.trimEnd();
+      updatedBody =
+        trimmed.length > 0
+          ? `${trimmed}\n\n${sectionContent}`
+          : `${sectionContent}`;
+    }
+
+    if (!updatedBody.endsWith("\n")) {
+      updatedBody += "\n";
+    }
 
     await updateIssue(parentNumber, { body: updatedBody });
     log.info(

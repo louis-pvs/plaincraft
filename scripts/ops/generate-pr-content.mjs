@@ -24,7 +24,11 @@ import {
 } from "../_lib/core.mjs";
 import { execCommand } from "../_lib/git.mjs";
 import { getIssue } from "../_lib/github.mjs";
-import { parseIdeaFile, findIdeaFiles } from "../_lib/ideas.mjs";
+import {
+  loadIdeaFile,
+  findIdeaFiles,
+  extractChecklistItems,
+} from "../_lib/ideas.mjs";
 
 const SCRIPT_NAME = "generate-pr-content";
 const rawArgs = parseFlags(process.argv.slice(2));
@@ -87,7 +91,7 @@ async function findIdeaFileForIssue(issueNumber, log, root) {
     const allIdeas = await findIdeaFiles(ideasDir);
     for (const ideaFile of allIdeas) {
       const ideaPath = join(ideasDir, ideaFile);
-      const parsed = await parseIdeaFile(ideaPath);
+      const parsed = await loadIdeaFile(ideaPath);
       if (parsed.metadata.issue === issueNumber) return ideaPath;
     }
 
@@ -421,62 +425,118 @@ ${issueNumber ? `**Linked issue**: #${issueNumber}` : "*Update with ticket refer
 async function generateContentFromIdea(ideaFilePath, issueNumber, log) {
   log.info(`Generating PR content from idea file: ${ideaFilePath}`);
 
-  const parsed = await parseIdeaFile(ideaFilePath);
+  const parsed = await loadIdeaFile(ideaFilePath);
   const ideaFileName = ideaFilePath.split("/").pop();
+  const metadata = parsed.metadata || {};
 
-  // Extract sections from parsed content
-  const problemMatch = parsed.content.match(
-    /## Problem\s*([\s\S]*?)(?=\n##|$)/,
-  );
-  const proposalMatch = parsed.content.match(
-    /## Proposal\s*([\s\S]*?)(?=\n##|$)/,
-  );
-  const checklistMatch = parsed.content.match(
-    /## Acceptance Checklist\s*([\s\S]*?)(?=\n##|\n$)/,
-  );
+  const purpose = metadata.purpose ? metadata.purpose.trim() : "";
+  const fallbackSection = (regex) => {
+    const match = parsed.content.match(regex);
+    return match ? match[1].trim() : "";
+  };
 
-  const problem = problemMatch ? problemMatch[1].trim() : "";
-  const proposal = proposalMatch ? proposalMatch[1].trim() : "";
+  const problem =
+    metadata.problem?.trim() ||
+    fallbackSection(/## Problem\s*([\s\S]*?)(?=\n##|$)/i);
+  const proposal =
+    metadata.proposal?.trim() ||
+    fallbackSection(/## Proposal\s*([\s\S]*?)(?=\n##|$)/i);
 
-  let acceptance = [];
-  if (checklistMatch) {
-    acceptance = checklistMatch[1]
-      .split("\n")
-      .filter((line) => line.trim().startsWith("- [ ]"))
-      .map((line) => line.trim());
-  }
-
-  if (acceptance.length === 0) {
-    acceptance = [
-      "- [ ] All CI checks passing",
-      "- [ ] Code reviewed",
-      "- [ ] Documentation updated",
-      "- [ ] Integration window (at :00 or :30)",
+  let acceptanceItems = extractChecklistItems(metadata);
+  if (acceptanceItems.length === 0) {
+    acceptanceItems = [
+      "All CI checks passing",
+      "Code reviewed",
+      "Documentation updated",
+      "Integration window (at :00 or :30)",
     ];
   }
 
-  const title = parsed.metadata.title || `Issue #${issueNumber}`;
-  const purpose = parsed.metadata.purpose || "";
+  acceptanceItems = acceptanceItems.map((item) => item.trim()).filter(Boolean);
 
-  const body = `Closes #${issueNumber}
+  const acceptanceLines = acceptanceItems.map((item) => {
+    const trimmed = item.trim();
+    if (/^- \[[x\s]\]/i.test(trimmed)) {
+      return trimmed.replace(/\s+$/, "");
+    }
+    return `- [ ] ${trimmed}`;
+  });
 
-${purpose ? `**Purpose:** ${purpose}\n` : ""}
-## Problem
+  const parentIssueNumber =
+    typeof metadata.parentIssue === "number" ? metadata.parentIssue : null;
+  let parentTitle = metadata.parentSlug || "";
+  const hasParentSlug = Boolean(metadata.parentSlug);
 
-${problem}
+  if (parentIssueNumber) {
+    try {
+      const parentIssue = await getIssue(parentIssueNumber);
+      if (parentIssue?.title) {
+        parentTitle = parentIssue.title;
+      }
+    } catch (error) {
+      log.warn(
+        `Failed to fetch parent issue #${parentIssueNumber}: ${error.message}`,
+      );
+    }
+  }
 
-## Proposal
+  const parentBanner =
+    parentIssueNumber !== null
+      ? `Part of #${parentIssueNumber}${parentTitle ? ` ${parentTitle}` : ""}`
+      : hasParentSlug
+        ? `Part of ${parentTitle}`
+        : "";
 
-${proposal}
+  const headerLines = [`Closes #${issueNumber}`];
+  if (parentBanner) {
+    headerLines.push(parentBanner);
+  }
 
-## Acceptance Checklist
+  const title = metadata.title || `Issue #${issueNumber}`;
+  const problemSection =
+    problem && problem.length > 0
+      ? problem
+      : "_No problem statement provided._";
+  const proposalSection =
+    proposal && proposal.length > 0
+      ? proposal
+      : "_No proposal details provided._";
 
-${acceptance.join("\n")}
+  const metaLines = [];
+  if (parentIssueNumber !== null) {
+    metaLines.push(
+      `**Parent:** #${parentIssueNumber}${
+        parentTitle ? ` - ${parentTitle}` : ""
+      }`,
+    );
+  } else if (hasParentSlug) {
+    metaLines.push(`**Parent:** ${parentTitle}`);
+  }
+  metaLines.push(`**Source:** \`/ideas/${ideaFileName}\``);
 
----
+  const bodySegments = [
+    headerLines.join("\n"),
+    "",
+    purpose ? `**Purpose:** ${purpose}` : null,
+    purpose ? "" : null,
+    "## Problem",
+    "",
+    problemSection,
+    "",
+    "## Proposal",
+    "",
+    proposalSection,
+    "",
+    "## Acceptance Checklist",
+    "",
+    acceptanceLines.join("\n"),
+    "",
+    "---",
+    "",
+    metaLines.join("\n"),
+  ].filter((segment) => segment !== null);
 
-**Source:** \`/ideas/${ideaFileName}\`
-`;
+  const body = `${bodySegments.join("\n")}\n`;
 
   return { title, body };
 }

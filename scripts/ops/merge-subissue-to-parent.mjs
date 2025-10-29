@@ -10,12 +10,13 @@
  */
 
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { z } from "zod";
 import { Logger, parseFlags, fail, succeed, repoRoot } from "../_lib/core.mjs";
 import { execCommand } from "../_lib/git.mjs";
-import { getIssue } from "../_lib/github.mjs";
-import { parseIdeaFile, findIdeaFiles } from "../_lib/ideas.mjs";
+import { getIssue, getPR, updatePR, updateIssue } from "../_lib/github.mjs";
+import { loadIdeaFile, findIdeaFiles } from "../_lib/ideas.mjs";
 
 const SCRIPT_NAME = "merge-subissue-to-parent";
 
@@ -40,38 +41,43 @@ async function findIdeaFile(issueNumber, log) {
   try {
     const issue = await getIssue(issueNumber);
     const { title, body } = issue;
+    const root = await repoRoot();
+    const ideasDir = join(root, "ideas");
+    const bodyText = body || "";
 
     log.debug(`Searching for idea file for issue #${issueNumber}`);
 
     // Method 1: Check body for source reference
-    let match = body.match(/Source:\s*`([^`]+)`/);
+    let match = bodyText.match(/Source:\s*`([^`]+)`/);
     if (match) {
       const filePath = match[1];
-      const fullPath = filePath.startsWith("/ideas/")
-        ? resolve(repoRoot(), filePath.slice(1))
-        : resolve(repoRoot(), "ideas", filePath);
+      const normalized = filePath.startsWith("/ideas/")
+        ? filePath.slice(1)
+        : join("ideas", filePath);
+      const fullPath = join(root, normalized);
       if (existsSync(fullPath)) return fullPath;
     }
 
     // Method 2: Check for "See /ideas/..." reference
-    match = body.match(/See\s+\/ideas\/([^\s]+\.md)/);
+    match = bodyText.match(/See\s+\/ideas\/([^\s]+\.md)/);
     if (match) {
-      const fullPath = resolve(repoRoot(), "ideas", match[1]);
+      const fullPath = join(ideasDir, match[1]);
       if (existsSync(fullPath)) return fullPath;
     }
 
     // Method 3: Derive from title
     const titleMatch = title.match(/^([A-Z]+-[a-z0-9-]+)/i);
     if (titleMatch) {
-      const fullPath = resolve(repoRoot(), "ideas", `${titleMatch[1]}.md`);
+      const fullPath = join(ideasDir, `${titleMatch[1]}.md`);
       if (existsSync(fullPath)) return fullPath;
     }
 
     // Method 4: Search all idea files
-    const allIdeas = await findIdeaFiles();
-    for (const ideaPath of allIdeas) {
-      const parsed = await parseIdeaFile(ideaPath);
-      if (parsed.metadata.issue === issueNumber) return ideaPath;
+    const allIdeas = await findIdeaFiles(ideasDir);
+    for (const ideaFilename of allIdeas) {
+      const absolutePath = join(ideasDir, ideaFilename);
+      const parsed = await loadIdeaFile(absolutePath);
+      if (parsed.metadata.issue === issueNumber) return absolutePath;
     }
 
     return null;
@@ -89,9 +95,8 @@ async function findIdeaFile(issueNumber, log) {
  */
 async function getParentIssue(ideaFilePath, log) {
   try {
-    const parsed = await parseIdeaFile(ideaFilePath);
-    const parentMatch = parsed.content.match(/Parent:\s*#(\d+)/);
-    return parentMatch ? parseInt(parentMatch[1], 10) : null;
+    const parsed = await loadIdeaFile(ideaFilePath);
+    return parsed.metadata.parentIssue ?? null;
   } catch (error) {
     log.error(`Error parsing idea file: ${error.message}`);
     return null;
@@ -126,12 +131,222 @@ async function getBranchName(issueNumber, log) {
  * @param {string} branchName - Branch name
  * @returns {string|null} Worktree path
  */
-function findWorktree(branchName) {
-  const root = repoRoot();
+async function findWorktree(branchName) {
+  const root = await repoRoot();
   const worktreeName = `plaincraft-${branchName.replace(/\//g, "-")}`;
   const worktreePath = resolve(root, "..", worktreeName);
 
   return existsSync(worktreePath) ? worktreePath : null;
+}
+
+async function findParentPullRequestNumber(parentIssueNumber, log) {
+  try {
+    const { stdout } = await execCommand("gh", [
+      "pr",
+      "list",
+      "--state",
+      "open",
+      "--search",
+      `Closes #${parentIssueNumber}`,
+      "--json",
+      "number,title",
+      "--limit",
+      "5",
+    ]);
+
+    const prs = JSON.parse(stdout);
+    if (Array.isArray(prs) && prs.length > 0) {
+      return prs[0].number;
+    }
+  } catch (error) {
+    log.debug(
+      `Unable to query parent PR for issue #${parentIssueNumber}: ${error.message}`,
+    );
+  }
+
+  return null;
+}
+
+function buildProgressSection(subIssuesContent) {
+  const lines = subIssuesContent
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  const taskLines = lines.filter((line) => /^- \[[x\s]\]/i.test(line));
+  const completed = taskLines.filter((line) => /^- \[[x]\]/i.test(line)).length;
+  const total = taskLines.length;
+
+  const sectionLines = ["## Sub-Issues Progress", ""];
+
+  if (total > 0) {
+    sectionLines.push(`**Progress:** ${completed} / ${total} complete`, "");
+  }
+
+  if (lines.length > 0) {
+    sectionLines.push(lines.join("\n"));
+  } else {
+    sectionLines.push("_No sub-issues tracked yet._");
+  }
+
+  return sectionLines.join("\n");
+}
+
+export async function updateParentIssueChecklist(
+  parentIssueNumber,
+  subIssueNumber,
+  log,
+  { dryRun = false } = {},
+) {
+  try {
+    const parentIssue = await getIssue(parentIssueNumber);
+    const body = parentIssue?.body || "";
+    const subIssuesRegex = /##\s*Sub-Issues\s*([\s\S]*?)(?=\n##|\n$|$)/i;
+    const match = body.match(subIssuesRegex);
+
+    if (!match || !match[1]) {
+      log.info(
+        `Parent issue #${parentIssueNumber} has no Sub-Issues section to update`,
+      );
+      return { updated: false, reason: "no-section" };
+    }
+
+    const sectionContent = match[1];
+    const lineRegex = new RegExp(
+      `(- \\[[x\\s]\\]\\s+#${subIssueNumber}\\b[^\\n]*)`,
+      "i",
+    );
+
+    if (!lineRegex.test(sectionContent)) {
+      log.info(
+        `No checklist entry found for sub-issue #${subIssueNumber} in parent issue #${parentIssueNumber}`,
+      );
+      return { updated: false, reason: "no-line" };
+    }
+
+    const updatedSection = sectionContent.replace(lineRegex, (line) =>
+      line.replace(/\[[x\s]\]/i, "[x]"),
+    );
+
+    if (updatedSection === sectionContent) {
+      log.debug(
+        `Checklist already marked complete for #${subIssueNumber} in parent issue #${parentIssueNumber}`,
+      );
+      return { updated: false, reason: "no-change" };
+    }
+
+    const normalizedSection = updatedSection.trim();
+    const replacement = `## Sub-Issues\n\n${normalizedSection}`;
+    let nextBody = body.replace(subIssuesRegex, replacement);
+
+    if (!nextBody.endsWith("\n")) {
+      nextBody += "\n";
+    }
+
+    if (dryRun) {
+      log.info(
+        `[DRY-RUN] Would mark sub-issue #${subIssueNumber} complete in parent issue #${parentIssueNumber}`,
+      );
+      return { updated: false, reason: "dry-run" };
+    }
+
+    await updateIssue(parentIssueNumber, { body: nextBody });
+    log.info(
+      `Marked sub-issue #${subIssueNumber} complete in parent issue #${parentIssueNumber}`,
+    );
+    return { updated: true };
+  } catch (error) {
+    log.warn(
+      `Failed to update parent issue #${parentIssueNumber}: ${error.message}`,
+    );
+    return { updated: false, reason: "error", error: error.message };
+  }
+}
+
+export async function updateParentPullRequest(
+  parentIssueNumber,
+  subIssueNumber,
+  log,
+  { dryRun = false } = {},
+) {
+  try {
+    const prNumber = await findParentPullRequestNumber(parentIssueNumber, log);
+
+    if (!prNumber) {
+      log.info(`No open PR found for parent issue #${parentIssueNumber}`);
+      return { updated: false, prNumber: null, reason: "no-pr" };
+    }
+
+    const parentIssue = await getIssue(parentIssueNumber);
+    const body = parentIssue?.body || "";
+    const subIssuesMatch = body.match(
+      /##\s*Sub-Issues\s*([\s\S]*?)(?=\n##|\n$|$)/i,
+    );
+
+    if (!subIssuesMatch || !subIssuesMatch[1].trim()) {
+      log.info(
+        `Parent issue #${parentIssueNumber} has no Sub-Issues section to sync`,
+      );
+      return { updated: false, prNumber, reason: "no-section" };
+    }
+
+    const progressSection = buildProgressSection(subIssuesMatch[1]);
+    const parentPR = await getPR(prNumber);
+    const currentBody = parentPR?.body || "";
+
+    const progressRegex =
+      /##\s*Sub-Issues Progress\s*([\s\S]*?)(?=\n##|\n$|$)/i;
+
+    let nextBody;
+    if (progressRegex.test(currentBody)) {
+      nextBody = currentBody.replace(progressRegex, progressSection);
+    } else if (/##\s*Acceptance Checklist/i.test(currentBody)) {
+      nextBody = currentBody.replace(
+        /##\s*Acceptance Checklist/i,
+        `${progressSection}\n\n## Acceptance Checklist`,
+      );
+    } else if (/\n---/.test(currentBody)) {
+      nextBody = currentBody.replace(/\n---/, `\n\n${progressSection}\n\n---`);
+    } else {
+      const trimmed = currentBody.trimEnd();
+      nextBody =
+        trimmed.length > 0
+          ? `${trimmed}\n\n${progressSection}`
+          : progressSection;
+    }
+
+    if (!nextBody.endsWith("\n")) {
+      nextBody += "\n";
+    }
+
+    if (nextBody === currentBody) {
+      log.debug(`Parent PR #${prNumber} already reflects latest progress`);
+      return { updated: false, prNumber, reason: "no-change" };
+    }
+
+    if (dryRun) {
+      log.info(
+        `[DRY-RUN] Would update parent PR #${prNumber} with sub-issue progress from #${subIssueNumber}`,
+      );
+      return { updated: false, prNumber, reason: "dry-run" };
+    }
+
+    await updatePR(prNumber, { body: nextBody });
+    log.info(
+      `Updated parent PR #${prNumber} with sub-issue progress after merging #${subIssueNumber}`,
+    );
+    return { updated: true, prNumber };
+  } catch (error) {
+    log.warn(
+      `Failed to update parent PR for issue #${parentIssueNumber}: ${error.message}`,
+    );
+    return {
+      updated: false,
+      prNumber: null,
+      reason: "error",
+      error: error.message,
+    };
+  }
 }
 
 /**
@@ -174,7 +389,7 @@ async function mergeSubIssueToParent(subIssueNumber, dryRun, log) {
   log.info(`Parent branch: ${parentBranch}`);
 
   // Find parent worktree
-  const parentWorktree = findWorktree(parentBranch);
+  const parentWorktree = await findWorktree(parentBranch);
   if (!parentWorktree) {
     const expectedPath = resolve(
       repoRoot(),
@@ -192,12 +407,28 @@ async function mergeSubIssueToParent(subIssueNumber, dryRun, log) {
     log.info(`  Fetch: origin/${subBranch}`);
     log.info(`  Merge: origin/${subBranch} → ${parentBranch}`);
     log.info(`  Push: origin/${parentBranch}`);
+    const checklistUpdate = await updateParentIssueChecklist(
+      parentIssueNumber,
+      subIssueNumber,
+      log,
+      { dryRun: true },
+    );
+    const progressUpdate = await updateParentPullRequest(
+      parentIssueNumber,
+      subIssueNumber,
+      log,
+      {
+        dryRun: true,
+      },
+    );
     return {
       subIssueNumber,
       parentIssueNumber,
       subBranch,
       parentBranch,
       parentWorktree,
+      checklistUpdate,
+      progressUpdate,
       merged: false,
     };
   }
@@ -232,12 +463,19 @@ async function mergeSubIssueToParent(subIssueNumber, dryRun, log) {
     log.info(
       `Successfully merged sub-issue #${subIssueNumber} to parent #${parentIssueNumber}`,
     );
-    log.info("Next steps:");
-    log.info("  1. Verify changes in parent PR");
-    log.info(
-      `  2. Close sub-issue #${subIssueNumber} with reference to parent`,
+    log.info("Automation follow-up:");
+    log.info("  - Updating parent issue checklist");
+    const checklistUpdate = await updateParentIssueChecklist(
+      parentIssueNumber,
+      subIssueNumber,
+      log,
     );
-    log.info("  3. Update parent issue task list to mark sub-issue complete");
+    log.info("  - Refreshing parent PR progress");
+    const progressUpdate = await updateParentPullRequest(
+      parentIssueNumber,
+      subIssueNumber,
+      log,
+    );
 
     return {
       subIssueNumber,
@@ -245,6 +483,8 @@ async function mergeSubIssueToParent(subIssueNumber, dryRun, log) {
       subBranch,
       parentBranch,
       parentWorktree,
+      checklistUpdate,
+      progressUpdate,
       merged: true,
     };
   } catch (error) {
@@ -399,4 +639,11 @@ Exit codes:
   }
 }
 
-main();
+const entryUrl =
+  typeof process.argv[1] === "string"
+    ? pathToFileURL(process.argv[1]).href
+    : null;
+
+if (entryUrl === import.meta.url) {
+  main();
+}
