@@ -313,6 +313,17 @@ try {
 }
 ```
 
+### `_lib/ideas.mjs`
+
+```js
+import {
+  loadIdeaFile, // Read idea markdown with metadata + checklist extraction
+  findIdeaFiles, // Discover idea cards under /ideas
+  extractChecklistItems, // Parse acceptance checklist entries
+  extractSubIssues, // Pull Sub-issues section metadata
+} from "./_lib/ideas.mjs";
+```
+
 ---
 
 ## Testing

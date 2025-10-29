@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /**
  * validate-commit-headers.mjs
+ * @since 2025-10-28
+ * @version 1.0.0
  * Aggregates commit header validation for CI and automation.
  */
 
@@ -14,8 +16,11 @@ const SCRIPT_NAME = "validate-commit-headers";
 
 const ArgsSchema = z.object({
   help: z.boolean().default(false),
+  dryRun: z.boolean().default(true),
+  yes: z.boolean().default(false),
   output: z.enum(["text", "json"]).default("text"),
   logLevel: z.enum(["trace", "debug", "info", "warn", "error"]).default("info"),
+  cwd: z.string().optional(),
   commitListFile: z.string().optional(),
   branchId: z.string().optional(),
 });
@@ -79,12 +84,23 @@ Validates one commit header per line using the commit-msg hook validator.
 Examples:
   gh pr view 123 --json commits -q '.commits[].messageHeadline' | node scripts/ops/${SCRIPT_NAME}.mjs
   node scripts/ops/${SCRIPT_NAME}.mjs --commit-list-file commits.txt
+
+Flags:
+  --dry-run           Preview mode (default true)
+  --yes               Execute mode (sets dry-run=false)
+  --output <fmt>      text | json (default text)
+  --log-level <lvl>   trace|debug|info|warn|error (default info)
+  --cwd <path>        Repository root (defaults to cwd)
 `);
     process.exit(0);
   }
 
   try {
-    const args = ArgsSchema.parse(flags);
+    const parsed = ArgsSchema.parse(flags);
+    const args = {
+      ...parsed,
+      dryRun: parsed.yes ? false : parsed.dryRun,
+    };
     const raw = await readInput(args.commitListFile);
     const messages = parseMessages(raw);
 
@@ -94,7 +110,7 @@ Examples:
         message: "No commit headers provided",
         exitCode: 0,
         output: args.output,
-        data: { checked: 0, invalid: [] },
+        data: { checked: 0, invalid: [], dryRun: args.dryRun },
       });
       return;
     }
@@ -115,7 +131,7 @@ Examples:
         message: "Invalid commit headers",
         exitCode: 1,
         output: args.output,
-        data: { checked, invalid },
+        data: { checked, invalid, dryRun: args.dryRun },
       });
       return;
     }
@@ -125,7 +141,7 @@ Examples:
       message: "All commit headers valid",
       exitCode: 0,
       output: args.output,
-      data: { checked },
+      data: { checked, dryRun: args.dryRun },
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

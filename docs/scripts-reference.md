@@ -26,6 +26,7 @@ All scripts honour the shared CLI contract:
 | Path                                           | Purpose                                                        | When to run                                                 |
 | ---------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
 | `scripts/ops/create-worktree-pr.mjs`           | Spin up worktree + PR from Issue, hydrate body from idea file  | Kick off implementation after the idea passes validation    |
+| `scripts/ops/generate-pr-content.mjs`          | Build PR title/body from idea cards or changelog entries       | When opening a PR and you need the template prefilled       |
 | `scripts/ops/archive-idea-for-issue.mjs`       | Move finished ideas to archive and close the feedback loop     | After shipping the corresponding PR                         |
 | `scripts/ops/consolidate-changelog.mjs`        | Merge `_tmp` release notes into `CHANGELOG.md` with guardrails | Before publishing a new release                             |
 | `scripts/ops/create-issues-from-changelog.mjs` | Raise follow-up issues for each changelog section              | Immediately after changelog consolidation                   |
@@ -38,12 +39,12 @@ All scripts honour the shared CLI contract:
 
 ## Idea Workflow Helpers
 
-| Command                                                 | Snapshot                                                           |
-| ------------------------------------------------------- | ------------------------------------------------------------------ |
-| `node scripts/ops/ideas-to-issues.mjs <idea>`           | Converts idea cards to GitHub Issues, applies labels, links source |
-| `node scripts/ops/sync-ideas-checklists.mjs`            | Mirrors checklist state between idea files and live issues         |
-| `node scripts/ops/merge-subissue-to-parent.mjs <issue>` | Merges sub-issue branches back into the parent lane                |
-| `node scripts/ops/sync-issue-to-card.mjs <issue>`       | Pulls updated Issue content back into the originating idea file    |
+| Command                                                 | Snapshot                                                                 |
+| ------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `node scripts/ops/ideas-to-issues.mjs <idea>`           | Converts idea cards to GitHub Issues, applies labels, links source       |
+| `node scripts/ops/sync-ideas-checklists.mjs`            | Mirrors checklist state between idea files and live issues               |
+| `node scripts/ops/merge-subissue-to-parent.mjs <issue>` | Merges sub-issue branches back into the parent lane, using idea metadata |
+| `node scripts/ops/sync-issue-to-card.mjs <issue>`       | Pulls updated Issue content back into the originating idea file          |
 
 Or use the pnpm shortcuts:
 

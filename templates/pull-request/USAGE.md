@@ -96,7 +96,7 @@ Fixes #456. Profile component was calling API twice on mount due to missing depe
 
 ```bash
 # Auto-generate PR body from issue
-node scripts/generate-pr-content.mjs --issue 123
+node scripts/ops/generate-pr-content.mjs --issue 123
 
 # Create issue + worktree + PR draft atomically
 node scripts/create-worktree-pr.mjs \
