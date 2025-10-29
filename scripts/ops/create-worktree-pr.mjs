@@ -28,7 +28,7 @@ import {
 } from "../_lib/core.mjs";
 import { createWorktree, removeWorktree } from "../_lib/git.mjs";
 import { getIssue, createPR } from "../_lib/github.mjs";
-import { findIdeaFiles, parseIdeaFile } from "../_lib/ideas.mjs";
+import { findIdeaFiles, loadIdeaFile } from "../_lib/ideas.mjs";
 
 const SCRIPT_NAME = "create-worktree-pr";
 
@@ -178,7 +178,7 @@ async function generatePRBody(issue, ideaFilePath) {
 
   // Use idea file if available
   if (ideaFilePath) {
-    const ideaContent = await parseIdeaFile(ideaFilePath);
+    const ideaContent = await loadIdeaFile(ideaFilePath);
     if (ideaContent && ideaContent.metadata) {
       const { metadata } = ideaContent;
       const ideaFileName = path.basename(ideaFilePath);

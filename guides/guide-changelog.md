@@ -41,13 +41,13 @@ last_verified: 2025-10-28
 3. **Validate structure:**
 
    ```bash
-   # Check commit message format
-   node scripts/commit-msg-hook.mjs "[U-slug] Add feature"
+   # Check commit headers follow ticket policy
+   printf '[ARCH-123] chore(repo): consolidate changelog\n' | node scripts/ops/validate-commit-headers.mjs
    ```
 
 4. **Commit with proper ticket prefix:**
    ```bash
-   git commit -m "[ARCH-changelog-workflow] Consolidate release notes"
+   git commit -m "[ARCH-123] chore(repo): consolidate release notes"
    ```
 
 # Rollback
@@ -57,7 +57,7 @@ last_verified: 2025-10-28
 
 # Requirements
 
-- Commit messages must start with ticket ID: `[U-*]`, `[C-*]`, `[B-*]`, `[ARCH-*]`, `[PB-*]`
+- Commit headers must follow `[ID] type(scope): subject` using IDs: `[ARCH-#]`, `[U-#]`, `[C-#]`, `[B-#]`, `[PB-#]`
 - CHANGELOG.md uses format: `## [<version>] - YYYY-MM-DD`
 - Temporary files in `_tmp/*.md` with title as first `#` heading
 - Each release block organizes with `###` headings: Highlights, Tooling, Rollout Notes
@@ -65,6 +65,7 @@ last_verified: 2025-10-28
 # Links
 
 - Script: `/scripts/ops/consolidate-changelog.mjs`
-- Hook: `/scripts/commit-msg-hook.mjs`
+- Hook: `/scripts/ops/commit-msg-hook.mjs`
+- CI validator: `/scripts/ops/validate-commit-headers.mjs`
 - Template: `/templates/ideas/` (for ticket structure)
 - Pre-commit: `/scripts/pre-commit-changelog.mjs`

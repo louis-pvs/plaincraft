@@ -44,7 +44,7 @@
   "references": {
     "guide": "guides/guide-workflow.md",
     "scripts": [
-      "scripts/generate-pr-content.mjs",
+      "scripts/ops/generate-pr-content.mjs",
       "scripts/create-worktree-pr.mjs",
       "scripts/manual-update-pr-checkboxes.mjs"
     ],
@@ -52,7 +52,7 @@
   },
   "auto_generation": {
     "supported": true,
-    "script": "scripts/generate-pr-content.mjs",
+    "script": "scripts/ops/generate-pr-content.mjs",
     "populated_fields": [
       "issue_reference",
       "changed_files",

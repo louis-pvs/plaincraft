@@ -24,7 +24,7 @@ import {
 } from "../_lib/core.mjs";
 import { execCommand } from "../_lib/git.mjs";
 import { getIssue } from "../_lib/github.mjs";
-import { parseIdeaFile, findIdeaFiles } from "../_lib/ideas.mjs";
+import { loadIdeaFile, findIdeaFiles } from "../_lib/ideas.mjs";
 
 const SCRIPT_NAME = "generate-pr-content";
 const rawArgs = parseFlags(process.argv.slice(2));
@@ -87,8 +87,8 @@ async function findIdeaFileForIssue(issueNumber, log, root) {
     const allIdeas = await findIdeaFiles(ideasDir);
     for (const ideaFile of allIdeas) {
       const ideaPath = join(ideasDir, ideaFile);
-      const parsed = await parseIdeaFile(ideaPath);
-      if (parsed.metadata.issue === issueNumber) return ideaPath;
+      const parsed = await loadIdeaFile(ideaPath);
+      if (parsed.metadata.issueNumber === issueNumber) return ideaPath;
     }
 
     return null;
@@ -421,10 +421,13 @@ ${issueNumber ? `**Linked issue**: #${issueNumber}` : "*Update with ticket refer
 async function generateContentFromIdea(ideaFilePath, issueNumber, log) {
   log.info(`Generating PR content from idea file: ${ideaFilePath}`);
 
-  const parsed = await parseIdeaFile(ideaFilePath);
+  const parsed = await loadIdeaFile(ideaFilePath);
   const ideaFileName = ideaFilePath.split("/").pop();
 
   // Extract sections from parsed content
+  const purposeMatch = parsed.content.match(
+    /## Purpose\s*([\s\S]*?)(?=\n##|$)/,
+  );
   const problemMatch = parsed.content.match(
     /## Problem\s*([\s\S]*?)(?=\n##|$)/,
   );
@@ -435,6 +438,7 @@ async function generateContentFromIdea(ideaFilePath, issueNumber, log) {
     /## Acceptance Checklist\s*([\s\S]*?)(?=\n##|\n$)/,
   );
 
+  const purpose = purposeMatch ? purposeMatch[1].trim() : "";
   const problem = problemMatch ? problemMatch[1].trim() : "";
   const proposal = proposalMatch ? proposalMatch[1].trim() : "";
 
@@ -456,7 +460,6 @@ async function generateContentFromIdea(ideaFilePath, issueNumber, log) {
   }
 
   const title = parsed.metadata.title || `Issue #${issueNumber}`;
-  const purpose = parsed.metadata.purpose || "";
 
   const body = `Closes #${issueNumber}
 

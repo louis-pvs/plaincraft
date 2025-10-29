@@ -48,30 +48,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Verify all commits have tag prefix [U-*], [C-*], [B-*], [ARCH-*], [PB-*], or [D-*]
           commits=$(gh pr view ${{ github.event.pull_request.number }} --json commits -q '.commits[].messageHeadline')
 
-          missing_tags=0
-          invalid_commits=""
-          while IFS= read -r commit; do
-            # Check for any of the valid tag patterns at the start of the message
-            # Must start with [ then one of the prefixes, then -, then anything, then ]
-            if ! echo "$commit" | grep -qE '^\[(U-|C-|B-|ARCH-|PB-|D-)'; then
-              echo "❌ Missing valid tag: $commit"
-              invalid_commits="${invalid_commits}- ${commit}"$'\n'
-              missing_tags=$((missing_tags + 1))
-            fi
-          done <<< "$commits"
-
-          if [ $missing_tags -gt 0 ]; then
-            echo "::error title=Invalid Commit Tags::${missing_tags} commit(s) missing valid tag prefix: [U-*], [C-*], [B-*], [ARCH-*], [PB-*], or [D-*]"
-            # Output invalid commits on separate lines
-            echo "Invalid commits:"
-            echo "$invalid_commits"
+          if ! printf '%s\n' "$commits" | node scripts/ops/validate-commit-headers.mjs; then
+            echo "::error title=Invalid Commit Headers::Commits must follow [ID] type(scope): subject and use numeric ticket ids."
             exit 1
           fi
 
-          echo "✅ All commits have valid tag prefix"
+          echo "✅ All commit headers valid"
 
       - name: Summary
         if: always()
@@ -91,9 +75,9 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ steps.commits.outcome }}" == "success" ]; then
-            echo "✅ **Commit Tags**: Passed" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Commit Headers**: Passed" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ **Commit Tags**: Failed" >> $GITHUB_STEP_SUMMARY
-            echo "- All commits must have valid tag prefix" >> $GITHUB_STEP_SUMMARY
-            echo "- Valid tags: \`[U-*]\`, \`[C-*]\`, \`[B-*]\`, \`[ARCH-*]\`, \`[PB-*]\`, \`[D-*]\`" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Commit Headers**: Failed" >> $GITHUB_STEP_SUMMARY
+            echo "- All commits must follow \`[ID] type(scope): subject\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Valid IDs: \`ARCH-#\`, \`U-#\`, \`C-#\`, \`B-#\`, \`PB-#\`" >> $GITHUB_STEP_SUMMARY
           fi

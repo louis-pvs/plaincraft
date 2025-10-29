@@ -86,6 +86,6 @@ last_verified: 2025-10-28
 # Links
 
 - Templates: `/templates/ideas/`, `/templates/issue-unit/`, `/templates/issue-composition/`, `/templates/pull-request/`
-- Validation + generation: `/scripts/validate-ideas.mjs`, `/scripts/generate-pr-content.mjs`
+- Validation + generation: `/scripts/validate-ideas.mjs`, `/scripts/ops/generate-pr-content.mjs`
 - Issue + worktree automation: `/scripts/ideas-to-issues.mjs`, `/scripts/create-worktree-pr.mjs`
 - Checklist sync: `/scripts/sync-ideas-checklists.mjs`

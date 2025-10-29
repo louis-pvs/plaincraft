@@ -299,3 +299,15 @@ export async function writeJSON(filePath, data) {
 export function getDirname(importMetaUrl) {
   return path.dirname(fileURLToPath(importMetaUrl));
 }
+
+/**
+ * Determine if current module is the entry point
+ * @param {ImportMeta} importMeta - import.meta from the module
+ * @returns {boolean}
+ */
+export function isMain(importMeta) {
+  if (!importMeta || !importMeta.url) return false;
+  const entry = process.argv[1];
+  if (!entry) return false;
+  return path.resolve(entry) === fileURLToPath(importMeta.url);
+}

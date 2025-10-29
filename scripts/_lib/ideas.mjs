@@ -112,6 +112,19 @@ export function parseIdeaFile(content) {
 }
 
 /**
+ * Load idea file from disk and include metadata + derived content.
+ * @param {string} filePath - Path to idea markdown file
+ * @returns {Promise<{metadata: object, content: string, checklistItems: string[]}>}
+ */
+export async function loadIdeaFile(filePath) {
+  const content = await readFile(filePath, "utf-8");
+  const metadata = parseIdeaFile(content);
+  const checklistItems = extractChecklistItems(content);
+
+  return { metadata, content, checklistItems };
+}
+
+/**
  * Validate single idea file
  * @param {string} filePath - Path to idea file
  * @returns {Promise<object>} Validation result

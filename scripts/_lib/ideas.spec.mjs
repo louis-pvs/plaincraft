@@ -9,6 +9,7 @@ import {
   VALIDATION_RULES,
   getIdeaType,
   parseIdeaFile,
+  loadIdeaFile,
   validateIdeaFile,
   findIdeaFiles,
   extractSubIssues,
@@ -165,6 +166,34 @@ Some problem
 
     expect(result.title).toBe("Title With Spaces");
     expect(result.lane).toBe("C");
+  });
+});
+
+describe("loadIdeaFile", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("loads content and metadata from disk", async () => {
+    const content = `# ARCH-example
+
+Lane: C
+
+## Purpose
+Do a thing
+
+## Acceptance Checklist
+- [ ] Task 1
+`;
+
+    readFile.mockResolvedValue(content);
+
+    const result = await loadIdeaFile("/ideas/ARCH-example.md");
+
+    expect(readFile).toHaveBeenCalledWith("/ideas/ARCH-example.md", "utf-8");
+    expect(result.content).toBe(content);
+    expect(result.metadata.title).toBe("ARCH-example");
+    expect(result.checklistItems).toEqual(["Task 1"]);
   });
 });
 

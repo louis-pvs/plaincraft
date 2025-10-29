@@ -39,11 +39,11 @@ Use this template when creating pull requests to provide:
 cp templates/pull-request/pull-request.md .github/pull_request_template.md
 
 # Or use via script (auto-generates PR body)
-node scripts/generate-pr-content.mjs --issue 123
+node scripts/ops/generate-pr-content.mjs --issue 123
 ```
 
 ## Related
 
 - Guide: `guides/guide-workflow.md`
-- Script: `scripts/generate-pr-content.mjs`, `scripts/create-worktree-pr.mjs`
+- Script: `scripts/ops/generate-pr-content.mjs`, `scripts/ops/create-worktree-pr.mjs`
 - Template: `templates/issue-unit/`, `templates/issue-composition/`

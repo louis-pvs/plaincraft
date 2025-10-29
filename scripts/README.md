@@ -198,7 +198,14 @@ import {
 
 - All inputs via flags or environment variables
 - No `readline`, `inquirer`, or similar
-- CI must be able to run headlessly
+
+---
+
+## Commit Policy Tooling
+
+- `scripts/ops/prepare-commit-msg-hook.mjs` pre-fills `[ID] type(scope): subject` headers from the current branch ID.
+- `scripts/ops/commit-msg-hook.mjs` enforces the compact commit format locally and mirrors the CI validator.
+- `scripts/ops/validate-commit-headers.mjs` validates a list of commit headers (stdin or file) and powers the PR commit check.
 
 ### 6. No Secret Handling in Code
 
@@ -304,6 +311,17 @@ try {
   logger.error("Failed:", error.message);
   fail(11, "execution_error", error.message, args.output);
 }
+```
+
+### `_lib/ideas.mjs`
+
+```js
+import {
+  loadIdeaFile, // Read idea markdown with metadata + checklist extraction
+  findIdeaFiles, // Discover idea cards under /ideas
+  extractChecklistItems, // Parse acceptance checklist entries
+  extractSubIssues, // Pull Sub-issues section metadata
+} from "./_lib/ideas.mjs";
 ```
 
 ---
