@@ -45,23 +45,26 @@ export async function getIssue(issueNumber, cwd = process.cwd()) {
  * Create a PR
  * @param {object} options - PR options
  * @param {string} options.title - PR title
- * @param {string} options.body - PR body
+ * @param {string} options.body - PR body (use bodyFile for multiline content)
+ * @param {string} options.bodyFile - Path to file containing PR body
  * @param {string} options.base - Base branch
  * @param {boolean} options.draft - Create as draft
  * @param {string} cwd - Working directory
  * @returns {Promise<object>} PR data
  */
 export async function createPR(options, cwd = process.cwd()) {
-  const args = [
-    "pr",
-    "create",
-    "--title",
-    options.title,
-    "--body",
-    options.body || "",
-    "--base",
-    options.base || "main",
-  ];
+  const args = ["pr", "create", "--title", options.title];
+
+  // Prefer bodyFile over body to avoid shell escaping issues
+  if (options.bodyFile) {
+    args.push("--body-file", options.bodyFile);
+  } else if (options.body) {
+    args.push("--body", options.body);
+  } else {
+    args.push("--body", "");
+  }
+
+  args.push("--base", options.base || "main");
 
   if (options.draft) {
     args.push("--draft");

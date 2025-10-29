@@ -185,6 +185,37 @@ describe("createPR", () => {
     );
   });
 
+  it("should use bodyFile when provided", async () => {
+    execa.mockResolvedValue({
+      stdout: "https://github.com/owner/repo/pull/123",
+    });
+
+    await createPR({ title: "Feature", bodyFile: "/tmp/pr-body.md" });
+
+    expect(execa).toHaveBeenCalledWith(
+      "gh",
+      expect.arrayContaining(["--body-file", "/tmp/pr-body.md"]),
+      expect.any(Object),
+    );
+  });
+
+  it("should prefer bodyFile over body", async () => {
+    execa.mockResolvedValue({
+      stdout: "https://github.com/owner/repo/pull/123",
+    });
+
+    await createPR({
+      title: "Feature",
+      body: "inline body",
+      bodyFile: "/tmp/pr-body.md",
+    });
+
+    const call = execa.mock.calls[0][1];
+    expect(call).toContain("--body-file");
+    expect(call).toContain("/tmp/pr-body.md");
+    expect(call).not.toContain("inline body");
+  });
+
   it("should use provided cwd", async () => {
     execa.mockResolvedValue({ stdout: "url" });
 

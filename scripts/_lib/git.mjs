@@ -67,11 +67,16 @@ export async function getRecentCommits(count = 10, cwd = process.cwd()) {
  * Create a new worktree
  * @param {string} path - Worktree path
  * @param {string} branch - Branch name
- * @param {string} cwd - Working directory
+ * @param {object} options - Options
+ * @param {string} options.cwd - Working directory
+ * @param {string} options.baseBranch - Base branch to branch from
  * @returns {Promise<void>}
  */
-export async function createWorktree(path, branch, cwd = process.cwd()) {
-  await execa("git", ["worktree", "add", "-b", branch, path], { cwd });
+export async function createWorktree(path, branch, options = {}) {
+  const { cwd = process.cwd(), baseBranch = "main" } = options;
+  await execa("git", ["worktree", "add", "-b", branch, path, baseBranch], {
+    cwd,
+  });
 }
 
 /**

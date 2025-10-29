@@ -53,6 +53,12 @@ pnpm ideas:sync             # sync-ideas-checklists
 pnpm ideas:validate         # validate-ideas
 ```
 
+### `create-worktree-pr.mjs` notes
+
+- Accepts `--base <branch>` to specify the base branch for worktree creation (defaults to `main`)
+- The script runs git commands from the repository root, eliminating `spawn git ENOENT` errors in sandboxed environments
+- Terminal output includes a confirmation log showing the resolved base branch for debugging
+
 ### `validate-ideas.mjs` quick reference
 
 - Supports Unit (`U-`), Composition (`C-`), Architecture (`ARCH-`), Playbook (`PB-`), Bug (`B-`), and brief (lowercase) idea cards.

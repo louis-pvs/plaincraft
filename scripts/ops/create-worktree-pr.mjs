@@ -14,7 +14,8 @@
  */
 
 import path from "node:path";
-import { access, cp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { access, rm, writeFile } from "node:fs/promises";
 import { z } from "zod";
 import { execa } from "execa";
 import {
@@ -125,17 +126,21 @@ async function bootstrapNodeModules(sourceRoot, worktreePath, log) {
     // Ignore cleanup errors; force handles most cases
   }
 
-  log.info("Bootstrapping node_modules into worktree...");
+  log.info(
+    "Bootstrapping node_modules into worktree (this may take a minute)...",
+  );
   try {
-    await cp(sourceNodeModules, targetNodeModules, {
-      recursive: true,
-      force: true,
-      dereference: true,
+    // Use cp command for faster copying with progress indication
+    const startTime = Date.now();
+    await execa("cp", ["-rL", sourceNodeModules, targetNodeModules], {
+      cwd: worktreePath,
     });
-    log.info("node_modules bootstrapped");
+    const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+    log.info(`node_modules bootstrapped in ${duration}s`);
     return true;
   } catch (error) {
     log.warn(`Failed to bootstrap node_modules: ${error.message}`);
+    log.warn("Worktree will need to run pnpm install manually");
     return false;
   }
 }
@@ -365,6 +370,7 @@ async function executeWorkflow(args, log) {
   // Generate branch name
   const branchName = generateBranchName(issue.title);
   log.info(`Branch: ${branchName}`);
+  log.info(`Base branch: ${args.baseBranch}`);
 
   // Generate worktree path
   const worktreePath = generateWorktreePath(branchName, args.worktreeDir, root);
@@ -400,7 +406,10 @@ async function executeWorkflow(args, log) {
 
   // Create worktree
   log.info("Creating worktree...");
-  await createWorktree(worktreePath, branchName, args.baseBranch);
+  await createWorktree(worktreePath, branchName, {
+    cwd: root,
+    baseBranch: args.baseBranch,
+  });
 
   const bootstrappedDependencies = await bootstrapNodeModules(
     root,
@@ -453,25 +462,27 @@ async function executeWorkflow(args, log) {
   // Generate PR body
   const prBody = await generatePRBody(issue, ideaFilePath);
 
-  // Write body to temp file
-  const bodyFile = `/tmp/pr-body-${Date.now()}.md`;
+  // Write body to temp file using OS temp directory
+  const bodyFile = path.join(tmpdir(), `pr-body-${Date.now()}.md`);
   await atomicWrite(bodyFile, prBody);
 
   // Create PR
   log.info("Creating PR...");
-  const prUrl = await createPR(
-    issue.title,
-    branchName,
-    prBody,
-    args.draft,
-    issue.labels,
+  const prResult = await createPR(
+    {
+      title: issue.title,
+      bodyFile,
+      base: args.baseBranch,
+      draft: args.draft,
+    },
+    root,
   );
 
   return {
     issue,
     branchName,
     worktreePath,
-    prUrl,
+    prUrl: prResult.url,
   };
 }
 
