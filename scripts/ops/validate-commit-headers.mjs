@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 import { stdin } from "node:process";
 import { z } from "zod";
-import { Logger, parseFlags, fail, succeed } from "../_lib/core.mjs";
+import { Logger, parseFlags, fail, succeed, isMain } from "../_lib/core.mjs";
 import { validateHeader } from "./commit-msg-hook.mjs";
 
 const SCRIPT_NAME = "validate-commit-headers";
@@ -147,6 +147,6 @@ Examples:
   }
 }
 
-if (import.meta.main) {
+if (isMain(import.meta)) {
   main();
 }

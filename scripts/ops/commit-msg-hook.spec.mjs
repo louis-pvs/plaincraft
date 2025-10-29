@@ -1,4 +1,8 @@
 import { describe, it, expect } from "vitest";
+import { writeFile, mkdtemp } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { execa } from "execa";
 import {
   extractHeaderLine,
   extractTicketId,
@@ -99,5 +103,28 @@ Refs: ARCH-100, U-5
   it("extracts ticket ids in any case", () => {
     expect(extractTicketId("feat/arch-10-prepare-hook")).toBe("ARCH-10");
     expect(extractTicketId("fix/U-2-demo")).toBe("U-2");
+  });
+
+  it("fails the CLI when header is invalid", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "commit-hook-"));
+    const file = join(dir, "COMMIT_MSG");
+    await writeFile(file, "Add feature without ticket\n");
+
+    await expect(
+      execa("node", [join(process.cwd(), "scripts/ops/commit-msg-hook.mjs"), file]),
+    ).rejects.toMatchObject({ exitCode: 1 });
+  });
+
+  it("passes the CLI when header is valid", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "commit-hook-valid-"));
+    const file = join(dir, "COMMIT_MSG");
+    await writeFile(file, "[ARCH-10] fix(ui): repair bug\n");
+
+    const result = await execa("node", [
+      join(process.cwd(), "scripts/ops/commit-msg-hook.mjs"),
+      file,
+    ]);
+
+    expect(result.exitCode).toBe(0);
   });
 });

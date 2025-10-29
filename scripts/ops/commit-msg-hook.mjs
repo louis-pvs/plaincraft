@@ -8,7 +8,7 @@
 
 import { readFileSync } from "node:fs";
 import { z } from "zod";
-import { Logger, parseFlags, fail, succeed } from "../_lib/core.mjs";
+import { Logger, parseFlags, fail, succeed, isMain } from "../_lib/core.mjs";
 import { getCurrentBranch } from "../_lib/git.mjs";
 
 const SCRIPT_NAME = "commit-msg-hook";
@@ -271,6 +271,7 @@ Rules enforced:
         output: args.output,
         error,
       });
+      return;
     }
 
     const header = extractHeaderLine(rawCommitMsg);
@@ -310,6 +311,7 @@ Rules enforced:
           ...result,
         },
       });
+      return;
     }
 
     if (result.data?.skipped) {
@@ -340,6 +342,7 @@ Rules enforced:
         output: flags.output || "text",
         error,
       });
+      return;
     }
 
     fail({
@@ -348,9 +351,10 @@ Rules enforced:
       output: flags.output || "text",
       error,
     });
+    return;
   }
 }
 
-if (import.meta.main) {
+if (isMain(import.meta)) {
   main();
 }

@@ -20,7 +20,9 @@ import {
   readJSON,
   writeJSON,
   getDirname,
+  isMain,
 } from "./core.mjs";
+import { pathToFileURL } from "node:url";
 
 // Mock fs module
 vi.mock("node:fs/promises");
@@ -101,6 +103,21 @@ describe("Logger", () => {
       "message",
       123,
     );
+  });
+});
+
+describe("isMain", () => {
+  it("returns true when argv[1] matches module", () => {
+    const originalArgv = process.argv.slice();
+    const fakePath = "/tmp/test-script.mjs";
+    try {
+      process.argv[1] = fakePath;
+      expect(isMain({ url: pathToFileURL(fakePath).href })).toBe(true);
+      process.argv[1] = "/tmp/other.mjs";
+      expect(isMain({ url: pathToFileURL(fakePath).href })).toBe(false);
+    } finally {
+      process.argv = originalArgv;
+    }
   });
 });
 

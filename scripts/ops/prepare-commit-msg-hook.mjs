@@ -7,7 +7,7 @@
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { z } from "zod";
-import { Logger, parseFlags, succeed, fail } from "../_lib/core.mjs";
+import { Logger, parseFlags, succeed, fail, isMain } from "../_lib/core.mjs";
 import { getCurrentBranch } from "../_lib/git.mjs";
 import { extractTicketId } from "./commit-msg-hook.mjs";
 
@@ -157,6 +157,7 @@ Rules:
         output: args.output,
         error,
       });
+      return;
     }
 
     const lines = fileContents.split(/\r?\n/);
@@ -200,6 +201,7 @@ Rules:
         output: flags.output || "text",
         error,
       });
+      return;
     }
 
     fail({
@@ -208,9 +210,10 @@ Rules:
       output: flags.output || "text",
       error,
     });
+    return;
   }
 }
 
-if (import.meta.main) {
+if (isMain(import.meta)) {
   main();
 }

@@ -1,8 +1,7 @@
 {
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
-      "file": "../ideas/ARCH-agent-commit-compliance.md",
-      "text": "`[ID] type(scope): subject`where `ID` is a **short ticket id** (`ARCH-123`, `U-58`, etc.). The long **slug lives in the PR title and changelog**, not in every commit."
+      "file": ".github/commit-instructions.md"
     }
   ]
 }
