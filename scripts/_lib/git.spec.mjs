@@ -270,20 +270,32 @@ describe("createWorktree", () => {
 
     expect(execa).toHaveBeenCalledWith(
       "git",
-      ["worktree", "add", "-b", "feature-branch", "/path/to/worktree"],
-      expect.any(Object),
+      ["worktree", "add", "-b", "feature-branch", "/path/to/worktree", "main"],
+      expect.objectContaining({ cwd: process.cwd() }),
     );
   });
 
   it("should use provided cwd", async () => {
     execa.mockResolvedValue({});
 
-    await createWorktree("/worktree", "branch", "/custom/path");
+    await createWorktree("/worktree", "branch", { cwd: "/custom/path" });
 
     expect(execa).toHaveBeenCalledWith(
       "git",
-      ["worktree", "add", "-b", "branch", "/worktree"],
+      ["worktree", "add", "-b", "branch", "/worktree", "main"],
       { cwd: "/custom/path" },
+    );
+  });
+
+  it("should use provided base branch", async () => {
+    execa.mockResolvedValue({});
+
+    await createWorktree("/worktree", "branch", { baseBranch: "develop" });
+
+    expect(execa).toHaveBeenCalledWith(
+      "git",
+      ["worktree", "add", "-b", "branch", "/worktree", "develop"],
+      expect.objectContaining({ cwd: process.cwd() }),
     );
   });
 
