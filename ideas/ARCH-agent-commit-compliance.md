@@ -3,6 +3,7 @@
 Lane: C (DevOps & Automation)
 Tag: `ARCH-agent-commit-compliance`
 Owner: Pair C
+Issue: #72
 
 ## Lane
 
