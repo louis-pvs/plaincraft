@@ -116,6 +116,7 @@
     "npm": ">=10.0.0"
   },
   "simple-git-hooks": {
+    "prepare-commit-msg": "node scripts/ops/prepare-commit-msg-hook.mjs $1 $2 $3",
     "pre-commit": "npx lint-staged",
     "commit-msg": "node scripts/ops/commit-msg-hook.mjs $1"
   },

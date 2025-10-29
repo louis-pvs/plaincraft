@@ -70,7 +70,7 @@ where `ID` is a **short ticket id** (`ARCH-123`, `U-58`, etc.). The long **slug 
      If ambiguous, the agent must ask.
 
 3. **Conventional Commit atoms**
-   `type` in `{feat, fix, perf, refactor, chore, docs, test, build, ci}`
+   `type` in `{feat, fix, perf, refactor, chore, docs, test, build, ci, revert}`
    `scope` is optional and kebab-case. `subject` is imperative, ≤ 72 chars.
 
 4. **Length caps**
@@ -95,7 +95,7 @@ where `ID` is a **short ticket id** (`ARCH-123`, `U-58`, etc.). The long **slug 
 **Regexes**
 
 - Validation:
-  `^\[(ARCH|U|C|B|PB)-\d+\]\s+(feat|fix|perf|refactor|chore|docs|test|build|ci)(\([a-z0-9-]+\))?:\s.{1,72}$`
+  `^\[(ARCH|U|C|B|PB)-\d+\]\s+(feat|fix|perf|refactor|chore|docs|test|build|ci|revert)(\([a-z0-9-]+\))?:\s.{1,72}$`
 - Slug ban (block):
   `^\[[A-Z]+-[a-z0-9-]{6,}\]` ← if this matches, reject
 
@@ -109,6 +109,10 @@ where `ID` is a **short ticket id** (`ARCH-123`, `U-58`, etc.). The long **slug 
 - Reject on regex mismatch.
 - Reject if slug detected in header.
 - Hard-fail if no ID resolvable and no interactive context.
+
+**CI validator**
+
+- `scripts/ops/validate-commit-headers.mjs` exposes the same validation logic for CI jobs, CLI usage, and bulk scans.
 
 **Agent instruction delta**
 
@@ -130,12 +134,12 @@ where `ID` is a **short ticket id** (`ARCH-123`, `U-58`, etc.). The long **slug 
 
 ## Acceptance Checklist
 
-- [ ] `commit-msg` hook rejects headers without `[ID] type: subject`
-- [ ] `prepare-commit-msg` prepopulates from branch `([A-Z]+-\d+)`
-- [ ] CI job fails if any commit in the PR violates policy
+- [x] `commit-msg` hook rejects headers without `[ID] type: subject`
+- [x] `prepare-commit-msg` prepopulates from branch `([A-Z]+-\d+)`
+- [x] CI job fails if any commit in the PR violates policy
 - [ ] Changelog job maps `ID → slug` using PR title; no slug scraping from commits
 - [ ] Agent system prompt updated with the resolution order and format rules
-- [ ] Tests include: valid header, wrong ID vs branch, slug-in-header, overlength subject, missing type, multi-ticket body refs
+- [x] Tests include: valid header, wrong ID vs branch, slug-in-header, overlength subject, missing type, multi-ticket body refs
 
 ## Examples
 
