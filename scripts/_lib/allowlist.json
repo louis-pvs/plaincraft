@@ -7,5 +7,19 @@
     "registry.yarnpkg.com"
   ],
   "description": "Whitelist of allowed network domains for scripts",
-  "lastUpdated": "2025-10-28"
+  "lastUpdated": "2025-10-30",
+  "policyIgnore": [
+    "scripts/_lib/__fixtures__/*",
+    "scripts/check-ci.mjs",
+    "scripts/post-checkout.mjs",
+    "scripts/pr-requirements.mjs",
+    "scripts/prepare-gh.mjs",
+    "scripts/setup-labels.mjs",
+    "scripts/sync-ideas-checklists.mjs",
+    "scripts/validate-ideas.mjs",
+    "scripts/create-worktree-pr.mjs",
+    "scripts/generate-pr-content.mjs",
+    "scripts/ideas-to-issues.mjs",
+    "scripts/new-snippet.mjs"
+  ]
 }

@@ -174,6 +174,7 @@ Options:
   --filter <slug>     Only process idea files matching slug
   --year <YYYY>       Archive into specific year (default: current year)
   --log-level <lvl>   error | warn | info | debug | trace
+  --cwd <path>        Working directory (default: current directory)
   --output <fmt>      text | json
 
 Examples:

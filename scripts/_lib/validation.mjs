@@ -20,9 +20,12 @@ export async function loadAllowlist() {
   try {
     const content = await readFile(ALLOWLIST_PATH, "utf-8");
     const data = JSON.parse(content);
-    return data.domains || [];
+    return {
+      domains: data.domains || [],
+      policyIgnore: data.policyIgnore || [],
+    };
   } catch {
-    return [];
+    return { domains: [], policyIgnore: [] };
   }
 }
 
@@ -33,8 +36,9 @@ export async function loadAllowlist() {
  */
 export async function isUrlAllowed(url) {
   const allowlist = await loadAllowlist();
+  const domains = allowlist.domains || [];
   const urlObj = new URL(url);
-  return allowlist.some((domain) => urlObj.hostname.endsWith(domain));
+  return domains.some((domain) => urlObj.hostname.endsWith(domain));
 }
 
 /**
@@ -134,7 +138,7 @@ export function validateCLIContract(content) {
  * @param {string} content - Script file content
  * @returns {object} Validation result
  */
-export function detectDangerousPatterns(content) {
+export function detectDangerousPatterns(content, allowlist = {}) {
   const errors = [];
   const warnings = [];
 

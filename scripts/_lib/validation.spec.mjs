@@ -25,12 +25,16 @@ describe("loadAllowlist", () => {
   it("should load domains from allowlist file", async () => {
     const mockAllowlist = {
       domains: ["github.com", "npmjs.com", "nodejs.org"],
+      policyIgnore: ["scripts/_lib/__fixtures__/*"],
     };
     readFile.mockResolvedValue(JSON.stringify(mockAllowlist));
 
     const result = await loadAllowlist();
 
-    expect(result).toEqual(["github.com", "npmjs.com", "nodejs.org"]);
+    expect(result).toEqual({
+      domains: ["github.com", "npmjs.com", "nodejs.org"],
+      policyIgnore: ["scripts/_lib/__fixtures__/*"],
+    });
   });
 
   it("should return empty array when file not found", async () => {
@@ -38,7 +42,7 @@ describe("loadAllowlist", () => {
 
     const result = await loadAllowlist();
 
-    expect(result).toEqual([]);
+    expect(result).toEqual({ domains: [], policyIgnore: [] });
   });
 
   it("should return empty array when domains field missing", async () => {
@@ -46,7 +50,7 @@ describe("loadAllowlist", () => {
 
     const result = await loadAllowlist();
 
-    expect(result).toEqual([]);
+    expect(result).toEqual({ domains: [], policyIgnore: [] });
   });
 
   it("should handle invalid JSON gracefully", async () => {
@@ -54,7 +58,7 @@ describe("loadAllowlist", () => {
 
     const result = await loadAllowlist();
 
-    expect(result).toEqual([]);
+    expect(result).toEqual({ domains: [], policyIgnore: [] });
   });
 });
 

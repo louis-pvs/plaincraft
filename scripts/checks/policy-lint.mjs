@@ -22,6 +22,7 @@ import {
   validateCLIContract,
   detectDangerousPatterns,
   checkSizeCompliance,
+  loadAllowlist,
 } from "../_lib/validation.mjs";
 
 const start = Date.now();
@@ -65,6 +66,11 @@ logger.info("Starting policy lint");
 try {
   const root = await repoRoot(args.cwd);
   const scriptsDir = path.join(root, "scripts");
+  const allowlistConfig = await loadAllowlist();
+  const policyIgnore =
+    allowlistConfig?.policyIgnore?.map((pattern) =>
+      pattern.replace(/\\/g, "/"),
+    ) ?? [];
 
   const userIgnores = parseListArg(args.ignore);
   const filters = parseListArg(args.filter).map((pattern) =>
@@ -79,6 +85,20 @@ try {
 
   // Scan for all .mjs scripts (excluding _lib, node_modules, etc.)
   let scriptFiles = await findScriptFiles(scriptsDir, excludeDirs);
+
+  scriptFiles = scriptFiles.filter((filePath) => {
+    const relative = path.relative(root, filePath).replace(/\\/g, "/");
+    return !policyIgnore.some((pattern) => {
+      if (pattern.endsWith("/*")) {
+        const dir = pattern.slice(0, -2);
+        return relative === dir || relative.startsWith(`${dir}/`);
+      }
+      if (pattern.endsWith("/")) {
+        return relative.startsWith(pattern);
+      }
+      return relative === pattern;
+    });
+  });
 
   if (filters.length > 0) {
     scriptFiles = scriptFiles.filter((filePath) => {
