@@ -15,7 +15,7 @@ import { z } from "zod";
 import { Logger, parseFlags, fail, succeed, repoRoot } from "../_lib/core.mjs";
 import { execCommand } from "../_lib/git.mjs";
 import { getIssue } from "../_lib/github.mjs";
-import { parseIdeaFile, findIdeaFiles } from "../_lib/ideas.mjs";
+import { loadIdeaFile, findIdeaFiles } from "../_lib/ideas.mjs";
 
 const SCRIPT_NAME = "merge-subissue-to-parent";
 
@@ -70,8 +70,8 @@ async function findIdeaFile(issueNumber, log) {
     // Method 4: Search all idea files
     const allIdeas = await findIdeaFiles();
     for (const ideaPath of allIdeas) {
-      const parsed = await parseIdeaFile(ideaPath);
-      if (parsed.metadata.issue === issueNumber) return ideaPath;
+      const parsed = await loadIdeaFile(ideaPath);
+      if (parsed.metadata.issueNumber === issueNumber) return ideaPath;
     }
 
     return null;
@@ -89,7 +89,7 @@ async function findIdeaFile(issueNumber, log) {
  */
 async function getParentIssue(ideaFilePath, log) {
   try {
-    const parsed = await parseIdeaFile(ideaFilePath);
+    const parsed = await loadIdeaFile(ideaFilePath);
     const parentMatch = parsed.content.match(/Parent:\s*#(\d+)/);
     return parentMatch ? parseInt(parentMatch[1], 10) : null;
   } catch (error) {
