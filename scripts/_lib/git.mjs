@@ -126,5 +126,18 @@ export async function listWorktrees(cwd = process.cwd()) {
  * @returns {Promise<{stdout: string, stderr: string}>} Result
  */
 export async function execCommand(command, args, options = {}) {
-  return await execa(command, args, options);
+  try {
+    return await execa(command, args, options);
+  } catch (error) {
+    const isCommandMissing =
+      error?.code === "ENOENT" ||
+      /command not found/i.test(error?.message || "") ||
+      /not recognized/.test(error?.message || "");
+
+    if (command === "pnpm" && isCommandMissing) {
+      return await execa("corepack", ["pnpm", ...args], options);
+    }
+
+    throw error;
+  }
 }
