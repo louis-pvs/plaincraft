@@ -7,10 +7,10 @@ priority: P1
 state: ready
 next_state: in-progress
 acceptance:
-  - Storybook docs updated to host the former guide "view/read" narratives
-  - Playbook pages refreshed with business-facing guidance linked from READMEs
-  - Template README "Links" sections point to the new Storybook/Playbook routes
-  - Content review signed off by Lane B and paired with README owner acknowledgements
+  - [ ] Storybook docs updated to host the former guide "view/read" narratives
+  - [ ] Playbook pages refreshed with business-facing guidance linked from READMEs
+  - [ ] Template README "Links" sections point to the new Storybook/Playbook routes
+  - [ ] Content review signed off by Lane B and paired with README owner acknowledgements
 ---
 
 # PB-readme-narrative-migration
