@@ -1,7 +1,7 @@
 # ARCH-gh-worktree-bootstrap-sync
 
 Lane: C (DevOps & Automation)
-Issue: (pending)
+Issue: 100
 
 ## Lane
 
