@@ -43,8 +43,8 @@ pages.
 - [x] Legacy guides archived under `_archive/2025/11-guides-sunset/`.
 - [x] New `guides/README.md` stub directs developers to templates, Storybook,
       and Playbook.
-- [ ] README lint + template coverage checks replace guide governance in CI.
-- [ ] Folder README inventory verified; missing READMEs backfilled or marked with
+- [x] README lint + template coverage checks replace guide governance in CI.
+- [x] Folder README inventory verified; missing READMEs backfilled or marked with
       `// no-readme`.
 - [ ] ADR entry updated and linked from decision file.
 
@@ -52,3 +52,5 @@ pages.
 
 - 2025-10-30 - Advanced to `ready` by archiving legacy guides and publishing the
   stub README.
+- 2025-10-30 - Guardrails wired (`readme-lint`, `template-coverage`,
+  `view-dedupe`) and README coverage sweep completed.

@@ -35,6 +35,6 @@ git restore scripts/ops/my-automation.mjs
 
 - USAGE: /templates/script/USAGE.md
 - Storybook: /storybook/?path=/docs/tooling-scripts--docs
-- Playbook: /playbook/patterns/index.html
+- Playbook: /playbook/patterns/release-changelog-automation.html
 
 _Owner: @lane-c_

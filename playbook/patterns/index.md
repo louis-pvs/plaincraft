@@ -18,6 +18,19 @@ A pragmatic inline-edit component with optimistic save, keyboard navigation, and
 
 ---
 
+### [Release Changelog Automation](/patterns/release-changelog-automation)
+
+Keeps `_tmp/` release summaries flowing into `CHANGELOG.md` while Playbook stories stay focused on business outcomes.
+
+**Key Features:**
+
+- Guardrailed consolidation script with dry-run mode
+- Template-enforced narrative structure for release notes
+- Automatic cleanup of processed `_tmp/` entries
+- Links directly to Playbook status updates for stakeholders
+
+---
+
 ## Pattern Categories
 
 ### Unit Components
@@ -26,6 +39,12 @@ Self-contained, single-purpose components that solve specific UI problems:
 
 - **Inline Edit Label** — Quick inline text editing
 - _(More patterns coming soon)_
+
+### Operational Patterns
+
+Plays that wrap automation or workflow scripts around template-first docs:
+
+- **Release Changelog Automation** — Script + template handshake to publish post-merge highlights.
 
 ### Compositions
 

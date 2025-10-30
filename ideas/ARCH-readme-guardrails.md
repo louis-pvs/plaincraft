@@ -38,12 +38,17 @@ that surface:
 
 ## Acceptance Checklist
 
-- [ ] `readme-lint.mjs` validates headings, word count, executable blocks, owner
+- [x] `readme-lint.mjs` validates headings, word count, executable blocks, owner
       metadata, and `scaffold_ref`.
-- [ ] `template-coverage.mjs` enforces README/USAGE/config presence and `// no-readme`
+- [x] `template-coverage.mjs` enforces README/USAGE/config presence and `// no-readme`
       exemptions.
-- [ ] `view-dedupe.mjs` fails when Storybook or Playbook duplicates README step
+- [x] `view-dedupe.mjs` fails when Storybook or Playbook duplicates README step
       content.
-- [ ] `docs-governance.yml` runs on template, README, Storybook, and Playbook
+- [x] `docs-governance.yml` runs on template, README, Storybook, and Playbook
       changes using the new scripts.
-- [ ] `package.json` exposes `docs:lint` and `docs:views` chaining the new checks.
+- [x] `package.json` exposes `docs:lint` and `docs:views` chaining the new checks.
+
+## Status
+
+- 2025-10-30 - Lane C guardrails wired (`readme-lint`, `template-coverage`,
+  `view-dedupe`, docs governance workflow) and scripts verified locally.

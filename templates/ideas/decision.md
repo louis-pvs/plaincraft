@@ -215,7 +215,7 @@ pnpm run new:readme --from guides/_archive/2025/<file>.md --to snippets/<unit>/R
 - [x] All prior guides archived, stub exists in `/guides/README.md`
 - [ ] Each unit has a README with scaffold_ref and headings
 - [ ] At least one Storybook doc or Playbook page exists for any narrative content
-- [ ] CI warns on README misses, blocks on template or test failures
+- [x] CI warns on README misses, blocks on template or test failures
 - [ ] README steps validated on a clean clone within 10 minutes
 - [ ] Owners assigned on every README
 

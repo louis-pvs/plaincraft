@@ -83,9 +83,10 @@ The consolidation script:
 3. Merges content under appropriate release version
 4. Deletes processed temporary files
 
-## Related
+## Links
 
-- Script: `/scripts/ops/consolidate-changelog.mjs`
-- Hook: `/scripts/pre-commit-changelog.mjs`
+- Unit script: `/scripts/ops/consolidate-changelog.mjs`
+- Automation hook: `/scripts/pre-commit-changelog.mjs`
 - Commit hook: `/scripts/commit-msg-hook.mjs`
-- Guide: `/guides/guide-changelog.md`
+- Playbook pattern: `/playbook/patterns/release-changelog-automation.html`
+- Archive guide: `/guides/_archive/2025/11-guides-sunset/guide-changelog.md`
