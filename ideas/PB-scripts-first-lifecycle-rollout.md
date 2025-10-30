@@ -6,6 +6,7 @@ type: playbook
 priority: P1
 state: ready
 next_state: in-progress
+issue: 91
 acceptance:
   - Storybook governance docs walk through the four lifecycle commands with SoT links
   - Playbook pages narrate intake → branch → PR → closeout with business framing

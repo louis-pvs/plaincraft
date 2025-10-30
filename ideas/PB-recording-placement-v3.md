@@ -6,6 +6,7 @@ type: playbook
 priority: P1
 state: ready
 next_state: in-progress
+issue: 93
 acceptance:
   - Governance docs define placement rules, caption template, and rejection criteria for GIFs
   - Playbook pages embed one GIF per decision with alt text, caption, and template links

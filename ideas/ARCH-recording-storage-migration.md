@@ -1,7 +1,7 @@
 # ARCH-recording-storage-migration
 
 Lane: C (DevOps & Automation)
-Issue: (pending)
+Issue: 96
 
 ## Lane
 
