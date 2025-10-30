@@ -31,7 +31,13 @@ const ArgsSchema = z.object({
   output: z.enum(["text", "json"]).default("text"),
   logLevel: z.enum(["error", "warn", "info", "debug", "trace"]).default("info"),
   cwd: z.string().optional(),
-  filter: z.string().optional(),
+  filter: z
+    .union([z.string(), z.boolean()])
+    .optional()
+    .transform((value) => {
+      if (typeof value === "string") return value.trim();
+      return undefined;
+    }),
   skipExisting: z.boolean().default(true),
 });
 

@@ -1,7 +1,7 @@
 # ARCH-readme-guardrails
 
 Lane: C (DevOps & Automation)
-Issue: (pending)
+Issue: 77
 
 ## Lane
 
