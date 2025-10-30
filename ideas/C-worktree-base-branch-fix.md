@@ -5,6 +5,17 @@
 Lane: C  
 Linked Composition: `ARCH-ci-cd-implementation`
 
+## Metric Hypothesis
+
+- Worktree automation succeeds across sandboxes, reducing reported setup failures to 0 in weekly CI smoke runs.
+- Base-branch selection logs appear in ≥90% of new worktree logs captured during dry runs.
+- No new `spawn git ENOENT` errors reported after rollout.
+
+## Units In Scope
+
+- `scripts/_lib/git.mjs` — worktree helper
+- `scripts/ops/create-worktree-pr.mjs` — worktree orchestration script
+
 ## Contracts
 
 - Worktree automation must succeed from any repo checkout without manual intervention.
