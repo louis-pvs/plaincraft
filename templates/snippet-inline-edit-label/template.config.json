@@ -1,0 +1,22 @@
+{
+  "id": "snippet-inline-edit-label",
+  "name": "Snippet - Inline Edit Label",
+  "version": "0.1.0",
+  "category": "tooling",
+  "author": "lane-a",
+  "created": "2025-02-18",
+  "description": "Scaffold the InlineEditLabel snippet with controller, default view, headless variant, tests, Storybook docs, and README.",
+  "entrypoint": "snippets/InlineEditLabel/InlineEditLabel.tsx",
+  "variables": [],
+  "references": {
+    "readme": "snippets/InlineEditLabel/README.md",
+    "usage": "templates/snippet-inline-edit-label/USAGE.md",
+    "storybook": "Snippets/InlineEditLabel",
+    "playbook": "playbook/patterns/inline-edit-label"
+  },
+  "constraints": {
+    "requires_storybook": true,
+    "requires_vitest": true,
+    "max_setup_minutes": 10
+  }
+}
