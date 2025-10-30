@@ -1,0 +1,29 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Governance/Ideas Pipeline" />
+
+# Ideas Pipeline (view)
+
+Plaincraft treats `/ideas` as the single source of truth for delivery work. Cards seed Issues, PRs, and release notes, so a healthy pipeline keeps automation honest and reviewers in context.
+
+## Signals to Watch
+
+- Missing `Lane:` metadata or acceptance checklists hints at automation drift.
+- Parent ideas without `## Sub-Issues` make sub-issue progress invisible downstream.
+- Cards lingering in `/ideas/` after merge clog the roadmap audit trail.
+
+## Worked Example
+
+When `PB-readme-narrative-migration` moved into delivery, the idea card anchored the acceptance list. Running `ideas-to-issues` synced checklists to GitHub, while `merge-subissue-to-parent` refreshed the parent PR each time a child branch merged. The card stayed authoritative until archival.
+
+## Hand-off Links
+
+- Template README → `/templates/ideas/README.md`
+- Template USAGE → `/templates/ideas/USAGE.md`
+- Ops scripts → `scripts/ops/ideas-to-issues.mjs`, `scripts/ops/create-worktree-pr.mjs`, `scripts/ops/merge-subissue-to-parent.mjs`
+
+## Constraints
+
+- Card exists before Issue; automation refuses to run otherwise.
+- Ticket prefixes drive PR titles, changelog slugs, and roadmap cards—keep them aligned.
+- Archive closed ideas promptly to keep the `/ideas` directory actionable.

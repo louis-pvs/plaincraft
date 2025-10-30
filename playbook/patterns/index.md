@@ -31,6 +31,45 @@ Keeps `_tmp/` release summaries flowing into `CHANGELOG.md` while Playbook stori
 
 ---
 
+### [Ideas Source of Truth](/patterns/ideas-source-of-truth)
+
+Makes `/ideas` the authoritative contract between backlog automation, roadmap views, and Playbook storytelling.
+
+**Key Features:**
+
+- Aligns Purpose/Problem/Proposal/Acceptance metadata across automation
+- Preserves parent/child hierarchy for sub-issue pipelines
+- Keeps roadmap, changelog, and PR narratives in sync
+- Anchors governance metrics for lane health
+
+---
+
+### [Script Automation Guardrails](/patterns/script-automation-guardrails)
+
+Ensures every ops script ships with the template contract so guardrails stay predictable for dry-runs and CI.
+
+**Key Features:**
+
+- Standard CLI header and exit-code semantics
+- Preview-first execution with `--yes` gates for writes
+- Shared `_lib/` helpers for composability
+- Guardrail test suite coverage (policy, smoke, size)
+
+---
+
+### [Roadmap Project Onboarding](/patterns/roadmap-project-onboarding)
+
+Codifies the GitHub Projects setup so roadmap automation, lane views, and stakeholders stay aligned.
+
+**Key Features:**
+
+- Reproducible project scaffolding with scripts
+- WIP limits and lane filters baked into the template
+- Immediate pipeline-config sync guidance
+- Authentication cues for GitHub CLI usage
+
+---
+
 ## Pattern Categories
 
 ### Unit Components
@@ -45,6 +84,9 @@ Self-contained, single-purpose components that solve specific UI problems:
 Plays that wrap automation or workflow scripts around template-first docs:
 
 - **Release Changelog Automation** — Script + template handshake to publish post-merge highlights.
+- **Ideas Source of Truth** — Keeps `/ideas` authoritative for automation and storytelling.
+- **Script Automation Guardrails** — Standardizes ops scripts around the shared CLI contract.
+- **Roadmap Project Onboarding** — Rebuilds the Plaincraft roadmap with reproducible automation.
 
 ### Compositions
 

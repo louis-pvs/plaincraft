@@ -1,0 +1,29 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Governance/Roadmap Onboarding" />
+
+# Roadmap Onboarding (view)
+
+The Plaincraft Roadmap keeps lanes visible across Issues, PRs, and templates. A consistent setup means automation can push cards, enforce WIP limits, and surface metrics without manual cleanup.
+
+## Signals to Watch
+
+- Missing lane labels or mismatched project IDs break CI status mirrors.
+- Views without WIP caps invite scope creep for each lane.
+- Scripts failing to find the roadmap indicate authentication or project drift.
+
+## Worked Example
+
+During the README migration, Lane D cloned the roadmap template, ran `gh:setup-project`, and used the generated output to confirm automation IDs. The project surfaced PB-readme narratives under Lane B while Lane C tracked guardrail scripts under Lane C views.
+
+## Hand-off Links
+
+- Template README → `/templates/roadmap-project/README.md`
+- Template USAGE → `/templates/roadmap-project/USAGE.md`
+- Automation scripts → `scripts/ops/setup-project.mjs`, `scripts/ops/setup-labels.mjs`
+
+## Constraints
+
+- Keep the project name and custom fields aligned with `pipeline-config.json`.
+- Lane views must filter by `lane:<letter>` and honor the WIP limit of 3.
+- Refresh GitHub CLI tokens with `project` scope before running setup scripts.
