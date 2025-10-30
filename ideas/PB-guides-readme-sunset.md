@@ -46,7 +46,7 @@ pages.
 - [x] README lint + template coverage checks replace guide governance in CI.
 - [x] Folder README inventory verified; missing READMEs backfilled or marked with
       `// no-readme`.
-- [ ] ADR entry updated and linked from decision file.
+- [x] ADR entry updated and linked from decision file.
 
 ## Status
 
@@ -54,3 +54,4 @@ pages.
   stub README.
 - 2025-10-30 - Guardrails wired (`readme-lint`, `template-coverage`,
   `view-dedupe`) and README coverage sweep completed.
+- 2025-10-31 - ADR `docs/adr/2025-10-Overarching-v2.md` published and linked from the decision checklist.
