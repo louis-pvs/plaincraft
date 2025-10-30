@@ -10,10 +10,18 @@ const config: StorybookConfig = {
   addons: ["@storybook/addon-a11y", "@storybook/addon-docs"],
   async viteFinal(baseConfig) {
     const { createRequire } = await import("node:module");
+    const { access } = await import("node:fs/promises");
     const resolveModule = createRequire(import.meta.url);
-    const blocksModulePath = resolveModule.resolve(
+    let blocksModulePath = resolveModule.resolve(
       "@storybook/addon-docs/blocks",
     );
+    const mjsCandidate = blocksModulePath.replace(/\.js$/, ".mjs");
+    try {
+      await access(mjsCandidate);
+      blocksModulePath = mjsCandidate;
+    } catch {
+      // ignore, fall back to resolved path
+    }
 
     const alias = baseConfig.resolve?.alias ?? [];
 
