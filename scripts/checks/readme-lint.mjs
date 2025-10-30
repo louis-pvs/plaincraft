@@ -50,6 +50,8 @@ Usage: node scripts/checks/readme-lint.mjs [options]
 
 Options:
   --help              Show this help message
+  --dry-run           Preview mode without making changes (default: true)
+  --yes               Execute mode (confirms execution)
   --cwd <path>        Working directory (default: process.cwd())
   --output <format>   Output format: json|text (default: text)
   --log-level <level> Log level: trace|debug|info|warn|error (default: info)
