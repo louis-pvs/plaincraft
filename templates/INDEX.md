@@ -113,7 +113,7 @@ cp ./changelog/CHANGELOG.md .
 **Version:** 0.1.0  
 **Category:** workflow  
 **Created:** 2025-10-28  
-**Referenced by:** [guide-changelog.md](../guides/guide-changelog.md), [guide-workflow.md](../guides/guide-workflow.md)
+**Referenced by:** [ideas-source-of-truth](../playbook/patterns/ideas-source-of-truth.md)
 
 **Quick Start:**
 
@@ -132,7 +132,7 @@ Multi-component issue template for complex features with sub-tasks
 **Version:** 0.1.0  
 **Category:** workflow  
 **Created:** 2025-01-28  
-**Referenced by:** [guide-workflow.md](../guides/guide-workflow.md)
+**Referenced by:** [ideas-source-of-truth](../playbook/patterns/ideas-source-of-truth.md)
 
 **Quick Start:**
 
@@ -151,7 +151,7 @@ Single-purpose issue template for bugs, small features, or focused tasks
 **Version:** 0.1.0  
 **Category:** workflow  
 **Created:** 2025-01-28  
-**Referenced by:** [guide-workflow.md](../guides/guide-workflow.md)
+**Referenced by:** [ideas-source-of-truth](../playbook/patterns/ideas-source-of-truth.md)
 
 **Quick Start:**
 
@@ -170,7 +170,7 @@ Standard PR description template with context, changes, and verification checkli
 **Version:** 0.1.0  
 **Category:** workflow  
 **Created:** 2025-01-28  
-**Referenced by:** [guide-workflow.md](../guides/guide-workflow.md)
+**Referenced by:** [ideas-source-of-truth](../playbook/patterns/ideas-source-of-truth.md)
 
 **Quick Start:**
 
@@ -191,7 +191,7 @@ Template-first guide template with frontmatter and TTL tracking
 **Version:** 0.1.0  
 **Category:** documentation  
 **Created:** 2025-10-28  
-**Referenced by:** [guide-roadmap-setup.md](../guides/guide-roadmap-setup.md)
+**Referenced by:** [roadmap-project-onboarding](../playbook/patterns/roadmap-project-onboarding.md)
 
 **Quick Start:**
 
@@ -336,7 +336,7 @@ Compliant script template with full CLI contract and guardrails
 **Version:** 0.1.0  
 **Category:** tooling  
 **Created:** 2025-10-28  
-**Referenced by:** [guide-scripts.md](../guides/guide-scripts.md)
+**Referenced by:** [script-automation-guardrails](../playbook/patterns/script-automation-guardrails.md)
 
 **Quick Start:**
 
@@ -391,7 +391,7 @@ Integration test template for multi-component and API interaction testing
 **Version:** 0.1.0  
 **Category:** testing  
 **Created:** 2025-01-28  
-**Referenced by:** [guide-scripts.md](../guides/guide-scripts.md)
+**Referenced by:** [script-automation-guardrails](../playbook/patterns/script-automation-guardrails.md)
 
 **Quick Start:**
 
@@ -410,7 +410,7 @@ Unit test template for component and function testing with Vitest
 **Version:** 0.1.0  
 **Category:** testing  
 **Created:** 2025-01-28  
-**Referenced by:** [guide-scripts.md](../guides/guide-scripts.md)
+**Referenced by:** [script-automation-guardrails](../playbook/patterns/script-automation-guardrails.md)
 
 **Quick Start:**
 
