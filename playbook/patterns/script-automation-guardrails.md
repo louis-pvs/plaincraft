@@ -1,7 +1,7 @@
 # Script Automation Guardrails
 
 - **Audience:** Lane C automation engineers pairing with Lane B storytellers
-- **Decision Anchor:** [Template-first READMEs, Lane B narrative shift](../../templates/ideas/decision.md)
+- **Decision Anchor:** [Template-first READMEs, Lane B narrative shift](https://github.com/louis-pvs/plaincraft/blob/main/templates/ideas/decision.md)
 - **Owner:** @lane.b
 - **TTL:** Review by 2026-04-30
 - **Future Metric:** 100% of new scripts ship with `--dry-run` + `--yes` gates and smoke tests registered in CI
@@ -24,8 +24,8 @@ Repository scripts are the backbone of Plaincraft’s governance. They seed Issu
 
 ## Links
 
-- Template README: [`templates/script/README.md`](../../templates/script/README.md)
-- Template USAGE: [`templates/script/USAGE.md`](../../templates/script/USAGE.md)
-- Storybook View: [`storybook/docs/script-automation.mdx`](../../storybook/docs/script-automation.mdx)
-- Guardrail Scripts: [`scripts/checks/policy-lint.mjs`](../../scripts/checks/policy-lint.mjs), [`scripts/checks/smoke.mjs`](../../scripts/checks/smoke.mjs), [`scripts/checks/size-check.mjs`](../../scripts/checks/size-check.mjs)
-- Ops Examples: [`scripts/ops/consolidate-changelog.mjs`](../../scripts/ops/consolidate-changelog.mjs), [`scripts/ops/setup-project.mjs`](../../scripts/ops/setup-project.mjs)
+- Template README: [`templates/script/README.md`](https://github.com/louis-pvs/plaincraft/blob/main/templates/script/README.md)
+- Template USAGE: [`templates/script/USAGE.md`](https://github.com/louis-pvs/plaincraft/blob/main/templates/script/USAGE.md)
+- Storybook View: [Governance / Script Automation](https://louis-pvs.github.io/plaincraft/storybook/?path=/docs/governance-script-automation--docs)
+- Guardrail Scripts: [`scripts/checks/policy-lint.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/checks/policy-lint.mjs), [`scripts/checks/smoke.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/checks/smoke.mjs), [`scripts/checks/size-check.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/checks/size-check.mjs)
+- Ops Examples: [`scripts/ops/consolidate-changelog.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/consolidate-changelog.mjs), [`scripts/ops/setup-project.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/setup-project.mjs)

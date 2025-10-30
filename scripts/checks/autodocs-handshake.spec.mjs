@@ -34,7 +34,10 @@ describe("Autodocs README handshake", () => {
       const scaffoldMatch = readme.match(/scaffold_ref:\s*([^\s]+)/i);
       const ownerMatch = readme.match(/_Owner:\s*@([A-Za-z0-9-_]+)/);
 
-      expect(scaffoldMatch, `${dirName} README missing scaffold_ref`).toBeTruthy();
+      expect(
+        scaffoldMatch,
+        `${dirName} README missing scaffold_ref`,
+      ).toBeTruthy();
       expect(ownerMatch, `${dirName} README missing owner handle`).toBeTruthy();
 
       const scaffoldRaw = scaffoldMatch[1].replace(/^#/, "").trim();
@@ -49,9 +52,18 @@ describe("Autodocs README handshake", () => {
       ).toBe(true);
 
       const mdx = await readFile(mdxPath, "utf-8");
-      expect(mdx).toMatch(/README\.md\?raw/, `${dirName} Autodocs must import README`);
-      expect(mdx).toMatch(/scaffoldRef/i, `${dirName} Autodocs missing scaffoldRef surface`);
-      expect(mdx).toMatch(/ownerHandle/i, `${dirName} Autodocs missing owner handle surface`);
+      expect(mdx).toMatch(
+        /README\.md\?raw/,
+        `${dirName} Autodocs must import README`,
+      );
+      expect(mdx).toMatch(
+        /scaffoldRef/i,
+        `${dirName} Autodocs missing scaffoldRef surface`,
+      );
+      expect(mdx).toMatch(
+        /ownerHandle/i,
+        `${dirName} Autodocs missing owner handle surface`,
+      );
     }
   });
 });

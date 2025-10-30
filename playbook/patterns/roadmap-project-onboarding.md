@@ -1,7 +1,7 @@
 # Roadmap Project Onboarding
 
 - **Audience:** Lane D project stewards aligning with Lane B stakeholders
-- **Decision Anchor:** [Template-first READMEs, Lane B narrative shift](../../templates/ideas/decision.md)
+- **Decision Anchor:** [Template-first READMEs, Lane B narrative shift](https://github.com/louis-pvs/plaincraft/blob/main/templates/ideas/decision.md)
 - **Owner:** @lane.b
 - **TTL:** Review by 2026-04-30
 - **Future Metric:** Roadmap automation succeeds on first run in 95% of new environments
@@ -24,8 +24,8 @@ During the README migration, Lane D cloned the roadmap template and ran the setu
 
 ## Links
 
-- Template README: [`templates/roadmap-project/README.md`](../../templates/roadmap-project/README.md)
-- Template USAGE: [`templates/roadmap-project/USAGE.md`](../../templates/roadmap-project/USAGE.md)
-- Storybook View: [`storybook/docs/roadmap-onboarding.mdx`](../../storybook/docs/roadmap-onboarding.mdx)
-- Setup Scripts: [`scripts/ops/setup-project.mjs`](../../scripts/ops/setup-project.mjs), [`scripts/ops/setup-labels.mjs`](../../scripts/ops/setup-labels.mjs)
-- Decision Record: [`ideas/PB-readme-narrative-migration.md`](../../ideas/PB-readme-narrative-migration.md)
+- Template README: [`templates/roadmap-project/README.md`](https://github.com/louis-pvs/plaincraft/blob/main/templates/roadmap-project/README.md)
+- Template USAGE: [`templates/roadmap-project/USAGE.md`](https://github.com/louis-pvs/plaincraft/blob/main/templates/roadmap-project/USAGE.md)
+- Storybook View: [Governance / Roadmap Onboarding](https://louis-pvs.github.io/plaincraft/storybook/?path=/docs/governance-roadmap-onboarding--docs)
+- Setup Scripts: [`scripts/ops/setup-project.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/setup-project.mjs), [`scripts/ops/setup-labels.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/setup-labels.mjs)
+- Decision Record: [`ideas/PB-readme-narrative-migration.md`](https://github.com/louis-pvs/plaincraft/blob/main/ideas/PB-readme-narrative-migration.md)

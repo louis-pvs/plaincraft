@@ -1,7 +1,7 @@
 # Ideas Source of Truth
 
 - **Audience:** Lane D backlog owners coordinating with Lane B storytellers
-- **Decision Anchor:** [Template-first READMEs, Lane B narrative shift](../../templates/ideas/decision.md)
+- **Decision Anchor:** [Template-first READMEs, Lane B narrative shift](https://github.com/louis-pvs/plaincraft/blob/main/templates/ideas/decision.md)
 - **Owner:** @lane.b
 - **TTL:** Review by 2026-04-30
 - **Future Metric:** Fewer than 1% of active idea cards missing `Lane:` metadata during weekly audits
@@ -24,8 +24,8 @@ Plaincraft keeps work aligned by letting `/ideas` drive every downstream artifac
 
 ## Links
 
-- Template README: [`templates/ideas/README.md`](../../templates/ideas/README.md)
-- Template USAGE: [`templates/ideas/USAGE.md`](../../templates/ideas/USAGE.md)
-- Storybook View: [`storybook/docs/ideas-pipeline.mdx`](../../storybook/docs/ideas-pipeline.mdx)
-- Ops Scripts: [`scripts/ops/ideas-to-issues.mjs`](../../scripts/ops/ideas-to-issues.mjs), [`scripts/ops/create-worktree-pr.mjs`](../../scripts/ops/create-worktree-pr.mjs), [`scripts/ops/merge-subissue-to-parent.mjs`](../../scripts/ops/merge-subissue-to-parent.mjs), [`scripts/ops/sync-ideas-checklists.mjs`](../../scripts/ops/sync-ideas-checklists.mjs)
-- Decision Record: [`ideas/PB-readme-narrative-migration.md`](../../ideas/PB-readme-narrative-migration.md)
+- Template README: [`templates/ideas/README.md`](https://github.com/louis-pvs/plaincraft/blob/main/templates/ideas/README.md)
+- Template USAGE: [`templates/ideas/USAGE.md`](https://github.com/louis-pvs/plaincraft/blob/main/templates/ideas/USAGE.md)
+- Storybook View: [Governance / Ideas Pipeline](https://louis-pvs.github.io/plaincraft/storybook/?path=/docs/governance-ideas-pipeline--docs)
+- Ops Scripts: [`scripts/ops/ideas-to-issues.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/ideas-to-issues.mjs), [`scripts/ops/create-worktree-pr.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/create-worktree-pr.mjs), [`scripts/ops/merge-subissue-to-parent.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/merge-subissue-to-parent.mjs), [`scripts/ops/sync-ideas-checklists.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/sync-ideas-checklists.mjs)
+- Decision Record: [`ideas/PB-readme-narrative-migration.md`](https://github.com/louis-pvs/plaincraft/blob/main/ideas/PB-readme-narrative-migration.md)
