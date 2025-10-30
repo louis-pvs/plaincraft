@@ -34,7 +34,7 @@ git restore scripts/checks/my-check.mjs
 ## Links
 
 - USAGE: /templates/script/USAGE.md
-- Storybook: /storybook/?path=/docs/tooling-scripts--docs
-- Playbook: /playbook/patterns/index.html
+- Storybook: /storybook/?path=/docs/governance-script-automation--docs
+- Playbook: /playbook/patterns/script-automation-guardrails.html
 
 _Owner: @lane-c_

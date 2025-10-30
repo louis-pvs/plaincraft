@@ -88,5 +88,6 @@ The consolidation script:
 - Unit script: `/scripts/ops/consolidate-changelog.mjs`
 - Automation hook: `/scripts/pre-commit-changelog.mjs`
 - Commit hook: `/scripts/commit-msg-hook.mjs`
+- Storybook view: `/storybook/?path=/docs/governance-release-changelog--docs`
 - Playbook pattern: `/playbook/patterns/release-changelog-automation.html`
 - Archive guide: `/guides/_archive/2025/11-guides-sunset/guide-changelog.md`
