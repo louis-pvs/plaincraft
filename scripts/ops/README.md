@@ -1,0 +1,40 @@
+# Script Ops
+
+## When to use
+
+- Orchestrate multi-step automations that compose guardrail helpers.
+- Wire repository workflows to GitHub, Storybook, or Playbook.
+- Ship resilient tooling that teams can run locally or in CI.
+
+## Scaffold
+
+```bash
+cp scripts/_template-ops.mjs scripts/ops/my-automation.mjs
+# scaffold_ref: /templates/script@v0.1
+```
+
+## Wire
+
+- Register the new command in `package.json` under `scripts`.
+- Document expected flags in `/templates/script/USAGE.md`.
+- Update `/scripts/README.md` with a short summary.
+
+## Test
+
+```bash
+pnpm scripts:test -- --filter my-automation
+```
+
+## Rollback
+
+```bash
+git restore scripts/ops/my-automation.mjs
+```
+
+## Links
+
+- USAGE: /templates/script/USAGE.md
+- Storybook: /storybook/?path=/docs/tooling-scripts--docs
+- Playbook: /playbook/patterns/index.html
+
+_Owner: @lane-c_
