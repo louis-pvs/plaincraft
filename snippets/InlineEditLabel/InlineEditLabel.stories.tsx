@@ -57,7 +57,7 @@ export const Interaction: Story = {
     await userEvent.keyboard("{Enter}");
     await canvas.findByText("Saved");
     await expect(
-      canvas.getByRole("button", { name: /edit label/i }),
+      canvas.getByRole("button", { name: labelName }),
     ).toHaveTextContent("Product strategy");
   },
 };
@@ -80,7 +80,7 @@ export const CancelsWithEscape: Story = {
     await canvas.findByText("Changes discarded.");
     // And the button should still show original value
     const button = await canvas.findByRole("button", {
-      name: /edit label/i,
+      name: labelName,
     });
     await expect(button).toHaveTextContent("Original value");
   },
@@ -131,7 +131,7 @@ export const RetryOnError: Story = {
     await userEvent.keyboard("{Enter}");
     await canvas.findByText("Saved");
     const button = await canvas.findByRole("button", {
-      name: /edit label/i,
+      name: labelName,
     });
     await expect(button).toHaveTextContent(/Launch retry/);
   },
