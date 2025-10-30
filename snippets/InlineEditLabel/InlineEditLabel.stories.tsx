@@ -16,6 +16,7 @@ const meta: Meta<typeof InlineEditLabel> = {
   args: {
     value: "Team charter",
     maxLength: 32,
+    ariaLabel: "Edit project headline",
     onSave: async () => {
       await delay(150);
     },

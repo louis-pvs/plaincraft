@@ -2,7 +2,27 @@ import { Meta, Markdown, ArgTypes, Canvas, Story } from "@storybook/addon-docs/b
 import * as Stories from "./InlineEditLabel.stories";
 import ReadmeSource from "./README.md?raw";
 
+const scaffoldRefMatch = ReadmeSource.match(/scaffold_ref:\s*(.+)/i);
+const ownerMatch = ReadmeSource.match(/_Owner:\s*@([A-Za-z0-9-_]+)/);
+const scaffoldRef = scaffoldRefMatch?.[1]?.trim() ?? "Missing scaffold_ref";
+const ownerHandle = ownerMatch?.[1] ? `@${ownerMatch[1]}` : "Unassigned";
+
 <Meta of={Stories} />
+
+<div style={{ display: "flex", gap: "1rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+  <div>
+    <div style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted-color)" }}>
+      Template
+    </div>
+    <code>{scaffoldRef}</code>
+  </div>
+  <div>
+    <div style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted-color)" }}>
+      Owner
+    </div>
+    <code>{ownerHandle}</code>
+  </div>
+</div>
 
 <Markdown>{ReadmeSource}</Markdown>
 
