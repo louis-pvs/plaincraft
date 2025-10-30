@@ -18,6 +18,7 @@ Plaincraft keeps work aligned by letting `/ideas` drive every downstream artifac
 ## Constraints to Honour
 
 - **Pre-Issue hygiene:** Card exists before an Issue, includes Purpose/Problem/Proposal/Acceptance, and carries accurate lane metadata.
+- **Bootstrap sync:** `pnpm gh:worktree` (aka `scripts/ops/create-worktree-pr.mjs`) must update the real idea file with `Issue: #<number>` and `status: in-progress` so lifecycle automation can trust the source of truth.
 - **Structure:** Naming prefixes (`U-`, `C-`, `ARCH-`, `PB-`, `B-`) and `## Sub-Issues` sections stay in sync so automation can map parents and children.
 - **Lifecycle:** Ticket IDs, roadmap cards, and changelog slugs reuse the same prefix; closed work moves to `/ideas/_archive/<year>/`.
 - **Automation health:** Guardrail scripts (`ideas-to-issues`, `create-worktree-pr`, `merge-subissue-to-parent`, `sync-ideas-checklists`) run in dry-run mode first and are preferred over manual edits.

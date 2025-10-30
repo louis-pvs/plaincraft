@@ -72,7 +72,7 @@ pnpm run ideas:validate
 # 4. Create GitHub Issue
 node scripts/ideas-to-issues.mjs U-your-slug.md
 
-# 5. Create worktree and PR
+# 5. Create worktree and PR (updates idea metadata)
 node scripts/create-worktree-pr.mjs <issue-number>
 # Updates the idea frontmatter with `Issue: #<number>` and `status: in-progress`
 # before pushing the bootstrap commit.

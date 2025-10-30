@@ -16,7 +16,7 @@ Workflows knit multiple templates together — ideas, issues, worktrees, changel
    - Lane C (`C-`): composition or integration work
    - Lane D (`ARCH-`/`PB-`): architecture or playbook updates
 2. Generate idea + issue artifacts with the idea templates and `node scripts/ideas-to-issues.mjs`.
-3. Spawn an isolated worktree:
+3. Spawn an isolated worktree (command updates the source idea with the issue number and flips status to `in-progress`):
    ```bash
    node scripts/create-worktree-pr.mjs <issue-number>
    ```
