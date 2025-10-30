@@ -46,6 +46,6 @@
     "/scripts/ops/consolidate-changelog.mjs",
     "/scripts/pre-commit-changelog.mjs",
     "/scripts/commit-msg-hook.mjs",
-    "/guides/guide-changelog.md"
+    "/playbook/patterns/release-changelog-automation.md"
   ]
 }

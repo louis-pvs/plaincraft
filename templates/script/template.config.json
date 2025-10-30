@@ -42,6 +42,6 @@
     "/scripts/_lib/core.mjs",
     "/scripts/_lib/validation.mjs",
     "/scripts/GUARDRAILS.md",
-    "/guides/guide-scripts.md"
+    "/playbook/patterns/script-automation-guardrails.md"
   ]
 }

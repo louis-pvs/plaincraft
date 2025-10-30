@@ -29,7 +29,7 @@
     "manual": "Import via GitHub Projects UI"
   },
   "relatedFiles": [
-    "/guides/guide-roadmap-setup.md",
+    "/playbook/patterns/roadmap-project-onboarding.md",
     "/scripts/ops/setup-project.mjs",
     "/templates/issue-unit/",
     "/templates/pull-request/"
