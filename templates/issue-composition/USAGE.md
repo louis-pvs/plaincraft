@@ -103,6 +103,7 @@ Convert API client and all endpoint handlers from JavaScript to TypeScript for t
 
 ```bash
 # Create parent issue and sub-issues atomically
+# (idea file updated with Issue:# and status: in-progress before bootstrap commit)
 node scripts/create-worktree-pr.mjs \
   --template issue-composition \
   --title "Implement dark mode" \

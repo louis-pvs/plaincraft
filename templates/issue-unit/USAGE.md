@@ -67,6 +67,7 @@ Users are unclear when the save button is disabled vs. enabled. Need visual feed
 
 ```bash
 # Create issue and worktree branch in one command
+# (idea frontmatter gets Issue:# and status: in-progress before the bootstrap commit)
 node scripts/create-worktree-pr.mjs \
   --template issue-unit \
   --title "Fix login redirect bug"

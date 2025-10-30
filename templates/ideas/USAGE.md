@@ -74,6 +74,8 @@ node scripts/ideas-to-issues.mjs U-your-slug.md
 
 # 5. Create worktree and PR
 node scripts/create-worktree-pr.mjs <issue-number>
+# Updates the idea frontmatter with `Issue: #<number>` and `status: in-progress`
+# before pushing the bootstrap commit.
 ```
 
 ## Validation Rules
@@ -114,7 +116,8 @@ Once an idea file exists:
 - `ideas-to-issues.mjs` creates GitHub Issue
 - Issue number synced back to idea file
 - `sync-ideas-checklists.mjs` keeps checklists in sync
-- `create-worktree-pr.mjs` scaffolds branch and PR
+- `create-worktree-pr.mjs` scaffolds branch and PR, updating the source idea
+  with the assigned issue number and `status: in-progress`
 
 ## Related Scripts
 

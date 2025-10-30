@@ -39,7 +39,7 @@ Use this template when creating GitHub issues for:
 # Copy template to new issue
 cp templates/issue-unit/issue-unit.md .github/ISSUE_TEMPLATE/bug_report.md
 
-# Or use via script
+# Or use via script (updates the idea file with the issue number and marks it in-progress)
 node scripts/create-worktree-pr.mjs --template issue-unit
 ```
 
