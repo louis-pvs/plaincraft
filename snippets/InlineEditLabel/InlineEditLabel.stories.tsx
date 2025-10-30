@@ -9,6 +9,7 @@ import {
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const TYPE_SPEED = { delay: 40 };
+const labelMatcher = (label?: string) => new RegExp(label ?? "Edit label", "i");
 
 const meta: Meta<typeof InlineEditLabel> = {
   title: "Snippets/InlineEditLabel",
@@ -46,10 +47,11 @@ type Story = StoryObj<typeof InlineEditLabel>;
 export const Basic: Story = {};
 
 export const Interaction: Story = {
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole("button", { name: /edit label/i }));
-    const input = await canvas.findByRole("textbox", { name: /edit label/i });
+    const labelName = labelMatcher(args.ariaLabel);
+    await userEvent.click(canvas.getByRole("button", { name: labelName }));
+    const input = await canvas.findByRole("textbox", { name: labelName });
     await userEvent.clear(input);
     await userEvent.type(input, "Product strategy", TYPE_SPEED);
     await userEvent.keyboard("{Enter}");
@@ -64,11 +66,13 @@ export const CancelsWithEscape: Story = {
   args: {
     maxLength: 32,
     value: "Original value",
+    ariaLabel: "Edit text",
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole("button", { name: /edit label/i }));
-    const input = await canvas.findByRole("textbox", { name: /edit label/i });
+    const labelName = labelMatcher(args.ariaLabel);
+    await userEvent.click(canvas.getByRole("button", { name: labelName }));
+    const input = await canvas.findByRole("textbox", { name: labelName });
     await userEvent.clear(input);
     await userEvent.type(input, "Changed value", TYPE_SPEED);
     await userEvent.keyboard("{Escape}");
@@ -87,6 +91,7 @@ export const RetryOnError: Story = {
     value: "Launch plan",
     maxLength: 16,
     errorLabel: "Save failed. Retry to continue.",
+    ariaLabel: "Edit launch label",
   },
   render: (args) => {
     const [value, setValue] = useState(args.value);
@@ -107,14 +112,15 @@ export const RetryOnError: Story = {
 
     return <InlineEditLabel {...args} value={value} onSave={handleSave} />;
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
+    const labelName = labelMatcher(args.ariaLabel);
     const launchButton = await canvas.findByRole("button", {
-      name: /edit label/i,
+      name: labelName,
     });
     await userEvent.click(launchButton);
     const input = await canvas.findByRole("textbox", {
-      name: /edit label/i,
+      name: labelName,
     });
     await userEvent.clear(input);
     await userEvent.type(input, "Launch update", TYPE_SPEED);
