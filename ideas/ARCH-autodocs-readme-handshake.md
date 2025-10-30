@@ -1,7 +1,7 @@
 # ARCH-autodocs-readme-handshake
 
 Lane: A (Foundations & Docs Automation)
-Issue: (pending)
+Issue: 75
 
 ## Lane
 
