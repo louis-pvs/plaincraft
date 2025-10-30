@@ -253,6 +253,6 @@ pnpm scripts:size
 ## Related
 
 - Guardrails: `/scripts/GUARDRAILS.md`
-- Guide: `/guides/guide-scripts.md`
+- Playbook: `/playbook/patterns/script-automation-guardrails.html`
 - Core library: `/scripts/_lib/core.mjs`
 - Example scripts: `/scripts/checks/*.mjs`

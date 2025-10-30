@@ -96,9 +96,10 @@ node scripts/your-script.mjs --dry-run
 - Validate inputs with schemas
 - Log to STDERR, output to STDOUT
 
-## Related
+## Links
 
-- Guide: `/guides/guide-scripts.md`
+- Playbook narrative: `/playbook/patterns/script-automation-guardrails.html`
+- Storybook view: `/storybook/?path=/docs/governance-script-automation--docs`
 - Guardrails: `/scripts/GUARDRAILS.md`
 - Core library: `/scripts/_lib/core.mjs`
 - Policy lint: `/scripts/checks/policy-lint.mjs`

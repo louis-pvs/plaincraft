@@ -46,8 +46,9 @@ All idea documents must include:
 - `PB-[slug].md` - Playbook ideas
 - `B-[slug].md` - Brief ideas
 
-## Related
+## Links
 
-- `/guides/guide-workflow.md` - Workflow guide
-- `/guides/guide-changelog.md` - Changelog process
+- Playbook: `/playbook/patterns/ideas-source-of-truth.html`
+- Storybook: `/storybook/?path=/docs/governance-ideas-pipeline--docs`
+- Release storytelling: `/playbook/patterns/release-changelog-automation.html`
 - `/templates/ideas/USAGE.md` - Detailed usage examples

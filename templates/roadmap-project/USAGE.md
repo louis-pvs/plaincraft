@@ -115,6 +115,7 @@ node scripts/checks/validate-template.mjs templates/roadmap-project
 
 ## See Also
 
-- `/guides/guide-roadmap-setup.md` - Complete setup guide
+- `/playbook/patterns/roadmap-project-onboarding.html` - Playbook narrative
+- `/storybook/?path=/docs/governance-roadmap-onboarding--docs` - Storybook view
 - `/templates/issue-unit/` - Issue templates
 - `/templates/pull-request/` - PR templates

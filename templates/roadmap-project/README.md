@@ -36,7 +36,8 @@ gh project create --owner louis-pvs --title "Sprint Roadmap" \
 - Automated card movement based on issue/PR state
 - Sprint-based views and filtering
 
-## Related
+## Links
 
-- `/guides/guide-roadmap-setup.md` - Setup guide
-- `/scripts/ops/setup-project.mjs` - Automation script
+- Playbook: `/playbook/patterns/roadmap-project-onboarding.html`
+- Storybook: `/storybook/?path=/docs/governance-roadmap-onboarding--docs`
+- Automation script: `/scripts/ops/setup-project.mjs`
