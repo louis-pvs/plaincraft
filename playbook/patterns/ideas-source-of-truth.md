@@ -26,5 +26,6 @@ Plaincraft keeps work aligned by letting `/ideas` drive every downstream artifac
 
 - Template README: [`templates/ideas/README.md`](../../templates/ideas/README.md)
 - Template USAGE: [`templates/ideas/USAGE.md`](../../templates/ideas/USAGE.md)
+- Storybook View: [`storybook/docs/ideas-pipeline.mdx`](../../storybook/docs/ideas-pipeline.mdx)
 - Ops Scripts: [`scripts/ops/ideas-to-issues.mjs`](../../scripts/ops/ideas-to-issues.mjs), [`scripts/ops/create-worktree-pr.mjs`](../../scripts/ops/create-worktree-pr.mjs), [`scripts/ops/merge-subissue-to-parent.mjs`](../../scripts/ops/merge-subissue-to-parent.mjs), [`scripts/ops/sync-ideas-checklists.mjs`](../../scripts/ops/sync-ideas-checklists.mjs)
 - Decision Record: [`ideas/PB-readme-narrative-migration.md`](../../ideas/PB-readme-narrative-migration.md)

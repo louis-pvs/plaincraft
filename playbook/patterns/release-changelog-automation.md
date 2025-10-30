@@ -30,6 +30,7 @@ The template keeps the narrative constrained to business outcomes while the unit
 
 - Template README: [`templates/changelog/README.md`](../../templates/changelog/README.md)
 - Template USAGE: [`templates/changelog/USAGE.md`](../../templates/changelog/USAGE.md)
+- Storybook View: [`storybook/docs/release-changelog.mdx`](../../storybook/docs/release-changelog.mdx)
 - Unit README: [`scripts/ops/README.md`](../../scripts/ops/README.md) _(includes consolidate-changelog reference)_
 - Unit Script: [`scripts/ops/consolidate-changelog.mjs`](../../scripts/ops/consolidate-changelog.mjs)
 - Decision Record: [`ideas/PB-readme-narrative-migration.md`](../../ideas/PB-readme-narrative-migration.md)

@@ -225,7 +225,7 @@ See existing compliant scripts:
 
 ## Related Documentation
 
-- **Guide**: `/guides/guide-scripts.md`
+- **Playbook**: `/playbook/patterns/script-automation-guardrails.html`
 - **Core library**: `/scripts/_lib/core.mjs`
 - **Validation library**: `/scripts/_lib/validation.mjs`
 - **CI workflow**: `.github/workflows/ci.yml`

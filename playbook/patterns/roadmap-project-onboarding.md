@@ -26,5 +26,6 @@ During the README migration, Lane D cloned the roadmap template and ran the setu
 
 - Template README: [`templates/roadmap-project/README.md`](../../templates/roadmap-project/README.md)
 - Template USAGE: [`templates/roadmap-project/USAGE.md`](../../templates/roadmap-project/USAGE.md)
+- Storybook View: [`storybook/docs/roadmap-onboarding.mdx`](../../storybook/docs/roadmap-onboarding.mdx)
 - Setup Scripts: [`scripts/ops/setup-project.mjs`](../../scripts/ops/setup-project.mjs), [`scripts/ops/setup-labels.mjs`](../../scripts/ops/setup-labels.mjs)
 - Decision Record: [`ideas/PB-readme-narrative-migration.md`](../../ideas/PB-readme-narrative-migration.md)

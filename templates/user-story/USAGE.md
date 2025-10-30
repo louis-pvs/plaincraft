@@ -352,14 +352,14 @@ If technical notes section is empty:
 
 ## Related Workflows
 
-- **Idea to Story**: `/guides/guide-workflow.md` - Converting ideas to actionable stories
-- **Story to PR**: `/guides/guide-workflow.md` - Linking stories to pull requests
-- **Roadmap Management**: `/guides/guide-roadmap-setup.md` - Managing roadmap board
+- **Idea to Story**: `/playbook/patterns/ideas-source-of-truth.html` - Converting ideas to actionable stories
+- **Story to PR**: `/storybook/?path=/docs/governance-ideas-pipeline--docs` - Linking stories to pull requests
+- **Roadmap Management**: `/playbook/patterns/roadmap-project-onboarding.html` - Managing roadmap board
 
 ## Support
 
 For questions or issues:
 
-- Check `/guides/USER-STORY-GUIDE.md` if it exists
+- Review `/playbook/patterns/ideas-source-of-truth.html` for the latest governance guardrails
 - Review existing stories in `/ideas/` for examples
 - Ask in #product-development channel

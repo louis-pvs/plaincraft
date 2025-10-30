@@ -26,5 +26,6 @@ Repository scripts are the backbone of Plaincraft’s governance. They seed Issu
 
 - Template README: [`templates/script/README.md`](../../templates/script/README.md)
 - Template USAGE: [`templates/script/USAGE.md`](../../templates/script/USAGE.md)
+- Storybook View: [`storybook/docs/script-automation.mdx`](../../storybook/docs/script-automation.mdx)
 - Guardrail Scripts: [`scripts/checks/policy-lint.mjs`](../../scripts/checks/policy-lint.mjs), [`scripts/checks/smoke.mjs`](../../scripts/checks/smoke.mjs), [`scripts/checks/size-check.mjs`](../../scripts/checks/size-check.mjs)
 - Ops Examples: [`scripts/ops/consolidate-changelog.mjs`](../../scripts/ops/consolidate-changelog.mjs), [`scripts/ops/setup-project.mjs`](../../scripts/ops/setup-project.mjs)

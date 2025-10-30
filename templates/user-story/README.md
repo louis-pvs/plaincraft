@@ -46,7 +46,7 @@ Files should live in `/ideas/` directory alongside their source idea files.
 
 ## Related Files
 
-- `/guides/USER-STORY-GUIDE.md` - Best practices for writing effective stories (archived if exists)
+- `/playbook/patterns/ideas-source-of-truth.html` - Governance for idea-sourced stories
 - `/templates/ideas/` - Source idea templates
 - `/templates/roadmap-project/` - Roadmap card structure
 - `/scripts/new-snippet.mjs` - Story creation automation
