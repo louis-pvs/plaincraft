@@ -1,8 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
-import path from "node:path";
 import os from "node:os";
-
+import path from "node:path";
+import { mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
+import { describe, it, expect, afterAll } from "vitest";
 import { ensureIdeaMetadataForBootstrap } from "./create-worktree-pr.mjs";
 
 const tempDirs = [];

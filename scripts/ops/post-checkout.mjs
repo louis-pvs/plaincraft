@@ -14,6 +14,7 @@
  */
 
 import path from "node:path";
+import { stat } from "node:fs/promises";
 import { z } from "zod";
 import {
   Logger,
@@ -24,7 +25,6 @@ import {
   readJSON,
 } from "../_lib/core.mjs";
 import { getCurrentBranch, execCommand } from "../_lib/git.mjs";
-import { stat } from "node:fs/promises";
 
 const SCRIPT_NAME = "post-checkout";
 

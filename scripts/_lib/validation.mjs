@@ -138,7 +138,7 @@ export function validateCLIContract(content) {
  * @param {string} content - Script file content
  * @returns {object} Validation result
  */
-export function detectDangerousPatterns(content, allowlist = {}) {
+export function detectDangerousPatterns(content, _allowlist = {}) {
   const errors = [];
   const warnings = [];
 

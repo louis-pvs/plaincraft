@@ -8,7 +8,7 @@
 
 import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
-import { Logger, parseFlags, repoRoot, fail, succeed } from "../_lib/core.mjs";
+import { parseFlags, repoRoot, fail, succeed } from "../_lib/core.mjs";
 
 const DOC_SOURCES = [
   { base: "storybook/docs", extensions: [".md", ".mdx"] },
@@ -45,8 +45,6 @@ Exit codes:
 `);
   process.exit(0);
 }
-
-const logger = new Logger(args.logLevel || "info");
 
 function normalizeCommand(block) {
   return block

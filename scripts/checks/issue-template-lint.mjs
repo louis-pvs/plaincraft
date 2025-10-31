@@ -97,6 +97,7 @@ function includesAll(content, list, formatter) {
         });
         logger.warn(
           `Template missing for ${ticketType} tickets: ${templateRelative}`,
+          error,
         );
         continue;
       }
