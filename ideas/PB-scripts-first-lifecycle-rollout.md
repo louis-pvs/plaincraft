@@ -9,8 +9,8 @@ next_state: review
 issue: 91
 acceptance:
   - [x] Storybook governance docs walk through the four lifecycle commands with SoT links
-  - [x] Playbook pages narrate intake → branch → PR → closeout with business framing
-  - [x] Templates and README “Links” sections updated to the new governance docs
+  - [x] Playbook pages narrate intake -> branch -> PR -> closeout with business framing
+  - [x] Templates and README "Links" sections updated to the new governance docs
   - [ ] Training packet drafted for Lane D and shared in the ADR thread
 ---
 
@@ -51,11 +51,10 @@ status, ideas, and branches stay in sync.
 
 ## Acceptance Checklist
 
-- [ ] Storybook governance docs live for Intake, Branch, PR Open, and Closeout
+- [x] Storybook governance docs live for Intake, Branch, PR Open, and Closeout
       flows referencing helper APIs.
-- [ ] Playbook patterns published for lifecycle overview and rollback/rollback
-      play, linked from Storybook pages.
-- [ ] Templates and script READMEs updated to reference the new docs; redirect
+- [x] Playbook patterns published for lifecycle overview and rollback coverage, linked from Storybook pages.
+- [x] Templates and script READMEs updated to reference the new docs; redirect
       stubs placed for superseded content.
 - [ ] Training packet shared with Lane D + ADR subscribers, including quick
       start and FAQ.
