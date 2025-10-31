@@ -2,7 +2,7 @@
 
 Lane: C (DevOps & Automation)
 Issue: #96
-Status: in-progress
+Status: Ticketed
 
 ## Lane
 

@@ -67,6 +67,16 @@ const SCOPE_COMMANDS = {
       idea: IDEA_ID,
       cmd: ["pnpm", "run", "scripts:deprecation"],
     },
+    {
+      id: "commit:guard",
+      idea: IDEA_ID,
+      cmd: ["pnpm", "run", "commit:guard"],
+    },
+    {
+      id: "drift:check",
+      idea: IDEA_ID,
+      cmd: ["pnpm", "run", "drift:check"],
+    },
   ],
   docs: [
     { id: "docs:check", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:check"] },

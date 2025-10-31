@@ -24,6 +24,10 @@ cp scripts/config/lifecycle.json scripts/config/lifecycle.local.json
 pnpm scripts:test -- --filter lifecycle
 ```
 
+## Required Guardrails
+
+- `pnpm guardrails` must pass before promoting config changes. The lifecycle smoke check consumes this file and fails if the schema drifts.
+
 ## Rollback
 
 ```bash
@@ -35,4 +39,5 @@ git restore scripts/config/lifecycle.json scripts/config/README.md
 - Idea: ARCH-scripts-first-automation-suite
 - Guardrails: scripts/checks/lifecycle-smoke.mjs
 
-\_Owner: @lane-c
+<!-- prettier-ignore -->
+_Owner: @lane-c

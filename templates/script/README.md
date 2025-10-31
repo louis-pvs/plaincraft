@@ -33,6 +33,11 @@ node scripts/your-script.mjs --help
 node scripts/your-script.mjs --dry-run
 ```
 
+## Required Guardrails
+
+- Run `pnpm guardrails` locally before any PR. Treat failures (including `commit:guard`, `drift:check`, lifecycle smoke) as stop-ship conditions until resolved.
+- Capture dry-run transcripts for key commands in your PR description so reviewers can trace planned writes without executing the script.
+
 ## What's Included
 
 ### Required Header
@@ -100,6 +105,7 @@ node scripts/your-script.mjs --dry-run
 
 - Playbook narrative: `/playbook/patterns/script-automation-guardrails.html`
 - Storybook view: `/storybook/?path=/docs/governance-script-automation--docs`
+- Commit guard view: `/storybook/?path=/docs/governance-commit-guard--docs`
 - Lifecycle governance: `/storybook/?path=/docs/governance-lifecycle-overview--docs`
 - Guardrails: `/scripts/GUARDRAILS.md`
 - Core library: `/scripts/_lib/core.mjs`

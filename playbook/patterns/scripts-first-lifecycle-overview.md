@@ -13,14 +13,14 @@ The lifecycle only stays trustworthy when every transition runs through the sanc
 
 ## Worked Example
 
-Lane D triages PB-scripts-first-lifecycle-rollout and runs:
+Lane D triages `ARCH-scripts-first-automation-suite` and records one dry-run transcript per command:
 
-1. `pnpm ideas:create ideas/PB-scripts-first-lifecycle-rollout.md --yes` — validates the idea and opens Issue #91 with the Project card moved to Ticketed.
-2. `pnpm gh:worktree 91 --yes` — bootstraps the branch, stamps `Issue`/`Status` on the idea, and opens a draft PR.
-3. `pnpm pr:generate --yes` followed by `pnpm pr:verify` — refreshes the PR body from the idea and checks checklist compliance before re-requesting review.
-4. `pnpm changelog -- --yes` then `node scripts/ops/archive-idea-for-issue.mjs 91 --yes` — publishes the release note and archives the idea once merged.
+1. `pnpm ops:idea-intake --file ideas/ARCH-scripts-first-automation-suite.md --yes` — synchronises Project fields (`Lane`, `Type`, `Priority`, `Owner`) and moves the card to Ticketed.
+2. `pnpm ops:create-branch -- --id ARCH-123 --slug scripts-first-automation --yes` — creates `feat/ARCH-123-scripts-first-automation`, switches local worktree, and moves the Project status to Branched.
+3. `pnpm ops:open-or-update-pr -- --id ARCH-123 --yes` — opens or refreshes the draft PR title/body from the idea and transitions the Project status to PR Open.
+4. `pnpm ops:closeout -- --id ARCH-123 --yes` — after merge, deletes the feature branch, appends the changelog entry, bumps the Project status to Merged, and (optionally) archives the idea.
 
-Every stage leaves behind a dry-run transcript that Lane B links inside the Playbook status update so observers can see what changed without parsing git diffs.
+Before pushing, the developer runs `pnpm commit:guard -- --range origin/main..HEAD` to confirm headers are boring and `pnpm drift:check` so the idea still maps to canonical statuses. If anything drifts, the dry-run output points straight at the fix.
 
 ## Constraints to Honour
 
@@ -28,6 +28,15 @@ Every stage leaves behind a dry-run transcript that Lane B links inside the Play
 - Treat dry-run output as part of the review artifact. Attach it to project updates before running with `--yes`.
 - Avoid manual Project status edits. If a correction is required, re-run the command so the scripted reconciliation writes the truth.
 - Store `_tmp/` changelog entries and idea archives in source control so closeout remains reproducible.
+- Fail any work-in-progress branch until `pnpm guardrails` reports `ok: true`; each lane owns fixing its scope before requesting review.
+- Guardrails never skip: `pnpm guardrails` (or the CI job) now calls `commit:guard`, `drift:check`, and `scripts:lifecycle-smoke`. Fix violations locally before retrying the promotion.
+
+## Recovery Paths
+
+- **Script failed?** Re-run with `--dry-run --output json` to capture the diff plan, fix the underlying issue, then re-run with `--yes`.
+- **Commit headers rejected?** Run `pnpm commit:guard -- --range origin/main..HEAD --output json` to see the offending commit and amend it before pushing.
+- **Idea status drift?** Run `pnpm drift:check --output json` to list files missing canonical statuses or lanes, adjust the idea frontmatter, then re-run.
+- **CI smoke red?** `pnpm scripts:lifecycle-smoke --yes` reproduces the job locally (idea validation, branch/PR dry-run, baseline refresh) so you can repair the flow without waiting for another pipeline run.
 
 ## Links
 

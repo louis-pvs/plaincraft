@@ -28,6 +28,7 @@ The GitHub Project item falls back to `Branched` or `Ticketed` automatically bas
 - Always capture new dry-run logs in the status note; rollback without evidence is treated as manual intervention.
 - Use the same commands that moved the lifecycle forward to reverse it—never edit the Project card directly.
 - If release notes already shipped, append a new `_tmp/` entry that references the rollback and rerun `pnpm changelog` so the history records the change.
+- Re-run `pnpm guardrails` after each corrective commit; merging with failing scopes is not permitted even during rollback.
 
 ## Links
 

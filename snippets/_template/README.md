@@ -130,6 +130,9 @@ pnpm storybook:test
 
 # View in Storybook
 pnpm storybook
+
+# Run repository guardrails (required before PR)
+pnpm guardrails
 ```
 
 ## Examples
@@ -156,6 +159,7 @@ See `TemplateSnippet.stories.tsx` for:
 8. Confirm linting passes: `pnpm lint`
 9. Confirm tests pass: `pnpm test`
 10. Review in Storybook: `pnpm storybook`
+11. Run repository guardrails: `pnpm guardrails`
 
 ## Migration & Customization
 

@@ -34,6 +34,8 @@ pnpm scripts:test -- --filter my-automation
 - `pnpm scripts:test -- --filter create-worktree-pr` - required when modifying worktree bootstrap helpers
 - `pnpm gh:worktree <issue>` automatically ensures git hooks are installed in new worktrees before dependencies install, so lint-staged/Prettier fire on first commit.
 
+> **Hard requirement:** Always finish with `pnpm guardrails`. CI blocks merges for any lane when guardrails fail, so fix local violations (commit headers, drift, lifecycle smoke) before opening or updating a PR.
+
 ## Rollback
 
 ```bash
@@ -44,6 +46,7 @@ git restore scripts/ops/my-automation.mjs
 
 - USAGE: /templates/script/USAGE.md
 - Storybook: /storybook/?path=/docs/governance-script-automation--docs
+- Commit Guard: /storybook/?path=/docs/governance-commit-guard--docs
 - Playbook (Guardrails): /playbook/patterns/script-automation-guardrails.html
 - Playbook (Lifecycle kickoff): /playbook/patterns/scripts-first-lifecycle-rollout.html
 - Governance Report: /playbook/patterns/backlog-pilot-scripts-first.html

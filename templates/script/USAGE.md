@@ -4,6 +4,8 @@
 
 Create automation scripts that comply with all repository guardrails.
 
+> Always finish development with `pnpm guardrails`. Treat any failures as blockers until they are resolved.
+
 ## When to Use
 
 - Building new automation for the repository

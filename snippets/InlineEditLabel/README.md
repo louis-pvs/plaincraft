@@ -41,4 +41,5 @@ git restore snippets/InlineEditLabel
 - Storybook: /storybook/?path=/docs/patterns-inline-edit--docs
 - Playbook: /playbook/patterns/inline-edit-label.html
 
-\_Owner: @lane-c
+<!-- prettier-ignore -->
+_Owner: @lane-c

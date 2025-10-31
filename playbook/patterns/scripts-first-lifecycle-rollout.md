@@ -24,6 +24,7 @@ Lane C validates the idea, then calls `pnpm gh:worktree 91 --yes`. The script lo
 - Treat `--dry-run` output as the contract review; no writes happen until `--yes`, and the diff preview is what Lane B references in status notes.
 - Let the bootstrap commit stand until real work replaces it; deleting it before pushing a real commit stalls PR creation and breaks the automated branch check.
 - Avoid hand-crafted branches for lifecycle work. Skipping `pnpm gh:worktree` bypasses the metadata update and forces manual sync between the idea file, branch, and PR.
+- Run `pnpm guardrails` before requesting review so lane owners can see the automation scopes succeed alongside the new branch.
 
 ## Links
 

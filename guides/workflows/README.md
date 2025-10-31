@@ -23,7 +23,7 @@ Historical walkthroughs live in `guides/_archive/**`; ignore them when shipping 
    pnpm gh:worktree <issue-number> --no-draft
    ```
 4. Execute the relevant guide steps (see below) to keep changelog entries and release assets synchronized.
-5. Close the loop with `pnpm guides:check` before requesting review.
+5. Close the loop with `pnpm guardrails` (hard requirement across all lanes) and `pnpm guides:check` before requesting review. Guardrails failures block promotion until they are resolved locally.
 
 ## Related Guides
 

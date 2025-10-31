@@ -22,6 +22,7 @@ Canonical templates for creating idea files that populate GitHub Issues and driv
 - Contracts - API surface and props
 - Props + Shape - Data structure
 - Behaviors - Interaction patterns
+- Status log (chronological bullet list of lifecycle transitions)
 - Acceptance Checklist
 
 ### 2. Composition Template (`idea-composition-template.md`)
@@ -39,6 +40,7 @@ Canonical templates for creating idea files that populate GitHub Issues and driv
 - Lane (A/B/C/D)
 - Metric Hypothesis - Success criteria
 - Units In Scope - Which units compose this
+- Status log - Track Draft → Ticketed → Branched → PR Open → In Review → Merged
 - Acceptance Checklist
 
 ### 3. Brief Template (`idea-brief-template.md`)
@@ -56,6 +58,7 @@ Canonical templates for creating idea files that populate GitHub Issues and driv
 - Purpose - Why this exists
 - Problem - What needs solving
 - Proposal - How to solve it
+- Status log - Dated entries for major lifecycle decisions
 - Acceptance Checklist
 
 ## Quick Start
@@ -74,7 +77,7 @@ node scripts/ideas-to-issues.mjs U-your-slug.md
 
 # 5. Create worktree and PR (updates idea metadata)
 node scripts/create-worktree-pr.mjs <issue-number>
-# Updates the idea frontmatter with `Issue: #<number>` and `status: in-progress`
+# Updates the idea frontmatter with `Issue: #<number>` and logs the status transition
 # before pushing the bootstrap commit.
 ```
 
@@ -118,6 +121,8 @@ Once an idea file exists:
 - `sync-ideas-checklists.mjs` keeps checklists in sync
 - `create-worktree-pr.mjs` scaffolds branch and PR, updating the source idea
   with the assigned issue number and `status: in-progress`
+- Always run `pnpm guardrails` before pushing; treat failures as blockers until resolved.
+- Use `pnpm drift:check --output json` to confirm Lane/Status remain canonical before requesting review.
 
 ## Related Scripts
 

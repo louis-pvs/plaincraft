@@ -4,6 +4,8 @@ Complete guide for creating and managing development-ready user stories.
 
 ## Setup
 
+> Regardless of the setup option you choose, always finish with `pnpm guardrails`. A failing run means the story isn’t ready to move forward.
+
 ### Option 1: Manual Copy (Quick)
 
 ```bash

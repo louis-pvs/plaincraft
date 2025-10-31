@@ -37,6 +37,7 @@ All idea documents must include:
 - **Problem** - What problem it solves
 - **Proposal** - How to implement
 - **Acceptance Checklist** - Definition of done
+- **Status log** - Dated bullet list tracking lifecycle transitions (Draft → Ticketed → Branched → PR Open → In Review → Merged → Archived)
 
 ## Naming Convention
 
@@ -45,6 +46,12 @@ All idea documents must include:
 - `ARCH-[slug].md` - Architecture ideas
 - `PB-[slug].md` - Playbook ideas
 - `B-[slug].md` - Brief ideas
+
+## Required Guardrails
+
+- Run `pnpm guardrails` locally before every PR or status update. CI blocks merges when guardrails fail.
+- Use `pnpm drift:check --output json` to confirm idea metadata (lane/status) is canonical; fix any mismatches immediately.
+- Attach dry-run transcripts from the lifecycle commands (`ops:idea-intake`, `ops:create-branch`, `ops:open-or-update-pr`, `ops:closeout`, `ops:report`) to your status notes so other lanes can audit transitions without parsing diffs.
 
 ## Links
 
