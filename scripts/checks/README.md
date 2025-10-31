@@ -25,6 +25,14 @@ cp scripts/_template-checks.mjs scripts/checks/my-check.mjs
 pnpm scripts:test -- --filter my-check
 ```
 
+## guardrails:baseline
+
+```bash
+pnpm guardrails:baseline --output json
+```
+
+Summarizes the last N (default 10) `ci.yml` runs, reporting guardrails job p50/p95 runtimes alongside artifact sizes for `guardrails-report`, `storybook-static`, `demo-dist`, and `playbook-static`. Useful before adjusting the Guardrail Suite budget.
+
 ## Rollback
 
 ```bash

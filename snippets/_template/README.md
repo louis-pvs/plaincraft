@@ -6,6 +6,13 @@ One file UX snippet template following Plaincraft architecture standards.
 
 Short description of what this snippet solves and why it exists.
 
+## Scaffold
+
+```bash
+pnpm run new:snippet TemplateSnippet -- --dry-run
+# scaffold_ref: /templates/snippet-template-snippet@v0.1
+```
+
 ## Architecture
 
 This snippet follows the Plaincraft layered architecture:
@@ -164,3 +171,7 @@ See `ADOPTION.md` for detailed guidance on:
 - **ADOPTION.md** - Adoption guide and best practices
 - **DEVELOPMENT.md** (in `/guides/`) - Architecture standards
 - **InlineEditLabel** - Reference implementation
+
+<!-- _Owner: @lane-x -->
+
+Owner: @lane-x

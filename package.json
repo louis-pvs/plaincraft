@@ -80,6 +80,7 @@
     "guardrails:issues": "node scripts/checks/guardrails.mjs --scope issues",
     "guardrails:recordings": "node scripts/checks/guardrails.mjs --scope recordings",
     "guardrails:ci": "node scripts/checks/guardrails.mjs --output json",
+    "guardrails:baseline": "node scripts/checks/guardrails-baseline.mjs",
     "scripts:guardrails": "pnpm guardrails"
   },
   "devDependencies": {
