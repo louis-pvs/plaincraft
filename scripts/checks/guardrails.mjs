@@ -2,7 +2,7 @@
 /**
  * guardrails.mjs
  * @since 2025-11-01
- * @version 0.1.0
+ * @version 0.3.0
  * Summary: Orchestrate all guardrail commands with structured reporting
  */
 
@@ -18,7 +18,7 @@ Usage: node scripts/checks/guardrails.mjs [options]
 
 Options:
   --help                 Show this help message
-  --scope <list>         Comma-separated scopes to run (scripts,docs,pr,issues,recordings).
+  --scope <list>         Comma-separated scopes to run (app,scripts,docs,pr,issues,recordings).
                          Default: all scopes.
   --fail-fast            Stop at first failure (default: false)
   --dry-run              Included for contract completeness (no effect, read-only commands)
@@ -26,11 +26,13 @@ Options:
   --output <format>      Output format: text|json (default: text)
   --log-level <level>    Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>           Working directory (default: current)
+  --concurrency <n>      Run up to n guardrails in parallel (default: 3)
+  --sequential           Force sequential execution (overrides concurrency)
 
 Description:
-  Runs the Plaincraft guardrail suite (scripts lint/tests, docs checks,
-  PR template lint, issue template lint, recording smoke tests) and emits a
-  single structured summary for developers and CI.
+  Runs the Plaincraft build/lint/test bundle plus guardrail suites (scripts, docs,
+  PR template lint, issue template lint, recording smoke tests) and emits a single
+  structured summary for developers and CI.
 
 Exit codes:
   0  - All guardrails passed
@@ -42,8 +44,15 @@ Exit codes:
 const logger = new Logger(args.logLevel || "info");
 
 const IDEA_ID = "ARCH-unified-guardrails-suite";
+const DEFAULT_CONCURRENCY = 3;
 
 const SCOPE_COMMANDS = {
+  app: [
+    { id: "build", idea: IDEA_ID, cmd: ["pnpm", "run", "build"] },
+    { id: "typecheck", idea: IDEA_ID, cmd: ["pnpm", "run", "typecheck"] },
+    { id: "lint", idea: IDEA_ID, cmd: ["pnpm", "run", "lint"] },
+    { id: "test", idea: IDEA_ID, cmd: ["pnpm", "run", "test"] },
+  ],
   scripts: [
     { id: "scripts:lint", idea: IDEA_ID, cmd: ["pnpm", "run", "scripts:lint"] },
     { id: "scripts:test", idea: IDEA_ID, cmd: ["pnpm", "run", "scripts:test"] },
@@ -79,11 +88,18 @@ const SCOPE_COMMANDS = {
   ],
 };
 
-const DEFAULT_SCOPE_ORDER = ["scripts", "docs", "pr", "issues", "recordings"];
 const SCOPE_ALIASES = {
   ideas: "issues",
   issue: "issues",
 };
+const DEFAULT_SCOPE_ORDER = [
+  "app",
+  "scripts",
+  "docs",
+  "pr",
+  "issues",
+  "recordings",
+];
 
 (async () => {
   try {
@@ -97,88 +113,64 @@ const SCOPE_ALIASES = {
     );
 
     const failFast = Boolean(args["fail-fast"]);
+    const sequentialMode = Boolean(args.sequential);
+    const requestedConcurrency = args.concurrency ?? args.parallel;
+    const resolvedConcurrency = resolveConcurrency(requestedConcurrency);
+    const effectiveConcurrency =
+      failFast || sequentialMode ? 1 : resolvedConcurrency;
+
+    const taskQueue = buildTaskQueue(scopes);
+    const progress = createProgressReporter(taskQueue.length, logger);
+    progress.start();
+
     const results = [];
     let failures = 0;
 
-    for (const scope of scopes) {
-      const commands = SCOPE_COMMANDS[scope];
-      if (!commands || commands.length === 0) {
-        logger.warn(`Unknown or empty scope "${scope}" - skipping.`);
-        continue;
-      }
+    try {
+      if (effectiveConcurrency === 1) {
+        for (const task of taskQueue) {
+          const { result, failed } = await runGuardrailTask(task, root);
+          results.push(result);
+          progress.advance(task, result);
 
-      logger.info(`Running guardrail scope: ${scope}`);
-
-      for (const { id, cmd, optional, idea } of commands) {
-        const start = performance.now();
-        const commandLabel = cmd.join(" ");
-        logger.info(`→ ${id}`);
-
-        let status = "passed";
-        let stdout = "";
-        let stderr = "";
-        let exitCode = 0;
-
-        try {
-          const { all, exitCode: cmdExitCode } = await execa(
-            cmd[0],
-            cmd.slice(1),
-            {
-              cwd: root,
-              all: true,
-              reject: false,
-            },
-          );
-          stdout = all || "";
-          exitCode = typeof cmdExitCode === "number" ? cmdExitCode : 0;
-          status = exitCode === 0 ? "passed" : "failed";
-        } catch (error) {
-          status = "failed";
-          exitCode = error.exitCode ?? 1;
-          stdout = error.all || error.stdout || "";
-          stderr = error.stderr || "";
+          if (failed && !task.optional) {
+            failures++;
+            if (failFast) {
+              throw new Error(
+                `Guardrail ${task.id} failed (fail-fast enabled)`,
+              );
+            }
+          }
         }
+      } else {
+        const resultsByIndex = new Array(taskQueue.length);
+        let cursor = 0;
+        const workerCount = Math.min(effectiveConcurrency, taskQueue.length);
 
-        const durationMs = Math.round(performance.now() - start);
-
-        if ((status === "failed" || exitCode !== 0) && optional) {
-          status = "skipped";
-          exitCode = 0;
-        }
-
-        const failed = status === "failed" || exitCode !== 0;
-
-        if (failed && !optional) {
-          failures++;
-          if (failFast) {
-            results.push({
-              scope,
-              id,
-              idea,
-              command: commandLabel,
-              status,
-              exitCode,
-              durationMs,
-              output: summarizeOutput(stdout, stderr),
-            });
-            throw new Error(`Guardrail ${id} failed (fail-fast enabled)`);
+        async function worker() {
+          while (true) {
+            const index = cursor++;
+            if (index >= taskQueue.length) break;
+            const task = taskQueue[index];
+            const { result, failed } = await runGuardrailTask(task, root);
+            progress.advance(task, result);
+            resultsByIndex[index] = result;
+            if (failed && !task.optional) {
+              failures++;
+            }
           }
         }
 
-        results.push({
-          scope,
-          id,
-          idea,
-          command: commandLabel,
-          status,
-          exitCode,
-          durationMs,
-          output:
-            failed || args.output === "json"
-              ? summarizeOutput(stdout, stderr)
-              : undefined,
-        });
+        await Promise.all(Array.from({ length: workerCount }, () => worker()));
+
+        for (const entry of resultsByIndex) {
+          if (entry) {
+            results.push(entry);
+          }
+        }
       }
+    } finally {
+      progress.finish();
     }
 
     const summary = {
@@ -243,4 +235,146 @@ function summarizeOutput(stdout, stderr) {
     return [...head, "...", ...tail].join("\n");
   }
   return lines.join("\n");
+}
+
+function createProgressReporter(totalTasks, logger) {
+  let completed = 0;
+
+  return {
+    start() {
+      if (totalTasks === 0) {
+        logger.info("[progress] No guardrail commands queued");
+        return;
+      }
+      logger.info(
+        `[progress] 0/${totalTasks} ${renderProgressBar(0, totalTasks)}`,
+      );
+    },
+    advance(task, result) {
+      if (totalTasks === 0) return;
+      completed = Math.min(totalTasks, completed + 1);
+      const statusLabel = formatStatusLabel(result.status);
+      logger.info(
+        `[progress] ${completed}/${totalTasks} ${renderProgressBar(
+          completed,
+          totalTasks,
+        )} ${task.id}${statusLabel}`,
+      );
+    },
+    finish() {
+      if (totalTasks === 0) return;
+      const label = completed >= totalTasks ? "complete" : "halted";
+      logger.info(
+        `[progress] ${label} ${completed}/${totalTasks} ${renderProgressBar(
+          completed,
+          totalTasks,
+        )}`,
+      );
+    },
+  };
+}
+
+function renderProgressBar(completed, total) {
+  const safeTotal = Math.max(0, total);
+  if (safeTotal === 0) return "[]";
+  const safeCompleted = Math.min(Math.max(completed, 0), safeTotal);
+  const pending = safeTotal - safeCompleted;
+  return `[${"=".repeat(safeCompleted)}${".".repeat(pending)}]`;
+}
+
+function formatStatusLabel(status) {
+  if (!status || status === "passed") return "";
+  if (status === "failed") return " (failed)";
+  if (status === "skipped") return " (skipped)";
+  return ` (${status})`;
+}
+
+function resolveConcurrency(value) {
+  if (value === undefined || value === null) {
+    return DEFAULT_CONCURRENCY;
+  }
+
+  const parsed =
+    typeof value === "string"
+      ? Number.parseInt(value, 10)
+      : Number.parseInt(String(value), 10);
+
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+
+  return DEFAULT_CONCURRENCY;
+}
+
+function buildTaskQueue(scopes) {
+  const tasks = [];
+
+  for (const scope of scopes) {
+    const commands = SCOPE_COMMANDS[scope];
+    if (!commands || commands.length === 0) {
+      logger.warn(`Unknown or empty scope "${scope}" - skipping.`);
+      continue;
+    }
+
+    logger.info(`Running guardrail scope: ${scope}`);
+
+    for (const command of commands) {
+      tasks.push({ scope, ...command });
+    }
+  }
+
+  return tasks;
+}
+
+async function runGuardrailTask(task, root) {
+  const { scope, id, cmd, optional, idea } = task;
+  const start = performance.now();
+  logger.info(`→ ${id}`);
+
+  let status = "passed";
+  let stdout = "";
+  let stderr = "";
+  let exitCode = 0;
+
+  try {
+    const { all, exitCode: cmdExitCode } = await execa(cmd[0], cmd.slice(1), {
+      cwd: root,
+      all: true,
+      reject: false,
+    });
+    stdout = all || "";
+    exitCode = typeof cmdExitCode === "number" ? cmdExitCode : 0;
+    status = exitCode === 0 ? "passed" : "failed";
+  } catch (error) {
+    status = "failed";
+    exitCode = error.exitCode ?? 1;
+    stdout = error.all || error.stdout || "";
+    stderr = error.stderr || "";
+  }
+
+  const durationMs = Math.round(performance.now() - start);
+
+  let failed = status === "failed" || exitCode !== 0;
+
+  if (failed && optional) {
+    status = "skipped";
+    exitCode = 0;
+    failed = false;
+  }
+
+  const result = {
+    scope,
+    id,
+    idea,
+    command: cmd.join(" "),
+    status,
+    exitCode,
+    durationMs,
+    output:
+      failed || args.output === "json"
+        ? summarizeOutput(stdout, stderr)
+        : undefined,
+  };
+
+  return { result, failed };
 }

@@ -7,7 +7,7 @@ Template scaffolds: `/templates/script/`.
 ## Runbook
 
 ```bash
-# Guardrails bundle
+# Guardrails bundle (build + lint + typecheck + test + guardrails)
 pnpm guardrails
 
 # Individual checks
@@ -16,6 +16,8 @@ pnpm scripts:smoke    # --help / --dry-run probes
 pnpm scripts:size     # LOC budget
 pnpm scripts:test     # unit tests
 ```
+
+`pnpm guardrails` now drives build, lint, typecheck, and test alongside the script/doc guardrails, fanning out up to three jobs at a time to stay inside the +90s budget. Watch the `[progress]` bar for dot updates, pass `--concurrency <n>` to tune throughput, or `--sequential` to match the legacy single-file order during incident response.
 
 All scripts honour the shared CLI contract:
 
