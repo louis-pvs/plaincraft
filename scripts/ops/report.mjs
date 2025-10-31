@@ -1,160 +1,65 @@
 #!/usr/bin/env node
 /**
  * report.mjs
- * @since 2025-10-31
+ * @since 2025-11-03
  * @version 0.1.0
- * Summarise Plaincraft Roadmap governance metadata for backlog pilots.
- *
- * The script reads `.repo/projects.json`, verifies the lifecycle v3 schema,
- * and emits a concise audit report. It defaults to dry-run mode so automation
- * can preview the plan before calling `--yes` to generate artefacts.
+ * Emit lifecycle configuration snapshot for dashboards.
  */
 
-import path from "node:path";
-import {
-  parseFlags,
-  succeed,
-  fail,
-  Logger,
-  repoRoot,
-  readJSON,
-  now,
-} from "../_lib/core.mjs";
+import { z } from "zod";
+import { parseFlags, fail, succeed, repoRoot, now } from "../_lib/core.mjs";
+import { loadLifecycleConfig } from "../_lib/lifecycle.mjs";
 
-const SCRIPT_NAME = "ops-report";
-const REQUIRED_FIELDS = [
-  "ID",
-  "Type",
-  "Lane",
-  "Status",
-  "Owner",
-  "Priority",
-  "Release",
-];
-const REQUIRED_STATUSES = [
-  "Draft",
-  "Ticketed",
-  "Branched",
-  "PR Open",
-  "In Review",
-  "Merged",
-  "Archived",
-];
-const REQUIRED_LANES = ["A", "B", "C", "D"];
-
-const args = parseFlags(process.argv.slice(2));
-
-if (args.help) {
-  console.log(`
-Usage: pnpm ops:report [options]
-
-Generate a Scripts-First lifecycle governance report based on the cached
-Plaincraft Roadmap metadata stored in .repo/projects.json.
-
-Options:
-  --help            Show this message
-  --dry-run         Preview actions without producing output (default)
-  --yes             Execute the audit and emit a report
-  --output <fmt>    Output format: text (default) or json
-  --log-level <L>   Log level: trace|debug|info|warn|error (default: info)
-  --cwd <path>      Repository path (defaults to current directory)
-`);
-  process.exit(0);
-}
-
-const logger = new Logger(args.logLevel || "info");
-const dryRun = args.dryRun !== false && args.yes !== true;
+const FLAG_SCHEMA = z.object({
+  output: z.string().optional(),
+  logLevel: z.string().optional(),
+  cwd: z.string().optional(),
+  format: z.enum(["json", "text"]).optional().default("json"),
+  dryRun: z.boolean().default(true),
+  yes: z.boolean().default(false),
+});
 
 (async () => {
   try {
-    const root = await repoRoot(args.cwd);
-    const cachePath = path.join(root, ".repo", "projects.json");
+    const rawFlags = parseFlags(process.argv.slice(2));
+    const flags = FLAG_SCHEMA.parse(rawFlags);
+    const root = await repoRoot(flags.cwd);
+    const config = await loadLifecycleConfig({ cwd: root });
+
     const payload = {
-      script: SCRIPT_NAME,
       generatedAt: now(),
-      cachePath: path.relative(root, cachePath),
+      projectId: config.project.id,
+      statuses: config.project.statuses,
+      types: config.project.types,
+      lanes: config.project.lanes,
+      priorities: config.project.priorities,
+      branchPrefixes: config.branches.allowedPrefixes,
     };
 
-    if (dryRun) {
+    if (flags.dryRun || !flags.yes) {
       await succeed({
-        ...payload,
+        script: "report",
         dryRun: true,
-        message:
-          "Dry run: would verify .repo/projects.json and emit lifecycle v3 report. Re-run with --yes to execute.",
-        output: args.output,
+        payload,
+        output: flags.output,
       });
       return;
     }
 
-    logger.info(`Reading project cache: ${payload.cachePath}`);
-    const cache = await readJSON(cachePath);
-
-    if (!cache?.project) {
-      throw new Error(
-        "Project cache missing `project` key. Run `pnpm ops:report --dry-run` after updating cache.",
-      );
-    }
-
-    const { project } = cache;
-    const fieldNames = Object.keys(project.fields ?? {});
-    const missingFields = REQUIRED_FIELDS.filter(
-      (name) => !fieldNames.includes(name),
-    );
-
-    const statusOptions = project.fields?.Status?.options ?? [];
-    const statusNames = statusOptions.map((option) => option.name);
-    const missingStatuses = REQUIRED_STATUSES.filter(
-      (status) => !statusNames.includes(status),
-    );
-
-    const laneOptions = project.fields?.Lane?.options ?? [];
-    const laneNames = laneOptions.map((option) => option.name);
-    const missingLanes = REQUIRED_LANES.filter(
-      (lane) => !laneNames.includes(lane),
-    );
-
-    const warnings = [];
-    if (missingFields.length) {
-      warnings.push(`Missing fields: ${missingFields.join(", ")}`);
-    }
-    if (missingStatuses.length) {
-      warnings.push(`Missing status options: ${missingStatuses.join(", ")}`);
-    }
-    if (missingLanes.length) {
-      warnings.push(`Missing lane options: ${missingLanes.join(", ")}`);
-    }
-
-    const report = {
-      ...payload,
-      dryRun: false,
-      project: {
-        id: project.id,
-        number: project.number,
-        name: project.name,
-        url: project.url,
-        fieldCount: fieldNames.length,
-      },
-      lifecycle: {
-        statuses: statusNames,
-        lanes: laneNames,
-        priorities:
-          project.fields?.Priority?.options?.map((option) => option.name) ?? [],
-      },
-      automation: {
-        workflows: project.automation?.workflows ?? [],
-        scripts: project.automation?.scripts ?? [],
-      },
-      warnings,
-      output: args.output,
-    };
-
-    await succeed(report);
+    await fail({
+      script: "report",
+      exitCode: 10,
+      message:
+        "Report publishing not implemented. Use --dry-run to inspect current payload.",
+      error: payload,
+      output: flags.output,
+    });
   } catch (error) {
     await fail({
-      script: SCRIPT_NAME,
-      output: args.output,
-      message: "Failed to generate lifecycle governance report",
+      script: "report",
+      message: "report failed",
       error: error?.message || String(error),
+      output: undefined,
     });
   }
 })();

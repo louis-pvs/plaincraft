@@ -31,6 +31,9 @@
     "ops:idea-intake": "node scripts/ops/idea-intake.mjs",
     "ops:create-branch": "node scripts/ops/create-branch.mjs",
     "ops:open-or-update-pr": "node scripts/ops/open-or-update-pr.mjs",
+    "ops:reconcile-status": "node scripts/ops/reconcile-status.mjs",
+    "ops:closeout": "node scripts/ops/closeout.mjs",
+    "ops:report": "node scripts/ops/report.mjs",
     "lint:staged": "lint-staged",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -84,7 +87,6 @@
     "guardrails:recordings": "node scripts/checks/guardrails.mjs --scope recordings",
     "guardrails:ci": "node scripts/checks/guardrails.mjs --output json",
     "guardrails:baseline": "node scripts/checks/guardrails-baseline.mjs",
-    "ops:report": "node scripts/ops/report.mjs",
     "scripts:lifecycle-smoke": "node scripts/checks/lifecycle-smoke.mjs",
     "scripts:guardrails": "pnpm guardrails"
   },

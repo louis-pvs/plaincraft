@@ -69,6 +69,66 @@ const CHECKS = [
     description: "Dry-run guardrails baseline reporting",
     command: ["pnpm", ["run", "guardrails:baseline", "--", "--output", "json"]],
   },
+  {
+    id: "ops-create-branch-smoke",
+    lane: "C",
+    description: "Dry-run create-branch for lifecycle smoke",
+    command: [
+      "pnpm",
+      [
+        "ops:create-branch",
+        "--",
+        "--id",
+        "ARCH-123",
+        "--slug",
+        "lifecycle-smoke",
+      ],
+    ],
+  },
+  {
+    id: "ops-open-pr-smoke",
+    lane: "C",
+    description: "Dry-run open-or-update-pr for lifecycle smoke",
+    command: [
+      "pnpm",
+      [
+        "ops:open-or-update-pr",
+        "--",
+        "--id",
+        "ARCH-123",
+        "--branch",
+        "feat/ARCH-123-lifecycle-smoke",
+      ],
+    ],
+  },
+  {
+    id: "ops-reconcile-smoke",
+    lane: "C",
+    description: "Dry-run reconcile-status for lifecycle smoke",
+    command: [
+      "pnpm",
+      [
+        "ops:reconcile-status",
+        "--",
+        "--id",
+        "ARCH-ideas",
+        "--file",
+        "ideas/ARCH-ideas-folder-pipeline.md",
+      ],
+    ],
+  },
+  {
+    id: "ops-closeout-smoke",
+    lane: "C",
+    description: "Dry-run closeout plan",
+    command: ["pnpm", ["ops:closeout", "--", "--id", "ARCH-123"]],
+  },
+  {
+    id: "ops-report-smoke",
+    lane: "C",
+    description: "Dry-run lifecycle report",
+    command: ["pnpm", ["ops:report"]],
+  },
 ];
 
 (async () => {

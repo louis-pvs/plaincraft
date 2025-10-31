@@ -53,3 +53,4 @@ CLI surface or CI enforcement to make it real. Missing automation leaves us with
 ## Status
 
 - 2025-10-31 - In progress: Lifecycle config + loaders landed (`scripts/config/lifecycle.json`, `scripts/_lib/lifecycle.mjs`), and intake/branch/PR commands now emit validated plans (`ops/idea-intake.mjs`, `ops/create-branch.mjs`, `ops/open-or-update-pr.mjs`). CI guardrail job calls `pnpm scripts:lifecycle-smoke` but Projects mutations (status reconcile, closeout, report) still pending.
+- 2025-11-03 - Latest: Added placeholder planners for `ops/reconcile-status.mjs`, `ops/closeout.mjs`, `ops/report.mjs`, and extended lifecycle smoke to exercise the new scripts. Guardrails still failing on policy lint until the CLI contract flags (`--yes`, `--output`, `--log-level`, `--cwd`) are added to the new ops commands and documentation is updated.
