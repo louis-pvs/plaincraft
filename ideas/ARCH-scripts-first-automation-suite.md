@@ -1,7 +1,8 @@
 # ARCH-scripts-first-automation-suite
 
 Lane: C (DevOps & Automation)
-Issue: 97
+Issue: #97
+Status: in-progress
 
 ## Lane
 
