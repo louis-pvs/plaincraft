@@ -9,6 +9,7 @@
 import path from "node:path";
 import {
   parseFlags,
+  resolveLogLevel,
   fail,
   succeed,
   Logger,
@@ -19,6 +20,7 @@ import {
 
 const start = Date.now();
 const args = parseFlags(process.argv.slice(2));
+const log = new Logger(resolveLogLevel({ flags: args }));
 
 if (args.help) {
   // eslint-disable-next-line no-console
@@ -30,7 +32,9 @@ Options:
   --dry-run           Preview changes without writing (default: true)
   --yes               Execute writes (overrides --dry-run)
   --output <format>   Output format: json|text (default: text)
-  --log-level <level> Log level: trace|debug|info|warn|error (default: info)
+  --log-level <level> Log level: trace|debug|info|warn|error
+  --verbose           Shortcut for --log-level debug
+  --quiet             Shortcut for --log-level error
   --cwd <path>        Working directory (default: current directory)
 
 Description:
@@ -52,24 +56,26 @@ Examples:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel || "info");
 const runId = generateRunId();
 const dryRun = args.dryRun !== false && args.yes !== true;
 
-logger.info(`Starting template-script (runId: ${runId})`);
-logger.debug(`Options: ${JSON.stringify(args)}`);
+log.info("script.start", { runId, dryRun, output: args.output });
+log.debug("script.flags", { args });
 
 try {
   // 1. Get repo root
   const root = await repoRoot(args.cwd);
-  logger.debug(`Repository root: ${root}`);
+  log.debug("context.repo", { root });
 
   // 2. Run preflight checks
-  await preflight(root);
+  const preflightStep = log.step("preflight", { runId });
+  await preflight(root, log);
+  preflightStep.done();
 
   // 3. Build plan
+  const planStep = log.step("plan.build", { runId });
   const plan = await buildPlan(root);
-  logger.info(`Plan: ${plan.length} actions`);
+  planStep.done({ actions: plan.length });
 
   // 4. Execute or preview
   if (dryRun) {
@@ -85,7 +91,9 @@ try {
   }
 
   // 5. Execute plan
-  const results = await executePlan(plan, root);
+  const execStep = log.step("plan.execute", { runId });
+  const results = await executePlan(plan, root, log);
+  execStep.done({ results: results.length });
 
   // 6. Success
   succeed({
@@ -96,6 +104,7 @@ try {
     durationMs: Date.now() - start,
   });
 } catch (error) {
+  log.error("script.fail", { runId, error: error.message });
   fail({
     runId,
     script: "template-script",
@@ -109,8 +118,9 @@ try {
 /**
  * Preflight validation checks
  * @param {string} _root - Repository root path
+ * @param {Logger} logger - Shared logger
  */
-async function preflight(_root) {
+async function preflight(_root, logger) {
   // Add precondition checks here
   // Example: check if required files exist, git status clean, etc.
   logger.debug("Preflight checks passed");
@@ -136,19 +146,24 @@ async function buildPlan(_root) {
  * @param {string} root - Repository root path
  * @returns {Promise<Array>} Execution results
  */
-async function executePlan(plan, root) {
+async function executePlan(plan, root, logger) {
   const results = [];
 
   for (const step of plan) {
-    logger.info(`Executing: ${step.action} ${step.file || ""}`);
+    const stepLog = logger.step("plan.step", {
+      action: step.action,
+      file: step.file,
+    });
 
     switch (step.action) {
       case "write":
         await atomicWrite(path.join(root, step.file), step.content);
         results.push({ action: "write", file: step.file, status: "success" });
+        stepLog.done({ result: "updated" });
         break;
 
       default:
+        stepLog.fail(new Error("unknown action"), { result: "unknown" });
         throw new Error(`Unknown action: ${step.action}`);
     }
   }

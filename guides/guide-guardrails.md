@@ -37,9 +37,10 @@ last_verified: 2025-11-03
 
    - The suite covers app build/lint/test plus script, docs, PR, issue, and recording checks.
    - Lane-specific focus:
-     - **Lane A/B (units):** investigate React/Vitest failures and Storybook diffs surfaced in the app scope.
-     - **Lane C (automation):** keep `scripts:*` scopes green; repair policy or size violations immediately.
-     - **Lane D (narrative):** fix docs lint/dedupe failures and ensure Playbook link guard stays clean.
+     - **Lane A (Foundations & Tooling):** investigate React/Vitest failures and component regressions surfaced in the app scope.
+     - **Lane B (Narrative & Enablement):** resolve Storybook governance diffs and Playbook snapshot drifts.
+     - **Lane C (DevOps & Automation):** keep `scripts:*` scopes green; repair policy or size violations immediately.
+     - **Lane D (Program Operations):** clear docs lint/dedupe violations and ensure Playbook link guard stays clean for roadmap reporting.
 
 3. **Triage failures with scoped runs when needed:**
 

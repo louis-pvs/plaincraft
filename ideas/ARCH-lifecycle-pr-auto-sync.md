@@ -6,6 +6,7 @@ Status: Draft
 ## Lane
 
 - **Primary Lane:** C (DevOps & Automation)
+- **Partners:** Lane B (Narrative & Enablement) for Storybook/Playbook updates, Lane D (Program Operations) for rollout training and status-note templates.
 - **Labels:** lifecycle, automation, github-api
 
 ## Purpose
@@ -29,14 +30,15 @@ We currently emit dry-run plans (`ops/open-or-update-pr.mjs`, `ops/reconcile-sta
    - `report` publishes lifecycle snapshots to the repo (JSON) and GitHub summary.
 2. Factor shared GitHub client utilities into `scripts/_lib/github.mjs` (reuse existing token detection and repo slug helpers).
 3. Extend lifecycle smoke with a `--execute` gate in CI (nightly) to cover a sandbox repository, while keeping PR checks in dry-run mode.
-4. Update documentation (Playbook, Storybook, templates) to reflect the new `--yes` modes and permissions needed.
+4. Ship documentation updates in partnership with Lane B (Playbook + Storybook narratives) and Lane D (backlog training packets, status-note templates) so the new `--yes` modes and permissions are understood.
 
 ## Acceptance Checklist
 
 - [ ] Lifecycle ops (`open-or-update-pr`, `reconcile-status`, `closeout`, `report`) perform GitHub mutations when `--yes` is supplied.
 - [ ] `scripts/_lib/github.mjs` exposes reusable helpers with error handling and rate-limit backoff.
 - [ ] Lifecycle smoke gains an optional `--execute` path (nightly CI) using a sandbox repo to validate writes.
-- [ ] Storybook + Playbook docs updated to describe the automated PR/Project sync behaviour.
+- [ ] Lane B narratives (Storybook + Playbook) document the automated PR/Project sync behaviour, permissions, and rollback expectations.
+- [ ] Lane D backlog/training packet refreshed with `--yes` runbooks and status-note copy for the automated sync.
 - [ ] `pnpm guardrails` (dry-run) stays green; nightly execute job publishes a summary artifact.
 
 ## Status

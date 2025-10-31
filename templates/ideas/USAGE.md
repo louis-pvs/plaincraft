@@ -107,10 +107,10 @@ Each sub-issue becomes a separate GitHub Issue linked to parent.
 
 ## Lane Definitions
 
-- **A** - Core infrastructure, foundational work
-- **B** - Feature development, user-facing functionality
-- **C** - Improvements, refactoring, technical debt
-- **D** - Documentation, process, non-code work
+- **A — Foundations & Tooling**: Autodocs, shared component primitives, and interaction testing infrastructure.
+- **B — Narrative & Enablement**: Playbook/Storybook narratives, documentation migrations, and developer training material.
+- **C — DevOps & Automation**: Guardrails, CLI workflows, CI pipelines, and policy enforcement.
+- **D — Program Operations**: Backlog pilots, release governance, roadmap hygiene, and cross-lane coordination.
 
 ## Automation
 

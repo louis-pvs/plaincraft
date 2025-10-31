@@ -49,7 +49,7 @@ gh project link <PROJECT_ID> --repo louis-pvs/plaincraft
 ### Custom Fields
 
 - **Priority** - High, Medium, Low
-- **Lane** - A, B, C, D (complexity lanes)
+- **Lane** - Execution lane (A Foundations & Tooling, B Narrative & Enablement, C DevOps & Automation, D Program Operations)
 - **Effort** - T-shirt sizing (XS, S, M, L, XL)
 - **Sprint** - Sprint number or milestone
 

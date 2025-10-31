@@ -14,9 +14,10 @@ Historical walkthroughs live in `guides/_archive/**`; ignore them when shipping 
 ## How to Use
 
 1. Choose the correct lane:
-   - Lane A/B (`U-`): unit scope
-   - Lane C (`C-`): composition or integration work
-   - Lane D (`ARCH-`/`PB-`): architecture or playbook updates
+   - **Lane A (Foundations & Tooling)** — Autodocs, shared primitives, and interaction test scaffolds (often `U-` ideas).
+   - **Lane B (Narrative & Enablement)** — Playbook/Storybook narratives, documentation migrations, and enablement packets (`PB-`/`B-` ideas).
+   - **Lane C (DevOps & Automation)** — Guardrails, CLI workflows, CI/policy automation (`ARCH-` automation efforts, script updates).
+   - **Lane D (Program Operations)** — Backlog pilots, release governance, lifecycle training, and cross-lane coordination (`ARCH-`/`PB-` ops briefs).
 2. Generate idea + issue artifacts with the idea templates and `node scripts/ideas-to-issues.mjs`.
 3. Spawn an isolated worktree (command updates the source idea with the issue number and flips status to `in-progress`):
    ```bash

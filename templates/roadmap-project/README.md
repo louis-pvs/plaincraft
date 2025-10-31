@@ -32,7 +32,7 @@ gh project create --owner louis-pvs --title "Sprint Roadmap" \
 ## Features
 
 - Standard column structure (Backlog, In Progress, Review, Done)
-- Custom fields for priority, lane, and effort
+- Custom fields for priority, lane (Foundations/Narrative/Automation/Operations), and effort
 - Automated card movement based on issue/PR state
 - Sprint-based views and filtering
 
