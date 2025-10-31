@@ -158,7 +158,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PROJECT_NAME="${{ github.event.inputs.project_name }}"
-          node scripts/setup-project.mjs --project-name "$PROJECT_NAME"
+          node scripts/ops/setup-project.mjs --project-name "$PROJECT_NAME"
 
       - name: Commit config updates
         if: success()

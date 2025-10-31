@@ -77,7 +77,7 @@ jobs:
         run: |
           echo "🔨 Creating Plaincraft Roadmap project..."
           pnpm gh:setup-labels
-          node scripts/setup-project.mjs --project-name "Plaincraft Roadmap"
+          node scripts/ops/setup-project.mjs --project-name "Plaincraft Roadmap"
 
           # Commit the config
           git config user.name "github-actions[bot]"
