@@ -52,6 +52,7 @@ const MAX_DEPRECATED_DAYS = 90;
 
 logger.info("Deprecation sweep started", {
   maxDays: MAX_DEPRECATED_DAYS,
+  example: "@deprecated since=2025-10-01 replace=scripts/new-script.mjs",
 });
 
 try {
@@ -66,6 +67,7 @@ try {
 
   logger.info("Scanning scripts for @deprecated", {
     total: allScripts.length,
+    example: "Use '@deprecated since=YYYY-MM-DD replace=path/to/new-script'.",
   });
 
   for (const scriptPath of allScripts) {
@@ -102,6 +104,8 @@ try {
           file: relativePath,
           daysDeprecated,
           replacement: replacementScript,
+          example:
+            "@deprecated since=2025-10-01 replace=scripts/new-script.mjs",
         });
       } else if (daysRemaining <= 14) {
         warningScripts.push(scriptInfo);
@@ -109,11 +113,15 @@ try {
           file: relativePath,
           daysRemaining,
           replacement: replacementScript,
+          example:
+            "@deprecated since=2025-10-01 replace=scripts/new-script.mjs",
         });
       } else {
         logger.debug("Deprecated script tracked", {
           file: relativePath,
           daysRemaining,
+          example:
+            "@deprecated since=2025-10-01 replace=scripts/new-script.mjs",
         });
       }
     }
@@ -140,12 +148,16 @@ try {
         logger.error("Deprecated folder script expired", {
           file: relativePath,
           daysOld: ageInDays,
+          example:
+            "Move script out of scripts/DEPRECATED or replace before 90 days.",
         });
       }
     }
   } catch {
     // DEPRECATED directory doesn't exist yet
-    logger.debug("DEPRECATED directory not found");
+    logger.debug("DEPRECATED directory not found", {
+      example: "Create scripts/DEPRECATED/ when parking legacy scripts.",
+    });
   }
 
   const durationMs = Date.now() - start;
@@ -173,6 +185,7 @@ try {
 } catch (error) {
   logger.error("Deprecation sweep failed", {
     error: error?.message || String(error),
+    example: "@deprecated since=2025-10-01 replace=scripts/new-script.mjs",
   });
   fail({
     runId,

@@ -141,6 +141,7 @@ const DEFAULT_SCOPE_ORDER = [
       failFast,
       sequential: sequentialMode,
       concurrency: effectiveConcurrency,
+      example: "node scripts/checks/guardrails.mjs --scope app,scripts",
     });
 
     const taskQueue = buildTaskQueue(scopes);
@@ -212,6 +213,7 @@ const DEFAULT_SCOPE_ORDER = [
       total: results.length,
       failures,
       skipped,
+      example: "Expect failures=0 and ok=true for a clean pipeline run.",
     });
 
     if (failures === 0) {
@@ -277,13 +279,18 @@ function createProgressReporter(totalTasks, logger) {
   return {
     start() {
       if (totalTasks === 0) {
-        logger.debug("Progress idle", { total: totalTasks });
+        logger.debug("Progress idle", {
+          total: totalTasks,
+          example:
+            "Re-run guardrails with --verbose to stream per-task progress.",
+        });
         return;
       }
       logger.debug("Progress started", {
         total: totalTasks,
         completed,
         bar: renderProgressBar(0, totalTasks),
+        example: "Progress bar only prints with --verbose for quieter CI logs.",
       });
     },
     advance(task, result) {
@@ -297,6 +304,7 @@ function createProgressReporter(totalTasks, logger) {
         total: totalTasks,
         optional: Boolean(task.optional),
         bar: renderProgressBar(completed, totalTasks),
+        example: `Next step re-run: ${[task.scope, task.id].join(" -> ")}`,
       });
     },
     finish() {
@@ -307,6 +315,7 @@ function createProgressReporter(totalTasks, logger) {
         completed,
         total: totalTasks,
         bar: renderProgressBar(completed, totalTasks),
+        example: "Expect status 'complete' when all guardrails finish.",
       });
     },
   };
@@ -343,13 +352,17 @@ function buildTaskQueue(scopes) {
   for (const scope of scopes) {
     const commands = SCOPE_COMMANDS[scope];
     if (!commands || commands.length === 0) {
-      logger.warn("Skipping unknown scope", { scope });
+      logger.warn("Skipping unknown scope", {
+        scope,
+        example: "Use --scope app,scripts,docs,pr,issues,recordings",
+      });
       continue;
     }
 
     logger.info("Queued guardrail scope", {
       scope,
       commands: commands.length,
+      example: `Typical command: pnpm run guardrails:${scope}`,
     });
 
     for (const command of commands) {
@@ -408,25 +421,37 @@ async function runGuardrailTask(task, root) {
         : undefined,
   };
 
+  const commandLine = `${cmd[0]} ${cmd.slice(1).flat().join(" ")}`.trim();
   const logPayload = {
     id,
     scope,
     duration: `${durationMs}ms`,
     exitCode,
     optional: Boolean(optional),
+    command: commandLine,
   };
 
   if (status === "skipped") {
-    logger.warn("Guardrail skipped (optional)", logPayload);
+    logger.warn("Guardrail skipped (optional)", {
+      ...logPayload,
+      example: `Optional guardrail: ${commandLine}`,
+    });
   } else if (failed) {
-    logger.error("Guardrail failed", logPayload);
+    logger.error("Guardrail failed", {
+      ...logPayload,
+      example: `Re-run with --verbose: ${commandLine}`,
+    });
     logger.debug("Guardrail output", {
       id,
       scope,
       output: summarizeOutput(stdout, stderr),
+      example: `Inspect logs above and re-run: ${commandLine} -- --verbose`,
     });
   } else {
-    logger.info("Guardrail passed", logPayload);
+    logger.info("Guardrail passed", {
+      ...logPayload,
+      example: `Typical success: ${commandLine}`,
+    });
   }
 
   return { result, failed };

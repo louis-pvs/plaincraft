@@ -92,6 +92,7 @@ const dryRun = args.dryRun !== false && args.yes !== true;
       workflow,
       jobName,
       limit,
+      example: "gh run list --workflow ci.yml --limit 10",
     });
 
     const runs = await fetchWorkflowRuns({ repo, workflow, limit });
@@ -163,6 +164,7 @@ const dryRun = args.dryRun !== false && args.yes !== true;
   } catch (error) {
     logger.error("Guardrails baseline failed", {
       error: error?.message || String(error),
+      example: "Re-run with --yes to fetch data from GitHub.",
     });
     await fail({
       script: "guardrails-baseline",

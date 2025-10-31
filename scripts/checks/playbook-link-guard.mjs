@@ -125,6 +125,8 @@ async function main() {
   if (errors.length > 0) {
     logger.error("Playbook link validation failed", {
       errors: errors.length,
+      example:
+        "Links section should include Storybook and template URLs like https://louis-pvs.github.io/plaincraft/storybook and https://github.com/.../templates/",
     });
     fail({
       script: SCRIPT_NAME,
@@ -139,6 +141,8 @@ async function main() {
   logger.info("Playbook pattern links validated", {
     patterns: results.length,
     errors: errors.length,
+    example:
+      "Each pattern should link to Storybook docs and the matching template README.",
   });
   succeed({
     script: SCRIPT_NAME,
@@ -158,6 +162,8 @@ function extractLinksSection(content) {
 main().catch((error) => {
   logger.error("Playbook link guard failed", {
     error: error instanceof Error ? error.message : String(error),
+    example:
+      "Include absolute URLs for Storybook and template references in each Links section.",
   });
   fail({
     script: SCRIPT_NAME,

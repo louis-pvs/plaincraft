@@ -62,6 +62,7 @@ logger.info("Docs governance report started", {
   saveMetrics: Boolean(args.save),
   quietMode: quiet,
   output: args.output || "text",
+  example: "Aim for a 3:1 template-to-guide ratio with fresh TTL dates.",
 });
 
 async function analyzeGuideHealth(root) {
@@ -295,7 +296,11 @@ try {
   if (args.save) {
     const metricsPath = path.join(root, "docs", "metrics.json");
     await writeFile(metricsPath, JSON.stringify(reportData, null, 2));
-    logger.info("Docs governance metrics saved", { path: metricsPath });
+    logger.info("Docs governance metrics saved", {
+      path: metricsPath,
+      example:
+        "docs/metrics.json should capture templates, guides, and recommendations.",
+    });
   }
 
   // Output
@@ -310,6 +315,7 @@ try {
     guides: reportData.guides,
     ratio: Number(reportData.ratio.toFixed(2)),
     recommendations: reportData.recommendations.length,
+    example: "Healthy state: templates=9, guides=3, ratio=3.00.",
   });
 
   succeed({
@@ -322,6 +328,8 @@ try {
 } catch (error) {
   logger.error("Docs report failed", {
     error: error?.message || String(error),
+    example:
+      "Ensure docs/templates folders exist and contain valid frontmatter.",
   });
   fail({
     runId,

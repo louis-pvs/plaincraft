@@ -55,6 +55,7 @@ const MAX_FUNCTION_LINES = 60;
 logger.info("Size compliance check started", {
   maxScriptLines: MAX_SCRIPT_LINES,
   maxFunctionLines: MAX_FUNCTION_LINES,
+  example: "Keep scripts under 300 lines with functions under 60 lines.",
 });
 
 try {
@@ -62,14 +63,20 @@ try {
   const scriptsDir = path.join(root, "scripts");
 
   const scriptFiles = await findScriptFiles(scriptsDir);
-  logger.info("Scanning scripts", { count: scriptFiles.length });
+  logger.info("Scanning scripts", {
+    count: scriptFiles.length,
+    example: "Example script: scripts/ops/example.mjs",
+  });
 
   const results = [];
   let totalViolations = 0;
 
   for (const scriptPath of scriptFiles) {
     const relativePath = path.relative(root, scriptPath);
-    logger.debug("Checking script", { file: relativePath });
+    logger.debug("Checking script", {
+      file: relativePath,
+      example: "Document verbose logic in helpers rather than inline.",
+    });
 
     const content = await readFile(scriptPath, "utf-8");
     const lines = content.split("\n");
@@ -136,6 +143,10 @@ try {
     }
   }
 } catch (error) {
+  logger.error("Size check failed", {
+    error: error?.message || String(error),
+    example: "Example: split large scripts into separate modules.",
+  });
   fail({
     runId,
     script: "size-check",

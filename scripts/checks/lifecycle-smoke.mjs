@@ -139,6 +139,8 @@ const CHECKS = [
     if (dryRun) {
       logger.info("Lifecycle smoke dry-run plan generated", {
         checks: CHECKS.length,
+        example:
+          "Run with --yes to execute checks like pnpm ideas:validate --filter ARCH-unified-guardrails-suite.",
       });
       await succeed({
         script: "lifecycle-smoke",
@@ -166,6 +168,7 @@ const CHECKS = [
         id: check.id,
         description: check.description,
         lane: check.lane,
+        example: `${check.command[0]} ${check.command[1].join(" ")}`,
       });
 
       try {
@@ -217,6 +220,7 @@ const CHECKS = [
         passed,
         failed,
         durationMs: Date.now() - startedAt,
+        example: "Re-run the failing check with --verbose for details.",
       });
       await fail({
         script: "lifecycle-smoke",
@@ -237,6 +241,7 @@ const CHECKS = [
     logger.info("Lifecycle smoke passed", {
       passed,
       durationMs: Date.now() - startedAt,
+      example: "Expected output: passed equals number of checks and failed=0.",
     });
 
     await succeed({
@@ -251,6 +256,8 @@ const CHECKS = [
   } catch (error) {
     logger.error("Lifecycle smoke errored", {
       error: error?.message || String(error),
+      example:
+        "Ensure pnpm guardrail scripts are installed before running lifecycle smoke.",
     });
     await fail({
       script: "lifecycle-smoke",

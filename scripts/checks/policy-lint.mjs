@@ -62,7 +62,10 @@ Exit codes:
 const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 
-logger.info("Policy lint started");
+logger.info("Policy lint started", {
+  example:
+    "Every script header should include @since YYYY-MM-DD and @version x.y.z",
+});
 
 try {
   const root = await repoRoot(args.cwd);
@@ -111,6 +114,7 @@ try {
   logger.info("Scripts queued for validation", {
     count: scriptFiles.length,
     strict: Boolean(args.strict),
+    example: "Example script: scripts/ops/create-worktree-pr.mjs",
   });
 
   const results = [];
@@ -119,7 +123,10 @@ try {
 
   for (const scriptPath of scriptFiles) {
     const relativePath = path.relative(root, scriptPath);
-    logger.debug("Validating script", { file: relativePath });
+    logger.debug("Validating script", {
+      file: relativePath,
+      example: "Header should include @since and CLI must support --dry-run",
+    });
 
     const content = await readFile(scriptPath, "utf-8");
     const result = {
@@ -223,6 +230,8 @@ try {
 } catch (error) {
   logger.error("Policy lint failed", {
     error: error?.message || String(error),
+    example:
+      "Script headers should follow the template: @since YYYY-MM-DD, @version 0.1.0",
   });
   fail({
     exitCode: 11,

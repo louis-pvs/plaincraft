@@ -52,6 +52,8 @@ const SIMILARITY_THRESHOLD = parseInt(args.threshold) || 30;
 
 logger.info("Guide deduplication check started", {
   threshold: SIMILARITY_THRESHOLD,
+  example:
+    "Aim for unique content per guide; consolidate duplicates into docs/overview.md.",
 });
 
 try {
@@ -64,7 +66,10 @@ try {
     (f) => f.endsWith(".md") && f.startsWith("guide-"),
   );
 
-  logger.info("Loaded guides", { count: guideFiles.length });
+  logger.info("Loaded guides", {
+    count: guideFiles.length,
+    example: "Example guide: guides/guide-ideas.md",
+  });
 
   const guides = [];
 
@@ -135,6 +140,7 @@ try {
 } catch (error) {
   logger.error("Guide deduplication failed", {
     error: error?.message || String(error),
+    example: "Keep a single canonical guide and link alternatives to it.",
   });
   fail({
     exitCode: 11,

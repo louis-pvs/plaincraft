@@ -68,7 +68,10 @@ const REQUIRED_FRONTMATTER = [
 const MAX_WORDS = 600;
 const MAX_GUIDES = 12;
 
-logger.info("Guide lint started");
+logger.info("Guide lint started", {
+  example:
+    "Frontmatter should include owner: @lane-c and scaffold_ref: /templates/example@v0.1",
+});
 
 try {
   const root = await repoRoot(args.cwd || process.cwd());
@@ -80,7 +83,10 @@ try {
     (f) => f.endsWith(".md") && f.startsWith("guide-") && f !== "README.md",
   );
 
-  logger.info("Guides discovered", { count: guideFiles.length });
+  logger.info("Guides discovered", {
+    count: guideFiles.length,
+    example: "Guides are markdown files like guides/guide-ideas.md",
+  });
 
   // Check guide count limit
   if (guideFiles.length > MAX_GUIDES) {
@@ -275,7 +281,10 @@ try {
     process.exit(exitCode);
   }
 } catch (error) {
-  logger.error("Guide lint failed:", error.message);
+  logger.error("Guide lint failed", {
+    error: error?.message || String(error),
+    example: "Ensure frontmatter has owner: @lane-c and scaffold_ref entries.",
+  });
   fail(11, "lint_error", error.message, args.output || "text");
 }
 

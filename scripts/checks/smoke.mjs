@@ -53,6 +53,10 @@ const runId = generateRunId();
 const timeout = parseInt(args.timeout) || 5000;
 
 logger.info("Smoke tests started", { timeoutMs: timeout });
+logger.info("Smoke test expectation", {
+  example:
+    "Each script should exit 0 for '--help' and support '--dry-run --output json'.",
+});
 
 try {
   const root = await repoRoot(args.cwd);
@@ -71,7 +75,10 @@ try {
     });
   }
 
-  logger.info("Executable scripts detected", { count: scriptFiles.length });
+  logger.info("Executable scripts detected", {
+    count: scriptFiles.length,
+    example: "Example script: scripts/ops/create-worktree-pr.mjs",
+  });
 
   const results = [];
   let passed = 0;
@@ -79,7 +86,10 @@ try {
 
   for (const scriptPath of scriptFiles) {
     const relativePath = path.relative(root, scriptPath);
-    logger.debug("Testing script", { file: relativePath });
+    logger.debug("Testing script", {
+      file: relativePath,
+      example: `node ${relativePath} --help`,
+    });
 
     const result = {
       file: relativePath,
@@ -131,6 +141,7 @@ try {
 } catch (error) {
   logger.error("Smoke test failed", {
     error: error?.message || String(error),
+    example: "Scripts should support '--help' and '--dry-run --output json'.",
   });
   fail({
     exitCode: 11,

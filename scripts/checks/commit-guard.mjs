@@ -72,6 +72,7 @@ Options:
       range,
       source: source ?? "manual",
       max: flags.max ?? 50,
+      example: "[ARCH-sample] Add lifecycle guardrail",
     });
 
     const commits = await collectCommits(range, flags.max, root);
@@ -104,6 +105,8 @@ Options:
           violations,
           pattern: commitRegex.toString(),
           branchPattern,
+          example:
+            "Use commit headers like '[ARCH-sample] Add lifecycle guardrail'.",
         },
       });
       return;
@@ -112,6 +115,7 @@ Options:
     logger.info("Commit headers valid", {
       range,
       commits: commits.length,
+      example: "[ARCH-sample] Add lifecycle guardrail",
     });
 
     await succeed({
@@ -126,12 +130,15 @@ Options:
   } catch (error) {
     logger.error("Commit guard failed", {
       error: error?.message || String(error),
+      example: "[ARCH-sample] Add lifecycle guardrail",
     });
     await fail({
       script: "commit-guard",
       output: rawFlags.output,
       message: "Commit guard failed",
       error: error?.message || String(error),
+      example:
+        "Use commit headers like '[ARCH-sample] Add lifecycle guardrail'.",
     });
   }
 })();

@@ -1,7 +1,7 @@
 # ARCH-cli-logging-verbosity
 
 Lane: C (DevOps & Automation)
-Status: Draft
+Status: In Progress
 
 ## Lane
 
@@ -102,17 +102,18 @@ Current scripts emit varied log formats (multi-line info, debug chatter, dry-run
 
 ## Acceptance Checklist
 
-- [ ] Logger resolves `--verbose`, `--log-level`, and `LOG_LEVEL` consistently; default `info` emits single-line structured entries.
-- [ ] Guardrail + lifecycle scripts route output through the new logger API; lint blocks new `console.log` usage.
-- [ ] Lane B narratives (template README + Playbook guardrail doc) document the verbosity contract with usage examples.
+- [x] Logger resolves `--verbose`, `--log-level`, and `LOG_LEVEL` consistently; default `info` emits single-line structured entries.
+- [x] Guardrail + lifecycle scripts route output through the new logger API; lint blocks new `console.log` usage.
+- [x] Lane B narratives (template README + Playbook guardrail doc) document the verbosity contract with usage examples.
 - [ ] Lane D guardrail training/checklists reference the new verbosity expectations and required status-note copy.
-- [ ] Unit tests cover flag/env precedence and log formatting; guardrail run confirms clean stderr.
-- [ ] CI guardrails run in default mode with concise output; manual `--verbose` run surfaces debug metadata without regressions.
+- [x] Unit tests cover flag/env precedence and log formatting; guardrail run confirms clean stderr.
+- [x] CI guardrails run in default mode with concise output; manual `--verbose` run surfaces debug metadata without regressions.
 
 ## Status
 
 - 2025-11-03 - Draft: captured need for unified logging verbosity flag across CLI scripts.
 - 2025-11-07 - In design: scoped flag resolution, formatting contract, migration guardrails for unified CLI logging.
+- 2025-11-08 - In progress: core logger shipped with structured output; guardrail + lifecycle scripts updated to emit human-friendly logs with examples.
 
 <!-- prettier-ignore -->
 _Owner: @lane-c
