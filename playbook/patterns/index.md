@@ -57,6 +57,19 @@ Ensures every ops script ships with the template contract so guardrails stay pre
 
 ---
 
+### [Scripts-First Lifecycle Overview](/patterns/scripts-first-lifecycle-overview)
+
+Tracks every lifecycle transition through the sanctioned scripts so ideas, branches, PRs, and releases stay in sync.
+
+**Key Features:**
+
+- Maps intake → branch → PR → closeout to existing automation
+- Requires dry-run transcripts for audit-ready status notes
+- Enforces idea frontmatter as the narrative source of truth
+- Links to Storybook governance docs for each command
+
+---
+
 ### [Scripts-First Lifecycle Rollout](/patterns/scripts-first-lifecycle-rollout)
 
 Keeps idea metadata, branches, and draft PRs aligned the moment work begins so lifecycle reporting never drifts.
@@ -67,6 +80,19 @@ Keeps idea metadata, branches, and draft PRs aligned the moment work begins so l
 - Bootstrap commit + draft PR give stakeholders an immediate artifact
 - Dry-run logs capture the contract diff before anything is written
 - Links back to the script template so new lifecycle commands stay consistent
+
+---
+
+### [Scripts-First Lifecycle Rollback](/patterns/scripts-first-lifecycle-rollback)
+
+Walks the lifecycle backward with the same commands used to advance it so rollback events leave a complete audit trail.
+
+**Key Features:**
+
+- Uses `remove-worktree.mjs` to unwind bootstrap artifacts safely
+- Replays branch + PR scripts in dry-run mode to confirm state
+- Requires updated transcripts in Playbook status updates
+- Calls out changelog follow-ups when releases already shipped
 
 ---
 
@@ -96,9 +122,12 @@ Self-contained, single-purpose components that solve specific UI problems:
 
 Plays that wrap automation or workflow scripts around template-first docs:
 
+- **Scripts-First Lifecycle Overview** — Coordinates intake through closeout using the sanctioned commands.
 - **Release Changelog Automation** — Script + template handshake to publish post-merge highlights.
 - **Ideas Source of Truth** — Keeps `/ideas` authoritative for automation and storytelling.
 - **Script Automation Guardrails** — Standardizes ops scripts around the shared CLI contract.
+- **Scripts-First Lifecycle Rollout** — Bootstraps branches and draft PRs directly from the idea file.
+- **Scripts-First Lifecycle Rollback** — Rewinds branches and PRs while preserving audit transcripts.
 - **Roadmap Project Onboarding** — Rebuilds the Plaincraft roadmap with reproducible automation.
 
 ### Compositions
