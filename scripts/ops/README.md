@@ -25,6 +25,14 @@ cp scripts/_template-ops.mjs scripts/ops/my-automation.mjs
 pnpm scripts:test -- --filter my-automation
 ```
 
+## Guardrail checklist
+
+- `pnpm scripts:lint` - header and CLI contract
+- `pnpm scripts:smoke` - `--help` and `--dry-run`
+- `pnpm scripts:size` - enforce LOC limits
+- `pnpm scripts:test -- --filter my-automation` - focused unit assertions
+- `pnpm scripts:test -- --filter create-worktree-pr` - required when modifying worktree bootstrap helpers
+
 ## Rollback
 
 ```bash
