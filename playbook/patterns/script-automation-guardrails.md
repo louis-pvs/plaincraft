@@ -21,6 +21,7 @@ Repository scripts are the backbone of Plaincraft’s governance. They seed Issu
 - Default to preview runs; require `--yes` for writes and surface JSON/text output.
 - Keep scripts under 300 LOC with functions under 60 LOC. Share helpers via `_lib/`.
 - Register smoke, size, and policy checks so CI failures flag missing guardrails.
+- Run focused tests (`pnpm scripts:test -- --filter <script>`) for any ops script edits, and keep the worktree bootstrap suite (`--filter create-worktree-pr`) green whenever `pnpm gh:worktree` behavior changes.
 - Ship updates alongside a fresh `pnpm guardrails` run (or scoped variant) so regressions surface before PR.
 
 ## Links

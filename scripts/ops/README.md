@@ -32,6 +32,7 @@ pnpm scripts:test -- --filter my-automation
 - `pnpm scripts:size` - enforce LOC limits
 - `pnpm scripts:test -- --filter my-automation` - focused unit assertions
 - `pnpm scripts:test -- --filter create-worktree-pr` - required when modifying worktree bootstrap helpers
+- `pnpm gh:worktree <issue>` automatically ensures git hooks are installed in new worktrees before dependencies install, so lint-staged/Prettier fire on first commit.
 
 ## Rollback
 

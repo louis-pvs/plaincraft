@@ -27,3 +27,4 @@ Scripts orchestrate Plaincraft’s guardrails. Every new helper must ship with t
 - Include the template header (`@since`, `@version`, `Summary`) and exit-code semantics.
 - Keep all writes behind `--yes`. Dry-runs must log intended mutations.
 - Prefer `_lib/` helpers for shared logic to keep ops scripts composable.
+- Run focused tests (`pnpm scripts:test -- --filter <script>`) before shipping, and always cover the worktree bootstrap spec (`--filter create-worktree-pr`) when `pnpm gh:worktree` behavior shifts.

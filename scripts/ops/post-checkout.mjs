@@ -24,6 +24,7 @@ import {
   readJSON,
 } from "../_lib/core.mjs";
 import { getCurrentBranch, execCommand } from "../_lib/git.mjs";
+import { stat } from "node:fs/promises";
 
 const SCRIPT_NAME = "post-checkout";
 
@@ -59,6 +60,33 @@ async function branchExistsOnRemote(branchName, cwd) {
   }
 }
 
+async function ensureGitHooks(root, dryRun, log) {
+  const hookPath = path.join(root, ".git", "simple-git-hooks", "pre-commit");
+
+  if (dryRun) {
+    log.info("[DRY-RUN] Would ensure git hooks via simple-git-hooks");
+    return true;
+  }
+
+  try {
+    await stat(hookPath);
+    log.debug("Git hooks already installed");
+    return true;
+  } catch {
+    log.info("Git hooks missing; installing via simple-git-hooks...");
+    try {
+      await execCommand("corepack", ["pnpm", "exec", "simple-git-hooks"], {
+        cwd: root,
+      });
+      log.info("Git hooks installed");
+      return true;
+    } catch (error) {
+      log.warn(`Failed to install git hooks: ${error.message}`);
+      return false;
+    }
+  }
+}
+
 /**
  * Install dependencies with pnpm
  * @param {string} root - Repository root
@@ -75,12 +103,7 @@ async function installDependencies(root, dryRun, log) {
   }
 
   try {
-    // Pass through SKIP_SIMPLE_GIT_HOOKS to prevent hook setup issues in worktrees
-    const env = process.env.SKIP_SIMPLE_GIT_HOOKS
-      ? { ...process.env }
-      : process.env;
-
-    await execCommand("pnpm", ["install"], { cwd: root, env });
+    await execCommand("pnpm", ["install"], { cwd: root });
     log.info("Dependencies installed");
     return true;
   } catch (error) {
@@ -214,6 +237,10 @@ async function executePostCheckout(args, log) {
     );
     results.install.skipped = true;
   } else {
+    const hooksOk = await ensureGitHooks(root, args.dryRun, log);
+    if (!hooksOk) {
+      log.warn("Continuing without hook installation");
+    }
     results.install.success = await installDependencies(root, args.dryRun, log);
   }
 
