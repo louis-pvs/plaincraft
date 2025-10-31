@@ -101,4 +101,5 @@ References to templates, scripts, related guides
 
 - Governance: `/guides/README.md` (rules and guardrails)
 - Active guides: `/guides/guide-*.md` (examples)
+- Historical docs in `/guides/_archive/**` are reference-only—never copy them into new work.
 - Templates: `/templates/` (what guides reference)

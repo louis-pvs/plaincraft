@@ -51,7 +51,7 @@ last_verified: 2025-10-28
 4. **Create worktree and PR:**
 
    ```bash
-   node scripts/create-worktree-pr.mjs <issue-number>
+   pnpm gh:worktree <issue-number> --no-draft
    ```
 
    - Copies `node_modules` from the source checkout so `pnpm` works in sandboxed worktrees without network access.

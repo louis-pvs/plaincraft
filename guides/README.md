@@ -12,3 +12,5 @@ their source templates:
 
 Legacy guides (pre-template-first) live under `_archive/2025/11-guides-sunset/`.
 Do not add new content here - link the owning template README instead.
+
+If you land on anything inside `guides/_archive/` or `guides/DEPRECATED/`, treat it as historical reference only. Do not follow, copy, or update those files for live workflows—always bounce back to the template README, Storybook doc, or Playbook pattern that owns the narrative today.
