@@ -95,6 +95,16 @@ function validateCommitMessage(commitMsg, log) {
  * Main entry point
  */
 async function main() {
+  if (
+    process.env.SKIP_SIMPLE_GIT_HOOKS === "1" ||
+    process.env.SIMPLE_GIT_HOOKS_BYPASS === "1"
+  ) {
+    console.log(
+      "[commit-msg-hook] Skipped due to SKIP_SIMPLE_GIT_HOOKS environment flag.",
+    );
+    process.exit(0);
+  }
+
   const flags = parseFlags();
   const log = new Logger(flags.logLevel);
 

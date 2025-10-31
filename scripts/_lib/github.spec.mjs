@@ -171,6 +171,24 @@ describe("createPR", () => {
     );
   });
 
+  it("should include head branch when provided", async () => {
+    execa.mockResolvedValue({
+      stdout: "https://github.com/owner/repo/pull/123",
+    });
+
+    await createPR({
+      title: "Feature",
+      body: "Description",
+      head: "feat/branch",
+    });
+
+    expect(execa).toHaveBeenCalledWith(
+      "gh",
+      expect.arrayContaining(["--head", "feat/branch"]),
+      expect.any(Object),
+    );
+  });
+
   it("should handle empty body", async () => {
     execa.mockResolvedValue({
       stdout: "https://github.com/owner/repo/pull/123",

@@ -36,10 +36,15 @@ in sync from the first commit.
      needed.
 3. Stage and commit the edited idea file as the initial worktree commit using
    the existing message format: `[ID] Bootstrap worktree for issue #NN [skip ci]`.
-4. Push the branch and continue the existing PR prep flow.
-5. If the idea file is missing, retain the current fallback behavior using
+4. Ensure the bootstrap commit can bypass git hooks/GPG signing so it works in
+   fresh worktrees where dependencies and keys are not yet available, while
+   leaving guardrails intact for follow-up commits.
+5. Make the dry-run flow execute a bootstrap commit simulation by default so
+   hook/GPG regressions surface before doing real worktree mutation.
+6. Push the branch and continue the existing PR prep flow.
+7. If the idea file is missing, retain the current fallback behavior using
    `.worktree-bootstrap.md`.
-6. Add unit tests covering metadata edits to avoid clobbering unusual
+8. Add unit tests covering metadata edits to avoid clobbering unusual
    frontmatter layouts.
 
 ## Acceptance Checklist
@@ -52,3 +57,7 @@ in sync from the first commit.
 - [x] Fallback path preserves current behavior when the idea file is missing.
 - [x] Unit tests cover metadata replacement (pending → numbered, missing status,
       unusual spacing) and run via `pnpm scripts:test`.
+- [x] Bootstrap automation bypasses repo git hooks/GPG requirements while it
+      scaffolds the first commit, then hands control back to normal guardrails.
+- [x] Dry-run mode performs the bootstrap-commit simulation and fails fast when
+      hooks or signing would block automation.

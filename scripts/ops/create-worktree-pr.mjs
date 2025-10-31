@@ -15,7 +15,15 @@
 
 import path from "node:path";
 import { tmpdir } from "node:os";
-import { access, rm, writeFile, readFile } from "node:fs/promises";
+import {
+  access,
+  rm,
+  writeFile,
+  readFile,
+  mkdtemp,
+  chmod,
+} from "node:fs/promises";
+import { pathToFileURL } from "node:url";
 import { z } from "zod";
 import { execa } from "execa";
 import {
@@ -33,9 +41,214 @@ import {
   loadIdeaFile,
   extractChecklistItems,
 } from "../_lib/ideas.mjs";
-import { pathToFileURL } from "node:url";
 
 const SCRIPT_NAME = "create-worktree-pr";
+
+/**
+ * Provide env vars that disable interactive git hooks during automation commits.
+ * Hooks rely on node_modules and user-specific config that aren't available yet
+ * in freshly bootstrapped worktrees, so we bypass them explicitly.
+ */
+function getBootstrapCommitEnv() {
+  return {
+    ...process.env,
+    SKIP_SIMPLE_GIT_HOOKS: "1",
+    SIMPLE_GIT_HOOKS_BYPASS: "1",
+  };
+}
+
+/**
+ * Central helper to run the bootstrap commit with consistent flags/env.
+ * Keeps real execution and dry-run verification in sync.
+ * @param {string} cwd - Working directory for git commit
+ * @param {string} commitMessage - Commit message
+ */
+async function runBootstrapCommit(cwd, commitMessage) {
+  await execa("git", ["commit", "--no-gpg-sign", "-m", commitMessage], {
+    cwd,
+    env: getBootstrapCommitEnv(),
+  });
+}
+
+/**
+ * Push bootstrap commit to origin, optionally forcing update if branch exists.
+ * @param {string} cwd - Worktree path
+ * @param {string} branchName - Branch being pushed
+ * @param {Logger} log - Logger
+ * @param {object} options - Push options
+ */
+async function pushBootstrapCommit(cwd, branchName, log, options = {}) {
+  const { force = false } = options;
+  const args = ["push", "--set-upstream", "origin", branchName];
+
+  if (force) {
+    args.splice(1, 0, "--force-with-lease");
+  }
+
+  try {
+    await execa("git", args, { cwd });
+  } catch (error) {
+    const details = error.stderr || error.stdout || error.message;
+
+    if (details && details.includes("non-fast-forward")) {
+      const guidance = force
+        ? "Force push failed even with --force-with-lease; investigate remote branch history."
+        : "Remote branch already exists. Re-run with `--force` to replace it or clean up the remote branch manually.";
+      log.warn(guidance);
+    }
+
+    throw error;
+  }
+}
+
+/**
+ * Inspect remote branch to determine if it already exists and whether it only
+ * contains a previous bootstrap commit that can be safely replaced.
+ * @param {string} root - Repository root
+ * @param {string} branchName - Branch name
+ * @param {Logger} log - Logger
+ * @returns {Promise<{exists: boolean, bootstrap: boolean}>}
+ */
+async function analyzeRemoteBootstrapState(root, branchName, log) {
+  let lsRemoteResult;
+  try {
+    lsRemoteResult = await execa(
+      "git",
+      ["ls-remote", "--heads", "origin", branchName],
+      { cwd: root },
+    );
+  } catch (error) {
+    throw new Error(
+      `Failed to inspect remote branch state: ${error.stderr || error.message}`,
+    );
+  }
+
+  if (!lsRemoteResult.stdout.trim()) {
+    return { exists: false, bootstrap: false };
+  }
+
+  try {
+    await execa("git", ["fetch", "--quiet", "origin", branchName], {
+      cwd: root,
+    });
+  } catch (error) {
+    log.warn(
+      `Failed to fetch existing remote branch ${branchName}: ${error.stderr || error.message}`,
+    );
+    return { exists: true, bootstrap: false };
+  }
+
+  try {
+    const { stdout } = await execa(
+      "git",
+      ["log", "-1", "--pretty=%s", `origin/${branchName}`],
+      { cwd: root },
+    );
+    const subject = stdout.trim();
+    const isBootstrapCommit =
+      subject.includes("Bootstrap worktree for issue") &&
+      subject.startsWith("[");
+
+    return { exists: true, bootstrap: isBootstrapCommit };
+  } catch {
+    return { exists: true, bootstrap: false };
+  }
+}
+
+/**
+ * Validate during dry-run that the bootstrap commit pipeline works end-to-end.
+ * Spins up a temporary repo with the real commit-msg hook to catch failures early.
+ * @param {string} root - Repository root
+ * @param {Logger} log - Logger
+ */
+async function verifyBootstrapCommitPipeline(root, log) {
+  log.info("Dry-run: verifying bootstrap commit pipeline...");
+  const tempDir = await mkdtemp(
+    path.join(tmpdir(), "plaincraft-bootstrap-check-"),
+  );
+
+  try {
+    try {
+      await execa("git", ["init", "--initial-branch=main"], { cwd: tempDir });
+    } catch {
+      await execa("git", ["init"], { cwd: tempDir });
+    }
+
+    await execa("git", ["config", "user.name", "Worktree Bootstrap"], {
+      cwd: tempDir,
+    });
+    await execa("git", ["config", "user.email", "automation@plaincraft.dev"], {
+      cwd: tempDir,
+    });
+
+    // Install the real commit-msg hook so we exercise the same guardrail.
+    const hookSource = `#!/bin/sh\n"${process.execPath}" "${path.join(
+      root,
+      "scripts",
+      "ops",
+      "commit-msg-hook.mjs",
+    )}" "$1"\n`;
+    const hookPath = path.join(tempDir, ".git", "hooks", "commit-msg");
+    await writeFile(hookPath, hookSource);
+    await chmod(hookPath, 0o755);
+
+    const probeFile = path.join(tempDir, "bootstrap-check.md");
+    await writeFile(probeFile, "bootstrap dry-run verification\n", "utf-8");
+    await execa("git", ["add", path.basename(probeFile)], { cwd: tempDir });
+
+    // Use an intentionally invalid commit message; without the env flags this would fail.
+    await runBootstrapCommit(tempDir, "bootstrap dry-run probe");
+
+    log.info("Dry-run: bootstrap commit pipeline passed");
+  } catch (error) {
+    throw new Error(
+      `Bootstrap commit dry-run failed: ${error.stderr || error.message}`,
+    );
+  } finally {
+    await rm(tempDir, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Dry-run helper to check whether the bootstrap push would succeed.
+ * Performs a git push --dry-run against origin to surface conflicts early.
+ * @param {string} root - Repository root
+ * @param {string} branchName - Target branch name
+ * @param {string} baseBranch - Base branch name
+ * @param {Logger} log - Logger instance
+ * @param {object} options - Options
+ */
+async function verifyBootstrapPushFeasibility(
+  root,
+  branchName,
+  baseBranch,
+  log,
+  options = {},
+) {
+  const { forcePush = false } = options;
+  log.info("Dry-run: checking bootstrap push feasibility...");
+
+  const args = [
+    "push",
+    "--dry-run",
+    "--porcelain",
+    "origin",
+    `${baseBranch}:${branchName}`,
+  ];
+
+  if (forcePush) {
+    args.splice(1, 0, "--force-with-lease");
+  }
+
+  try {
+    await execa("git", args, { cwd: root });
+    log.info("Dry-run: push would succeed");
+  } catch (error) {
+    throw new Error(
+      `Bootstrap push dry-run failed: ${error.stderr || error.message}`,
+    );
+  }
+}
 
 // Zod schema for CLI args
 const ArgsSchema = z.object({
@@ -257,7 +470,7 @@ async function createBootstrapCommit(
   log,
   options = {},
 ) {
-  const { ideaFilePath = null } = options;
+  const { ideaFilePath = null, forcePush = false } = options;
   const commitMessage = `[${branchName.split("/")[1]}] Bootstrap worktree for issue #${issueNumber} [skip ci]`;
 
   if (ideaFilePath) {
@@ -271,11 +484,9 @@ async function createBootstrapCommit(
         const relativeIdeaPath = path.relative(worktreePath, ideaFilePath);
 
         await execa("git", ["add", relativeIdeaPath], { cwd: worktreePath });
-        await execa("git", ["commit", "-m", commitMessage], {
-          cwd: worktreePath,
-        });
-        await execa("git", ["push", "--set-upstream", "origin", branchName], {
-          cwd: worktreePath,
+        await runBootstrapCommit(worktreePath, commitMessage);
+        await pushBootstrapCommit(worktreePath, branchName, log, {
+          force: forcePush,
         });
 
         log.info("Created bootstrap commit from idea file");
@@ -287,7 +498,6 @@ async function createBootstrapCommit(
       );
     } catch (error) {
       log.warn(`Failed to bootstrap using idea file: ${error.message}`);
-      return false;
     }
   }
 
@@ -297,6 +507,7 @@ async function createBootstrapCommit(
     branchName,
     log,
     commitMessage,
+    { forcePush },
   );
 }
 
@@ -306,7 +517,9 @@ async function createBootstrapStubCommit(
   branchName,
   log,
   commitMessage,
+  options = {},
 ) {
+  const { forcePush = false } = options;
   const bootstrapFile = ".worktree-bootstrap.md";
   const timestamp = new Date().toISOString();
   const content = `# Worktree Bootstrap
@@ -326,11 +539,11 @@ You can safely delete this file or amend this commit once you've added your actu
 
     // Stage and commit
     await execa("git", ["add", bootstrapFile], { cwd: worktreePath });
-    await execa("git", ["commit", "-m", commitMessage], { cwd: worktreePath });
+    await runBootstrapCommit(worktreePath, commitMessage);
 
     // Push with upstream tracking
-    await execa("git", ["push", "--set-upstream", "origin", branchName], {
-      cwd: worktreePath,
+    await pushBootstrapCommit(worktreePath, branchName, log, {
+      force: forcePush,
     });
 
     log.info("Created bootstrap commit");
@@ -499,11 +712,39 @@ async function executeWorkflow(args, log) {
   const worktreePath = generateWorktreePath(branchName, args.worktreeDir, root);
   log.info(`Worktree: ${worktreePath}`);
 
+  const remoteState = await analyzeRemoteBootstrapState(root, branchName, log);
+  let forcePushBootstrap = args.force;
+
+  if (!forcePushBootstrap && remoteState.bootstrap) {
+    log.info(
+      "Remote branch already has an automation bootstrap commit; will replace it with --force-with-lease.",
+    );
+    forcePushBootstrap = true;
+  }
+
+  if (remoteState.exists && !forcePushBootstrap) {
+    throw new Error(
+      `Remote branch origin/${branchName} already exists. Re-run with --force to replace it or clean up the remote branch manually.`,
+    );
+  }
+
   if (args.dryRun) {
+    if (args.bootstrap) {
+      await verifyBootstrapCommitPipeline(root, log);
+      await verifyBootstrapPushFeasibility(
+        root,
+        branchName,
+        args.baseBranch,
+        log,
+        { forcePush: forcePushBootstrap },
+      );
+    }
+
     return {
       issue,
       branchName,
       worktreePath,
+      forcePushBootstrap,
       dryRun: true,
     };
   }
@@ -569,6 +810,7 @@ async function executeWorkflow(args, log) {
       log,
       {
         ideaFilePath: ideaFilePathInWorktree,
+        forcePush: forcePushBootstrap,
       },
     );
     if (created) {
@@ -612,8 +854,9 @@ async function executeWorkflow(args, log) {
       bodyFile,
       base: args.baseBranch,
       draft: args.draft,
+      head: branchName,
     },
-    root,
+    worktreePath,
   );
 
   return {

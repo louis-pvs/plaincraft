@@ -70,6 +70,10 @@ export async function createPR(options, cwd = process.cwd()) {
     args.push("--draft");
   }
 
+  if (options.head) {
+    args.push("--head", options.head);
+  }
+
   const { stdout } = await execa("gh", args, { cwd });
   return { url: stdout.trim() };
 }
