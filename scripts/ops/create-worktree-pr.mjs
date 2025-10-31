@@ -326,15 +326,7 @@ You can safely delete this file or amend this commit once you've added your actu
 
     // Stage and commit
     await execa("git", ["add", bootstrapFile], { cwd: worktreePath });
-    await execa(
-      "git",
-      [
-        "commit",
-        "-m",
-        commitMessage,
-      ],
-      { cwd: worktreePath },
-    );
+    await execa("git", ["commit", "-m", commitMessage], { cwd: worktreePath });
 
     // Push with upstream tracking
     await execa("git", ["push", "--set-upstream", "origin", branchName], {
@@ -389,7 +381,10 @@ export async function ensureIdeaMetadataForBootstrap(
 
   let statusIndex = lowerLines.findIndex((line) => line.startsWith("status:"));
   if (statusIndex >= 0) {
-    if (lines[statusIndex].trim().toLowerCase() !== desiredStatusLine.toLowerCase()) {
+    if (
+      lines[statusIndex].trim().toLowerCase() !==
+      desiredStatusLine.toLowerCase()
+    ) {
       lines[statusIndex] = desiredStatusLine;
       lowerLines[statusIndex] = desiredStatusLine.toLowerCase();
       changed = true;
@@ -596,11 +591,7 @@ async function executeWorkflow(args, log) {
   // Find idea file
   let ideaFilePath = ideaFilePathInWorktree;
   if (!ideaFilePath) {
-    ideaFilePath = await findIdeaForIssue(
-      args.issueNumber,
-      issue.title,
-      root,
-    );
+    ideaFilePath = await findIdeaForIssue(args.issueNumber, issue.title, root);
     if (ideaFilePath) {
       log.info(`Found idea file: ${path.basename(ideaFilePath)}`);
     }

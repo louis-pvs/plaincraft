@@ -1,19 +1,36 @@
 import { describe, it, expect } from "vitest";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
 import path from "node:path";
+import os from "node:os";
 
 import { ensureIdeaMetadataForBootstrap } from "./create-worktree-pr.mjs";
 
+const tempDirs = [];
+
 async function makeTempIdeaFile(contents) {
   const dir = await mkdtemp(
-    path.join(process.cwd(), ".tmp-worktree-bootstrap-"),
+    path.join(os.tmpdir(), "plaincraft-worktree-bootstrap-"),
   );
+  tempDirs.push(dir);
   const file = path.join(dir, "idea.md");
   await writeFile(file, contents, "utf-8");
   return file;
 }
 
 describe("ensureIdeaMetadataForBootstrap", () => {
+  afterAll(async () => {
+    await Promise.all(
+      tempDirs.map(async (dir) => {
+        try {
+          await rm(dir, { recursive: true, force: true });
+        } catch {
+          // ignore cleanup errors in tests
+        }
+      }),
+    );
+    tempDirs.length = 0;
+  });
+
   it("updates pending issue and inserts status", async () => {
     const ideaFile = await makeTempIdeaFile(
       [
