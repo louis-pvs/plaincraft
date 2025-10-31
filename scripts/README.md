@@ -20,6 +20,8 @@ This directory follows strict guardrails to ensure all scripts are rerunnable, t
   README.md             # This file
 ```
 
+Anything under `scripts/DEPRECATED/` exists only as a compatibility shim; do not reference or extend those scripts when building new automation.
+
 ---
 
 ## Quick Start

@@ -369,8 +369,8 @@ No manual server management needed!
 **Worktree Creation:**
 
 ```bash
-# Create worktree, branch, and draft PR for issue #6
-pnpm gh:worktree 6
+# Create worktree, branch, and PR for issue #6 (updates idea metadata)
+pnpm gh:worktree 6 --no-draft
 
 # Preview without creating
 pnpm gh:worktree 6 --dry-run
@@ -386,8 +386,10 @@ pnpm gh:worktree 6 --base develop --no-draft
 
 1. Fetches issue details from GitHub
 2. Generates branch name from issue title (e.g., `fix/b-pr-template-enforcement`)
-3. Creates git worktree in parallel directory
-4. Creates draft PR linked to the issue with labels
+3. Updates the idea card (in the worktree) with `Issue: #` and `Status: in-progress`
+4. Creates git worktree in parallel directory and bootstraps dependencies
+5. Commits the updated idea file (falls back to a stub if the card is missing)
+6. Pushes the branch and opens the PR with labels
 
 ### Recording Scripts
 

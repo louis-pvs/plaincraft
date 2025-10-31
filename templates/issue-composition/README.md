@@ -39,7 +39,7 @@ Use this template when creating GitHub issues for:
 # Copy template to new issue
 cp templates/issue-composition/issue-composition.md my-feature.md
 
-# Or use via script with sub-issue creation
+# Or use via script with sub-issue creation (idea file updated with Issue:# and status: in-progress)
 node scripts/create-worktree-pr.mjs \
   --template issue-composition \
   --create-subissues

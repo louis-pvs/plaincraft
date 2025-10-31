@@ -463,6 +463,24 @@ describe("execCommand", () => {
     expect(result.stderr).toBe("err");
   });
 
+  it("should fallback to corepack pnpm when pnpm is missing", async () => {
+    const enoent = new Error("command not found: pnpm");
+    enoent.code = "ENOENT";
+    execa.mockRejectedValueOnce(enoent);
+    execa.mockResolvedValueOnce({ stdout: "ok", stderr: "" });
+
+    const result = await execCommand("pnpm", ["install"]);
+
+    expect(result.stdout).toBe("ok");
+    expect(execa).toHaveBeenNthCalledWith(1, "pnpm", ["install"], {});
+    expect(execa).toHaveBeenNthCalledWith(
+      2,
+      "corepack",
+      ["pnpm", "install"],
+      {},
+    );
+  });
+
   it("should propagate errors", async () => {
     execa.mockRejectedValue(new Error("Command failed"));
 

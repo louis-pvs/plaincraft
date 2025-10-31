@@ -19,7 +19,14 @@ pnpm dev
 - `guides/components/README.md` — Component-focused playbooks that point to snippet templates.
 - `guides/workflows/README.md` — End-to-end delivery flows, worktree automation, and CI touchpoints.
 - `guides/templates/README.md` — Catalog of scaffolds, schema references, and usage docs.
-- `guides/_archive/` — Auto-managed graveyard for anything past TTL or lacking an owner.
+- `guides/_archive/` — Auto-managed graveyard for anything past TTL or lacking an owner. Treat entries here as historical only; do not revive or follow them for active work.
+
+### Archived & Deprecated Directories
+
+- `guides/_archive/**`
+- `scripts/DEPRECATED/**`
+
+These folders exist purely for historical reference. Leave them untouched unless a ticket explicitly calls for pruning; all active guidance lives in the non-archived guides and templates listed above.
 
 Guides are thin overlays. They always defer to scaffolds living in `/templates/**`, scripts under `/scripts/**`, or snippet READMEs.
 

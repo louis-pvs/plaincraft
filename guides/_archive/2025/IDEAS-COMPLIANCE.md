@@ -48,7 +48,7 @@ requirements.
 - [ ] **Idea file is the source of truth** - Issues/PRs derive content from it
 - [ ] `Issue: #N` metadata added to idea file after Issue creation
 - [ ] Issues automatically populated using `scripts/ideas-to-issues.mjs`
-- [ ] PRs automatically generated using `scripts/create-worktree-pr.mjs`
+- [ ] PRs automatically generated using `pnpm gh:worktree`
 - [ ] Idea file kept current throughout development lifecycle
 - [ ] No manual duplication of content between idea file and Issue/PR
 - [ ] Plaincraft Roadmap entries reference the same ticket IDs and lane labels.

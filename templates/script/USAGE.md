@@ -112,6 +112,10 @@ pnpm guardrails
 pnpm scripts:lint    # Header, CLI contract, patterns
 pnpm scripts:smoke   # --help and --dry-run
 pnpm scripts:size    # LOC limits
+pnpm scripts:test -- --filter <script-name>  # Focused unit coverage
+
+# Lifecycle guardrail (required when touching gh:worktree helpers)
+pnpm scripts:test -- --filter create-worktree-pr
 ```
 
 ## Advanced Usage

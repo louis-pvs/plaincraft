@@ -179,6 +179,6 @@ gh issue create \
   --body-file my-bug.md \
   --label bug,priority:high
 
-# Link to worktree for fix
-node scripts/create-worktree-pr.mjs --issue 123
+# Link to worktree for fix (updates idea metadata automatically)
+pnpm gh:worktree 123 --no-draft
 ```

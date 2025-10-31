@@ -90,4 +90,4 @@ The consolidation script:
 - Commit hook: `/scripts/commit-msg-hook.mjs`
 - Storybook view: `/storybook/?path=/docs/governance-release-changelog--docs`
 - Playbook pattern: `/playbook/patterns/release-changelog-automation.html`
-- Archive guide: `/guides/_archive/2025/11-guides-sunset/guide-changelog.md`
+- Historical reference only: `/guides/_archive/2025/11-guides-sunset/guide-changelog.md` (do not follow for active work)

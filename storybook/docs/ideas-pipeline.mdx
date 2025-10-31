@@ -14,7 +14,7 @@ Plaincraft treats `/ideas` as the single source of truth for delivery work. Card
 
 ## Worked Example
 
-When `PB-readme-narrative-migration` moved into delivery, the idea card anchored the acceptance list. Running `ideas-to-issues` synced checklists to GitHub, while `merge-subissue-to-parent` refreshed the parent PR each time a child branch merged. The card stayed authoritative until archival.
+When `PB-readme-narrative-migration` moved into delivery, the idea card anchored the acceptance list. Running `ideas-to-issues` synced checklists to GitHub, `pnpm gh:worktree` updated the same card to include the new issue number and `status: in-progress`, and `merge-subissue-to-parent` refreshed the parent PR each time a child branch merged. The card stayed authoritative until archival.
 
 ## Hand-off Links
 
@@ -25,5 +25,6 @@ When `PB-readme-narrative-migration` moved into delivery, the idea card anchored
 ## Constraints
 
 - Card exists before Issue; automation refuses to run otherwise.
+- Bootstrapping a branch with `pnpm gh:worktree` must leave the real idea file at `status: in-progress` with the assigned `Issue: #` so downstream automation can trust it.
 - Ticket prefixes drive PR titles, changelog slugs, and roadmap cards—keep them aligned.
 - Archive closed ideas promptly to keep the `/ideas` directory actionable.

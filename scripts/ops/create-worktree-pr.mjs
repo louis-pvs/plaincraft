@@ -15,7 +15,7 @@
 
 import path from "node:path";
 import { tmpdir } from "node:os";
-import { access, rm, writeFile } from "node:fs/promises";
+import { access, rm, writeFile, readFile } from "node:fs/promises";
 import { z } from "zod";
 import { execa } from "execa";
 import {
@@ -33,6 +33,7 @@ import {
   loadIdeaFile,
   extractChecklistItems,
 } from "../_lib/ideas.mjs";
+import { pathToFileURL } from "node:url";
 
 const SCRIPT_NAME = "create-worktree-pr";
 
@@ -254,6 +255,57 @@ async function createBootstrapCommit(
   issueNumber,
   branchName,
   log,
+  options = {},
+) {
+  const { ideaFilePath = null } = options;
+  const commitMessage = `[${branchName.split("/")[1]}] Bootstrap worktree for issue #${issueNumber} [skip ci]`;
+
+  if (ideaFilePath) {
+    try {
+      const changed = await ensureIdeaMetadataForBootstrap(
+        ideaFilePath,
+        issueNumber,
+      );
+
+      if (changed) {
+        const relativeIdeaPath = path.relative(worktreePath, ideaFilePath);
+
+        await execa("git", ["add", relativeIdeaPath], { cwd: worktreePath });
+        await execa("git", ["commit", "-m", commitMessage], {
+          cwd: worktreePath,
+        });
+        await execa("git", ["push", "--set-upstream", "origin", branchName], {
+          cwd: worktreePath,
+        });
+
+        log.info("Created bootstrap commit from idea file");
+        return true;
+      }
+
+      log.info(
+        "Idea metadata already aligned; falling back to bootstrap placeholder",
+      );
+    } catch (error) {
+      log.warn(`Failed to bootstrap using idea file: ${error.message}`);
+      return false;
+    }
+  }
+
+  return await createBootstrapStubCommit(
+    worktreePath,
+    issueNumber,
+    branchName,
+    log,
+    commitMessage,
+  );
+}
+
+async function createBootstrapStubCommit(
+  worktreePath,
+  issueNumber,
+  branchName,
+  log,
+  commitMessage,
 ) {
   const bootstrapFile = ".worktree-bootstrap.md";
   const timestamp = new Date().toISOString();
@@ -274,15 +326,7 @@ You can safely delete this file or amend this commit once you've added your actu
 
     // Stage and commit
     await execa("git", ["add", bootstrapFile], { cwd: worktreePath });
-    await execa(
-      "git",
-      [
-        "commit",
-        "-m",
-        `[${branchName.split("/")[1]}] Bootstrap worktree for issue #${issueNumber} [skip ci]`,
-      ],
-      { cwd: worktreePath },
-    );
+    await execa("git", ["commit", "-m", commitMessage], { cwd: worktreePath });
 
     // Push with upstream tracking
     await execa("git", ["push", "--set-upstream", "origin", branchName], {
@@ -295,6 +339,81 @@ You can safely delete this file or amend this commit once you've added your actu
     log.warn(`Failed to create bootstrap commit: ${error.message}`);
     return false;
   }
+}
+
+/**
+ * Ensure idea metadata reflects active worktree
+ * @param {string} ideaFilePath - Absolute path to idea file
+ * @param {number} issueNumber - Issue number
+ * @returns {Promise<boolean>} True if file was modified
+ */
+export async function ensureIdeaMetadataForBootstrap(
+  ideaFilePath,
+  issueNumber,
+) {
+  const original = await readFile(ideaFilePath, "utf-8");
+  const lines = original.split(/\r?\n/);
+
+  const desiredIssueLine = `Issue: #${issueNumber}`;
+  const desiredStatusLine = "Status: in-progress";
+
+  const lowerLines = lines.map((line) => line.trim().toLowerCase());
+
+  let changed = false;
+
+  let issueIndex = lowerLines.findIndex((line) => line.startsWith("issue:"));
+  const laneIndex = lowerLines.findIndex((line) => line.startsWith("lane:"));
+
+  if (issueIndex >= 0) {
+    if (lines[issueIndex].trim() !== desiredIssueLine) {
+      lines[issueIndex] = desiredIssueLine;
+      lowerLines[issueIndex] = desiredIssueLine.toLowerCase();
+      changed = true;
+    }
+  } else {
+    const insertIndex =
+      laneIndex >= 0 ? laneIndex + 1 : Math.min(2, lines.length);
+    lines.splice(insertIndex, 0, desiredIssueLine);
+    lowerLines.splice(insertIndex, 0, desiredIssueLine.toLowerCase());
+    issueIndex = insertIndex;
+    changed = true;
+  }
+
+  let statusIndex = lowerLines.findIndex((line) => line.startsWith("status:"));
+  if (statusIndex >= 0) {
+    if (
+      lines[statusIndex].trim().toLowerCase() !==
+      desiredStatusLine.toLowerCase()
+    ) {
+      lines[statusIndex] = desiredStatusLine;
+      lowerLines[statusIndex] = desiredStatusLine.toLowerCase();
+      changed = true;
+    }
+  } else {
+    const insertIndex = issueIndex >= 0 ? issueIndex + 1 : lines.length;
+    lines.splice(insertIndex, 0, desiredStatusLine);
+    lowerLines.splice(insertIndex, 0, desiredStatusLine.toLowerCase());
+    statusIndex = insertIndex;
+    changed = true;
+  }
+
+  const nextLine = lines[statusIndex + 1];
+  if (nextLine !== undefined && nextLine.trim() !== "") {
+    lines.splice(statusIndex + 1, 0, "");
+    lowerLines.splice(statusIndex + 1, 0, "");
+    changed = true;
+  }
+
+  if (!changed) {
+    return false;
+  }
+
+  if (lines.length === 0 || lines[lines.length - 1] !== "") {
+    lines.push("");
+  }
+
+  await writeFile(ideaFilePath, lines.join("\n"), "utf-8");
+  return true;
 }
 
 /**
@@ -426,6 +545,17 @@ async function executeWorkflow(args, log) {
     bootstrappedDependencies,
   });
 
+  const ideaFilePathInWorktree = await findIdeaForIssue(
+    args.issueNumber,
+    issue.title,
+    worktreePath,
+  );
+  if (ideaFilePathInWorktree) {
+    log.info(
+      `Found idea file in worktree: ${path.basename(ideaFilePathInWorktree)}`,
+    );
+  }
+
   // Check for commits
   log.info("Checking for commits...");
   let hasCommitsForPR = await hasCommits(branchName, args.baseBranch, root);
@@ -437,9 +567,14 @@ async function executeWorkflow(args, log) {
       args.issueNumber,
       branchName,
       log,
+      {
+        ideaFilePath: ideaFilePathInWorktree,
+      },
     );
     if (created) {
       hasCommitsForPR = true;
+    } else {
+      log.warn("Bootstrap commit failed; install dependencies and retry.");
     }
   }
 
@@ -454,13 +589,12 @@ async function executeWorkflow(args, log) {
   }
 
   // Find idea file
-  const ideaFilePath = await findIdeaForIssue(
-    args.issueNumber,
-    issue.title,
-    root,
-  );
-  if (ideaFilePath) {
-    log.info(`Found idea file: ${path.basename(ideaFilePath)}`);
+  let ideaFilePath = ideaFilePathInWorktree;
+  if (!ideaFilePath) {
+    ideaFilePath = await findIdeaForIssue(args.issueNumber, issue.title, root);
+    if (ideaFilePath) {
+      log.info(`Found idea file: ${path.basename(ideaFilePath)}`);
+    }
   }
 
   // Generate PR body
@@ -590,4 +724,9 @@ Exit codes:
   }
 }
 
-main();
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  main();
+}
