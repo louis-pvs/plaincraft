@@ -39,6 +39,7 @@
     "pr:create-issue": "node scripts/checks/pr-requirements.mjs",
     "pr:generate": "node scripts/ops/generate-pr-content.mjs",
     "pr:verify": "node scripts/checks/pr-requirements.mjs --verify-pr",
+    "pr:template": "node scripts/checks/pr-template-lint.mjs",
     "prepare": "simple-git-hooks",
     "preview": "vite preview",
     "record:stories": "node scripts/record-stories.mjs",
@@ -57,15 +58,17 @@
     "scripts:smoke": "node scripts/checks/smoke.mjs",
     "scripts:size": "node scripts/checks/size-check.mjs",
     "scripts:deprecation": "node scripts/checks/deprecation-sweeper.mjs",
-    "scripts:guardrails": "pnpm scripts:lint && pnpm scripts:test && pnpm scripts:smoke && pnpm scripts:size && pnpm scripts:deprecation",
+    "scripts:guardrails": "pnpm scripts:lint && pnpm scripts:test && pnpm scripts:smoke && pnpm scripts:size && pnpm scripts:deprecation && pnpm pr:template && pnpm issues:lint",
     "docs:lint": "node scripts/checks/readme-lint.mjs && node scripts/checks/template-coverage.mjs",
     "docs:coverage": "node scripts/checks/template-coverage.mjs",
     "docs:views": "node scripts/checks/view-dedupe.mjs",
-    "docs:check": "pnpm docs:lint && pnpm docs:views",
+    "docs:playbook": "node scripts/checks/playbook-link-guard.mjs",
+    "docs:check": "pnpm docs:lint && pnpm docs:views && pnpm docs:playbook",
     "docs:report": "node scripts/checks/docs-report.mjs",
     "docs:dedupe": "node scripts/checks/guide-dedupe.mjs",
     "new:template": "node scripts/ops/new-template.mjs",
     "new:guide": "node scripts/ops/new-guide.mjs",
+    "issues:lint": "node scripts/checks/issue-template-lint.mjs",
     "guides:lint": "node scripts/checks/lint-guides.mjs",
     "guides:dedupe": "node scripts/checks/dedupe-guides.mjs",
     "guides:ttl": "node scripts/ops/archive-expired-guides.mjs",
@@ -139,6 +142,15 @@
     ],
     "playbook/pages/**/*.{md,mdx}": [
       "node scripts/checks/view-dedupe.mjs"
+    ],
+    "playbook/patterns/**/*.md": [
+      "node scripts/checks/playbook-link-guard.mjs"
+    ],
+    ".github/ISSUE_TEMPLATE/*.yml": [
+      "node scripts/checks/issue-template-lint.mjs"
+    ],
+    ".github/pull_request_template.md": [
+      "node scripts/checks/pr-template-lint.mjs"
     ]
   }
 }

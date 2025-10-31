@@ -154,13 +154,19 @@ Short rationale, constraints, examples.
 
 - Fail if Storybook docs or Playbook page contains step blocks that already exist in README/USAGE.
 
-5. Policy in code:
+5. `scripts/checks/playbook-link-guard.mjs`
+
+- Ensure Playbook patterns link to canonical template + Storybook docs using absolute URLs.
+
+6. Policy in code:
 
 ```json
 {
   "scripts": {
     "docs:lint": "node scripts/checks/readme-lint.mjs && node scripts/checks/template-coverage.mjs",
-    "docs:views": "node scripts/checks/view-dedupe.mjs"
+    "docs:views": "node scripts/checks/view-dedupe.mjs",
+    "docs:playbook": "node scripts/checks/playbook-link-guard.mjs",
+    "docs:check": "pnpm docs:lint && pnpm docs:views && pnpm docs:playbook"
   }
 }
 ```
