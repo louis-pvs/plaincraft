@@ -50,3 +50,7 @@ CLI surface or CI enforcement to make it real. Missing automation leaves us with
 scripts:lifecycle-smoke` or equivalent) on PRs.
 - [ ] Documentation updated (README snippets, ADR note) showing the four-command
       workflow and how to recover from failed runs.
+
+## Status
+
+- 2025-10-31 - In progress: Introduced shared lifecycle config loader (`scripts/_lib/lifecycle.mjs`), generated cache scaffolds under `scripts/config/`, and added the first `ops/idea-intake.mjs` dry-run planner. Guardrail pass (`pnpm guardrails`) still blocked until remaining ops scripts and project mutations are wired.

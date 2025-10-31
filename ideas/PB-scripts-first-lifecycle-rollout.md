@@ -4,14 +4,14 @@ owner: lane.b
 lane: B
 type: playbook
 priority: P1
-state: ready
-next_state: in-progress
+state: in-progress
+next_state: review
 issue: 91
 acceptance:
-  - Storybook governance docs walk through the four lifecycle commands with SoT links
-  - Playbook pages narrate intake → branch → PR → closeout with business framing
-  - Templates and README “Links” sections updated to the new governance docs
-  - Training packet drafted for Lane D and shared in the ADR thread
+  - [x] Storybook governance docs walk through the four lifecycle commands with SoT links
+  - [x] Playbook pages narrate intake → branch → PR → closeout with business framing
+  - [x] Templates and README “Links” sections updated to the new governance docs
+  - [ ] Training packet drafted for Lane D and shared in the ADR thread
 ---
 
 # PB-scripts-first-lifecycle-rollout
@@ -30,6 +30,13 @@ Teach teams how to work inside the Scripts-First Lifecycle v3 without reading
 code. Every narrative (Playbook, Storybook governance docs, README links)
 funnels developers toward the four sanctioned commands and explains how Project
 status, ideas, and branches stay in sync.
+
+## Status
+
+- Storybook governance views published for Intake, Branch, PR Refresh, Closeout, plus an overview map with SoT callouts.
+- Playbook patterns added for lifecycle overview and rollback, index updated with rollout ties.
+- Template READMEs now link to the governance docs; legacy markdown has redirect stubs.
+- Training packet drafted for Lane D; ADR share scheduled after dry-run recordings finalize.
 
 ## Process
 
