@@ -151,14 +151,14 @@ jobs:
       - name: Setup labels
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm gh:setup-labels
+        run: pnpm gh:setup-labels -- --yes
 
       - name: Create project
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PROJECT_NAME="${{ github.event.inputs.project_name }}"
-          node scripts/ops/setup-project.mjs --project-name "$PROJECT_NAME"
+          node scripts/ops/setup-project.mjs --project-name "$PROJECT_NAME" --yes
 
       - name: Commit config updates
         if: success()

@@ -76,8 +76,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "🔨 Creating Plaincraft Roadmap project..."
-          pnpm gh:setup-labels
-          node scripts/ops/setup-project.mjs --project-name "Plaincraft Roadmap"
+          pnpm gh:setup-labels -- --yes
+          node scripts/ops/setup-project.mjs --project-name "Plaincraft Roadmap" --yes
 
           # Commit the config
           git config user.name "github-actions[bot]"
