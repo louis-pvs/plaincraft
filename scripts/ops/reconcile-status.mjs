@@ -35,6 +35,23 @@ const FLAG_SCHEMA = z.object({
 (async () => {
   try {
     const rawFlags = parseFlags(process.argv.slice(2));
+    if (rawFlags.help) {
+      console.log(`
+Usage: pnpm ops:reconcile-status -- --id <ID> [options]
+
+Options:
+  --id <ID>            Idea or project identifier (required)
+  --file <path>        Idea markdown path (defaults to ideas/<ID>.md)
+  --status <value>     Project status override (default: Ticketed)
+  --dry-run            Preview reconciliation plan (default)
+  --yes                Execute writes (disables --dry-run)
+  --output <format>    json|text (default: text)
+  --log-level <level>  trace|debug|info|warn|error
+  --cwd <path>         Working directory
+  --help               Show this help message
+`);
+      process.exit(0);
+    }
     const flags = FLAG_SCHEMA.parse(rawFlags);
     const root = await repoRoot(flags.cwd);
     const config = await loadLifecycleConfig({ cwd: root });

@@ -36,6 +36,24 @@ const FLAG_SCHEMA = z.object({
 (async () => {
   try {
     const rawFlags = parseFlags(process.argv.slice(2));
+    if (rawFlags.help) {
+      console.log(`
+Usage: pnpm ops:open-or-update-pr -- --id <ID> [options]
+
+Options:
+  --id <ID>            Idea or project identifier (required)
+  --branch <name>      Branch to open or update (defaults to current)
+  --title <text>       Explicit PR title override
+  --draft              Create as draft (default: true)
+  --dry-run            Preview actions without writes (default)
+  --yes                Execute writes (disables --dry-run)
+  --output <format>    json|text (default: text)
+  --log-level <level>  trace|debug|info|warn|error
+  --cwd <path>         Working directory
+  --help               Show this help message
+`);
+      process.exit(0);
+    }
     const flags = FLAG_SCHEMA.parse(rawFlags);
     const root = await repoRoot(flags.cwd);
     const config = await loadLifecycleConfig({ cwd: root });

@@ -22,6 +22,21 @@ const FLAG_SCHEMA = z.object({
 (async () => {
   try {
     const rawFlags = parseFlags(process.argv.slice(2));
+    if (rawFlags.help) {
+      console.log(`
+Usage: pnpm ops:report [options]
+
+Options:
+  --dry-run            Preview payload (default)
+  --yes                Execute publishing (not yet implemented)
+  --format <json|text> Output format (default: json)
+  --output <format>    json|text (default: text)
+  --log-level <level>  trace|debug|info|warn|error
+  --cwd <path>         Working directory
+  --help               Show this help message
+`);
+      process.exit(0);
+    }
     const flags = FLAG_SCHEMA.parse(rawFlags);
     const root = await repoRoot(flags.cwd);
     const config = await loadLifecycleConfig({ cwd: root });

@@ -26,6 +26,23 @@ const FLAG_SCHEMA = z.object({
 (async () => {
   try {
     const rawFlags = parseFlags(process.argv.slice(2));
+    if (rawFlags.help) {
+      console.log(`
+Usage: pnpm ops:closeout -- --id <ID> [options]
+
+Options:
+  --id <ID>            Idea or project identifier (required)
+  --archive            Archive idea file after merge (default: true)
+  --changelog          Append changelog entry (default: true)
+  --dry-run            Preview closeout steps (default)
+  --yes                Execute cleanup (disables --dry-run)
+  --output <format>    json|text (default: text)
+  --log-level <level>  trace|debug|info|warn|error
+  --cwd <path>         Working directory
+  --help               Show this help message
+`);
+      process.exit(0);
+    }
     const flags = FLAG_SCHEMA.parse(rawFlags);
     const root = await repoRoot(flags.cwd);
     const config = await loadLifecycleConfig({ cwd: root });
