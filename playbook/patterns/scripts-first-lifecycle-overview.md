@@ -17,8 +17,9 @@ Lane D triages `ARCH-scripts-first-automation-suite` and records one dry-run tra
 
 1. `pnpm ops:idea-intake --file ideas/ARCH-scripts-first-automation-suite.md --yes` — synchronises Project fields (`Lane`, `Type`, `Priority`, `Owner`) and moves the card to Ticketed.
 2. `pnpm ops:create-branch -- --id ARCH-123 --slug scripts-first-automation --yes` — creates `feat/ARCH-123-scripts-first-automation`, switches local worktree, and moves the Project status to Branched.
-3. `pnpm ops:open-or-update-pr -- --id ARCH-123 --yes` — opens or refreshes the draft PR title/body from the idea and transitions the Project status to PR Open.
-4. `pnpm ops:closeout -- --id ARCH-123 --yes` — after merge, deletes the feature branch, appends the changelog entry, bumps the Project status to Merged, and (optionally) archives the idea.
+3. `pnpm ops:reconcile-status -- --id ARCH-123 --yes` — rewrites the idea `Status:` line from the Project card and confirms the board is tracking the same target lane before review starts.
+4. `pnpm ops:open-or-update-pr -- --id ARCH-123 --yes` — opens or refreshes the draft PR title/body (Purpose, Problem, Proposal + checklist), adds lifecycle labels, and transitions the Project status to PR Open.
+5. `pnpm ops:closeout -- --id ARCH-123 --yes` — after merge, archives the idea (unless skipped), appends the changelog entry, and bumps the Project status to Merged.
 
 Before pushing, the developer runs `pnpm commit:guard -- --range origin/main..HEAD` to confirm headers are boring and `pnpm drift:check` so the idea still maps to canonical statuses. If anything drifts, the dry-run output points straight at the fix.
 
@@ -30,6 +31,7 @@ Before pushing, the developer runs `pnpm commit:guard -- --range origin/main..HE
 - Store `_tmp/` changelog entries and idea archives in source control so closeout remains reproducible.
 - Fail any work-in-progress branch until `pnpm guardrails` reports `ok: true`; each lane owns fixing its scope before requesting review.
 - Guardrails never skip: `pnpm guardrails` (or the CI job) now calls `commit:guard`, `drift:check`, and `scripts:lifecycle-smoke`. Fix violations locally before retrying the promotion.
+- Nightly execute jobs must run `pnpm scripts:lifecycle-smoke --execute --sandbox <path>` so write-mode checks hit a disposable clone. Keep the sandbox repository clean and authenticated with a bot token that can mutate PRs/Projects.
 
 ## Recovery Paths
 

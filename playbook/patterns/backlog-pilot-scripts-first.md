@@ -13,7 +13,7 @@ Scripts-First only works when the backlog keeps Projects as the status source of
 
 ## Daily Intake Review
 
-1. Run `pnpm scripts:lifecycle-smoke --yes --output json` on the current branch (or download the latest artifact from the **Project & Issue Management → Sync Project Fields** workflow).
+1. Run `pnpm scripts:lifecycle-smoke --yes --output json` on the current branch (or download the latest artifact from the **Project & Issue Management → Sync Project Fields** workflow). For nightly verification, point the job at a sandbox clone: `pnpm scripts:lifecycle-smoke --execute --sandbox ../plaincraft-sandbox --output json`.
 2. Confirm new tickets include `Lane`, `Priority`, and checklist metadata before approving automation bootstrap.
 3. If `pnpm guardrails` fails because of missing owner/scaffold refs, bounce back to the lane owner with the `lifecycle-smoke-report.json` excerpt.
 4. Add `blocked by` notes in the roadmap when automation fails so other lanes can see the hold.
@@ -23,14 +23,28 @@ Scripts-First only works when the backlog keeps Projects as the status source of
 1. Review the artifact from the **Project Governance Audit** workflow (GitHub → Actions → `project-governance-report`).
 2. Cross-check the `statuses` list against `.repo/projects.json`. Missing statuses or lanes require a `pnpm gh:setup-project` run with updated templates.
 3. Spot-check random items directly in the Roadmap for owner and priority alignment.
-4. Update the audit log (see ADR below) with discrepancies and remediation actions.
+4. Update the audit log (see ADR below) with discrepancies and remediation actions. Include the latest `ops:report -- --yes` artifact so downstream lanes can reconcile schema changes quickly.
 
 ## Rollback & Escalation
 
-- **Automation failure (scripts crash):** capture the run ID, set Project status to `Pending-<script>`, and page Lane C with the guardrails output.
+- **Automation failure (scripts crash):** capture the run ID, set Project status to `Pending-<script>`, and page Lane C with the guardrails output. Include the dry-run transcript plus the status note template below when re-running with `--yes`.
 - **Schema drift (missing field / option):** re-run `pnpm gh:setup-project --yes` to reconcile fields, then rerun `pnpm ops:report --yes` to refresh the cache.
 - **Duplicate IDs:** immediately archive the least active card using `pnpm ops:closeout --id <ID> --dry-run` to confirm impact, then delete manually if safe.
 - **Escalation path:** Lane D → Lane C (script owners) → Lane A (API/pipeline) if GitHub permissions block action.
+
+## Status Note Template
+
+Paste the following status note on the Project card whenever you move it with automation:
+
+```
+Automation: `{command}` (`--dry-run` attached)
+Project: `{from}` → `{to}`
+Idea: `{ideaPath}` (status now `{ideaStatus}`)
+PR: {prUrl}
+Next action: {nextStep or "None"}
+```
+
+Replace `{command}` with the executed script (`pnpm ops:open-or-update-pr -- --id ARCH-123 --yes`, etc.) and attach the JSON transcript generated in dry-run. This keeps the backlog audit trail aligned with idea frontmatter and ensures future rotations can retrace the runbook.
 
 ## Links
 

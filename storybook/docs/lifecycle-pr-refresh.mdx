@@ -24,15 +24,27 @@ pnpm pr:verify    # optional: confirm checklist sync
 - Pass `--head <branch>` or `--issue <number>` to target a specific lifecycle item.
 - Pair with `pnpm pr:verify` (runs `scripts/checks/pr-requirements.mjs --verify-pr`) before requesting review.
 
+When you need the automation to write back to GitHub, run:
+
+```bash
+# Promote idea content + labels into the draft PR and sync Project status
+pnpm ops:open-or-update-pr -- --id ARCH-123 --branch feat/ARCH-123-foo --yes
+```
+
+- `ops:open-or-update-pr` sources Purpose / Problem / Proposal + checklist from the idea, applies lifecycle labels, toggles draft state, and moves the Project item to `PR Open`.
+- Always capture a dry-run transcript first (`--dry-run --output json`) and attach it to the Project card before the `--yes` run.
+- Requires a GitHub token with `repo` + `project` scopes. Fallback to `--dry-run` if the sandbox bot lacks permissions.
+
 ## Worked Example
 
-After landing design feedback, run `pnpm pr:generate --yes` to rehydrate the PR body from the idea file. The command keeps the acceptance checklist ordered and mirrors the summary so the narrative matches Playbook status notes. `pnpm pr:verify` confirms the merged checklist state and flags any missing reviewer tasks before you re-request review, preventing status drift in Projects.
+After landing design feedback, run `pnpm pr:generate --yes` to rehydrate the PR body from the idea file. Once the branch is ready, promote the changes with `pnpm ops:open-or-update-pr -- --id ARCH-123 --yes` so the PR title/body, labels, and Project status all match the idea. `pnpm pr:verify` confirms the merged checklist state and flags any missing reviewer tasks before you re-request review, preventing status drift in Projects.
 
 ## Constraints
 
 - Acceptance checklist items must be GitHub checkboxes; the generator toggles them to match Issue progress.
 - Keep idea metadata (`Lane`, `Owner`, `Priority`) current—PR refresh picks them up for the header.
 - Do not edit the generated PR body by hand; rerun the generator so automation sees the change and dry-run history stays auditable.
+- Record the automation in the Project status note (`Automation: pnpm ops:open-or-update-pr -- --id … --yes`) along with the dry-run transcript for auditability.
 
 ## Hand-off Links
 

@@ -34,12 +34,12 @@ We currently emit dry-run plans (`ops/open-or-update-pr.mjs`, `ops/reconcile-sta
 
 ## Acceptance Checklist
 
-- [ ] Lifecycle ops (`open-or-update-pr`, `reconcile-status`, `closeout`, `report`) perform GitHub mutations when `--yes` is supplied.
-- [ ] `scripts/_lib/github.mjs` exposes reusable helpers with error handling and rate-limit backoff.
-- [ ] Lifecycle smoke gains an optional `--execute` path (nightly CI) using a sandbox repo to validate writes.
-- [ ] Lane B narratives (Storybook + Playbook) document the automated PR/Project sync behaviour, permissions, and rollback expectations.
-- [ ] Lane D backlog/training packet refreshed with `--yes` runbooks and status-note copy for the automated sync.
-- [ ] `pnpm guardrails` (dry-run) stays green; nightly execute job publishes a summary artifact.
+- [x] Lifecycle ops (`open-or-update-pr`, `reconcile-status`, `closeout`, `report`) perform GitHub mutations when `--yes` is supplied.
+- [x] `scripts/_lib/github.mjs` exposes reusable helpers with error handling and rate-limit backoff.
+- [x] Lifecycle smoke gains an optional `--execute` path (nightly CI) using a sandbox repo to validate writes.
+- [x] Lane B narratives (Storybook + Playbook) document the automated PR/Project sync behaviour, permissions, and rollback expectations.
+- [x] Lane D backlog/training packet refreshed with `--yes` runbooks and status-note copy for the automated sync.
+- [ ] `pnpm guardrails` (dry-run) stays green; nightly execute job publishes a summary artifact. _(Current guardrails run fails because existing commits on `main` violate `[ID] type(scope): subject` headers; see notes below.)_
 
 ## Status
 

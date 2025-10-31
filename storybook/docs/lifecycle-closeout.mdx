@@ -4,39 +4,39 @@ import { Meta } from "storybook/blocks";
 
 # Lifecycle Closeout (view)
 
-Closeout ties the branch, changelog, and idea archive together so the lifecycle finishes cleanly. Use the changelog consolidator to publish release notes and archive the idea card once the PR merges.
+Closeout ties the branch, changelog, and idea archive together so the lifecycle finishes cleanly. Use the lifecycle closeout command to archive the idea, update the changelog, and promote the Project card to `Merged`, then publish the governance snapshot.
 
 ## System of Record
 
 - **Content:** `/ideas/<ID>-*.md` (final status and archive location)
 - **Status:** GitHub Projects – `Status` moves from `In Review` → `Merged` → `Archived`
-- **Automation:** `pnpm changelog -- --yes` + `node scripts/ops/archive-idea-for-issue.mjs <issue> --yes`
+- **Automation:** `pnpm ops:closeout -- --id <ID> --yes` + `pnpm ops:report -- --yes`
 
 ## Command Contract
 
 ```bash
-# Promote release notes and archive lifecycle artifacts
-pnpm changelog -- --yes
-node scripts/ops/archive-idea-for-issue.mjs 91 --yes
+# Archive lifecycle artifacts and publish governance snapshot
+pnpm ops:closeout -- --id ARCH-123 --yes
+pnpm ops:report -- --yes
 ```
 
-- `pnpm changelog` (aka `scripts/ops/consolidate-changelog.mjs`) merges `_tmp/` entries and stamps the release.
-- `archive-idea-for-issue.mjs` files the idea under `/ideas/_archive/<year>/` and updates status fields.
-- Both commands default to dry-run; pass `--yes` to execute.
+- `ops:closeout` archives the idea (optional), appends the changelog entry, and updates the Project status to `Merged`.
+- `ops:report` writes `artifacts/lifecycle/status.json` and appends a summary to `$GITHUB_STEP_SUMMARY` when running in CI.
+- Both commands default to dry-run; capture and attach the transcripts before running with `--yes`.
 
 ## Worked Example
 
-After the branch merges, `pnpm changelog -- --yes` promotes the `_tmp` summary into `CHANGELOG.md` and wipes the processed file. Running `node scripts/ops/archive-idea-for-issue.mjs 91 --yes` then archives `PB-scripts-first-lifecycle-rollout.md`, adds the changelog permalink, and sets the Project card to `Archived`. The dry-run transcripts are attached to the Lane D training packet so future releases follow the same play.
+After the branch merges, `pnpm ops:closeout -- --id ARCH-123 --yes` moves the idea file under `/ideas/_archive/<year>/`, appends the closeout note to `CHANGELOG.md`, and flips the Project card to `Merged`. Finally, `pnpm ops:report -- --yes` refreshes `artifacts/lifecycle/status.json` so governance dashboards pick up the new schema snapshot. Attach both dry-run transcripts to the Project note for future audits.
 
 ## Constraints
 
-- Keep `_tmp/` entries under version control so dry-run diffs capture pending release notes.
-- Archive scripts expect the idea filename to match the Issue ID; do not rename files after intake.
-- Run closeout commands from the main worktree so git history and changelog diffs stay accurate.
+- Keep `_tmp/` entries under version control so dry-run diffs capture pending release notes (closeout automatically appends the consolidated entry).
+- `ops:closeout` expects the idea filename to match the Issue ID; do not rename files after intake.
+- Run closeout commands from the main worktree or sandbox worktree so git history and changelog diffs stay accurate. For CI, run `pnpm scripts:lifecycle-smoke --execute --sandbox <path>` before invoking the write-mode scripts.
 
 ## Hand-off Links
 
-- Changelog Script → `/scripts/ops/consolidate-changelog.mjs`
-- Archive Script → `/scripts/ops/archive-idea-for-issue.mjs`
+- Lifecycle Closeout Script → `/scripts/ops/closeout.mjs`
+- Lifecycle Report Script → `/scripts/ops/report.mjs`
 - Template README → `/templates/changelog/README.md`
 - Playbook Pattern → `/playbook/patterns/release-changelog-automation.html`
