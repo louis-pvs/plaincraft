@@ -65,3 +65,4 @@ Required structure:
 - All required sections present
 - Valid links to source idea and roadmap card
 - At least 3 acceptance criteria
+- Successful `pnpm guardrails` run before opening the PR

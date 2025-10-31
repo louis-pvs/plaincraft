@@ -25,6 +25,22 @@ cp scripts/_template-checks.mjs scripts/checks/my-check.mjs
 pnpm scripts:test -- --filter my-check
 ```
 
+## guardrails:baseline
+
+```bash
+pnpm guardrails:baseline --output json
+```
+
+Summarizes the last N (default 10) `ci.yml` runs, reporting guardrails job p50/p95 runtimes alongside artifact sizes for `guardrails-report`, `storybook-static`, `demo-dist`, and `playbook-static`. Useful before adjusting the Guardrail Suite budget.
+
+## scripts:lifecycle-smoke
+
+```bash
+pnpm scripts:lifecycle-smoke --yes --output json
+```
+
+Runs the executable lifecycle guardrails that exist today (idea metadata validation for Lanes C & D plus a dry-run of the guardrails baseline script). Defaults to `--dry-run` so CI can toggle execution via `--yes`.
+
 ## Rollback
 
 ```bash

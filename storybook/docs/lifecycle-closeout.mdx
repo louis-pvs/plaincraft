@@ -1,0 +1,42 @@
+import { Meta } from "storybook/blocks";
+
+<Meta title="Governance/Lifecycle Closeout" />
+
+# Lifecycle Closeout (view)
+
+Closeout ties the branch, changelog, and idea archive together so the lifecycle finishes cleanly. Use the changelog consolidator to publish release notes and archive the idea card once the PR merges.
+
+## System of Record
+
+- **Content:** `/ideas/<ID>-*.md` (final status and archive location)
+- **Status:** GitHub Projects – `Status` moves from `In Review` → `Merged` → `Archived`
+- **Automation:** `pnpm changelog -- --yes` + `node scripts/ops/archive-idea-for-issue.mjs <issue> --yes`
+
+## Command Contract
+
+```bash
+# Promote release notes and archive lifecycle artifacts
+pnpm changelog -- --yes
+node scripts/ops/archive-idea-for-issue.mjs 91 --yes
+```
+
+- `pnpm changelog` (aka `scripts/ops/consolidate-changelog.mjs`) merges `_tmp/` entries and stamps the release.
+- `archive-idea-for-issue.mjs` files the idea under `/ideas/_archive/<year>/` and updates status fields.
+- Both commands default to dry-run; pass `--yes` to execute.
+
+## Worked Example
+
+After the branch merges, `pnpm changelog -- --yes` promotes the `_tmp` summary into `CHANGELOG.md` and wipes the processed file. Running `node scripts/ops/archive-idea-for-issue.mjs 91 --yes` then archives `PB-scripts-first-lifecycle-rollout.md`, adds the changelog permalink, and sets the Project card to `Archived`. The dry-run transcripts are attached to the Lane D training packet so future releases follow the same play.
+
+## Constraints
+
+- Keep `_tmp/` entries under version control so dry-run diffs capture pending release notes.
+- Archive scripts expect the idea filename to match the Issue ID; do not rename files after intake.
+- Run closeout commands from the main worktree so git history and changelog diffs stay accurate.
+
+## Hand-off Links
+
+- Changelog Script → `/scripts/ops/consolidate-changelog.mjs`
+- Archive Script → `/scripts/ops/archive-idea-for-issue.mjs`
+- Template README → `/templates/changelog/README.md`
+- Playbook Pattern → `/playbook/patterns/release-changelog-automation.html`

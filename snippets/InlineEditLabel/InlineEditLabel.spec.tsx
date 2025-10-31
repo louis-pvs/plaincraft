@@ -52,6 +52,26 @@ describe("InlineEditLabel", () => {
     warn.mockRestore();
   });
 
+  it("shows placeholder text when the current value is empty", () => {
+    const { container, root } = renderIntoDocument(
+      <InlineEditLabel
+        value=""
+        maxLength={32}
+        emptyValuePlaceholder="Add label"
+        onSave={vi.fn()}
+      />,
+    );
+
+    const button = container.querySelector('[role="button"]');
+    expect(button).not.toBeNull();
+    expect(button!.textContent).toContain("Add label");
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
   it("emits callbacks or state changes on primary action", async () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     const onSave = vi

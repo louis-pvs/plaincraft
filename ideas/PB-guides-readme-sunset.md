@@ -4,8 +4,8 @@ owner: lane.d
 lane: D
 type: playbook
 priority: P1
-state: ready
-next_state: in-progress
+state: delivered
+next_state: archive
 acceptance:
   - Legacy developer guides archived under `_archive/2025/11-guides-sunset/`
   - `guides/README.md` replaced with stub pointing to template and view owners

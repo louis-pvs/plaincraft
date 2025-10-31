@@ -1,0 +1,114 @@
+{
+  "cachedAt": "2025-10-31T07:20:00.000Z",
+  "version": 3,
+  "project": {
+    "id": "PVT_kwHOAGt2e84AAAAB",
+    "number": 1,
+    "name": "Plaincraft Roadmap",
+    "url": "https://github.com/orgs/louis-pvs/projects/1",
+    "fields": {
+      "ID": {
+        "id": "PVTSSF_lifecycle_id",
+        "type": "TEXT",
+        "description": "Ticket identifier (ARCH-, U-, C-, B-, PB-)",
+        "required": true
+      },
+      "Type": {
+        "id": "PVTSSF_lifecycle_type",
+        "type": "SINGLE_SELECT",
+        "options": [
+          { "id": "TYPE_UNIT", "name": "Unit" },
+          { "id": "TYPE_COMPOSITION", "name": "Composition" },
+          { "id": "TYPE_BUG", "name": "Bug" },
+          { "id": "TYPE_ARCH", "name": "Architecture" },
+          { "id": "TYPE_PLAYBOOK", "name": "Playbook" }
+        ],
+        "required": true
+      },
+      "Lane": {
+        "id": "PVTSSF_lifecycle_lane",
+        "type": "SINGLE_SELECT",
+        "options": [
+          { "id": "LANE_A", "name": "A" },
+          { "id": "LANE_B", "name": "B" },
+          { "id": "LANE_C", "name": "C" },
+          { "id": "LANE_D", "name": "D" }
+        ],
+        "required": true
+      },
+      "Status": {
+        "id": "PVTSSF_lifecycle_status",
+        "type": "SINGLE_SELECT",
+        "options": [
+          { "id": "STATUS_DRAFT", "name": "Draft", "category": "TODO" },
+          { "id": "STATUS_TICKETED", "name": "Ticketed", "category": "TODO" },
+          {
+            "id": "STATUS_BRANCHED",
+            "name": "Branched",
+            "category": "IN_PROGRESS"
+          },
+          {
+            "id": "STATUS_PR_OPEN",
+            "name": "PR Open",
+            "category": "IN_PROGRESS"
+          },
+          {
+            "id": "STATUS_IN_REVIEW",
+            "name": "In Review",
+            "category": "IN_PROGRESS"
+          },
+          { "id": "STATUS_MERGED", "name": "Merged", "category": "DONE" },
+          { "id": "STATUS_ARCHIVED", "name": "Archived", "category": "DONE" }
+        ],
+        "required": true
+      },
+      "Owner": {
+        "id": "PVTSSF_lifecycle_owner",
+        "type": "USER",
+        "required": true
+      },
+      "Priority": {
+        "id": "PVTSSF_lifecycle_priority",
+        "type": "SINGLE_SELECT",
+        "options": [
+          { "id": "PRIORITY_P1", "name": "P1" },
+          { "id": "PRIORITY_P2", "name": "P2" },
+          { "id": "PRIORITY_P3", "name": "P3" },
+          { "id": "PRIORITY_P4", "name": "P4" }
+        ],
+        "required": true
+      },
+      "Release": {
+        "id": "PVTSSF_lifecycle_release",
+        "type": "TEXT",
+        "required": false
+      }
+    },
+    "views": {
+      "ticketed": {
+        "id": "PVTVIEW_ticketed",
+        "filter": "Status:Ticketed",
+        "wipLimit": 8
+      },
+      "branched": {
+        "id": "PVTVIEW_branched",
+        "filter": "Status:Branched",
+        "wipLimit": 8
+      },
+      "review": {
+        "id": "PVTVIEW_review",
+        "filter": "Status:`PR Open`,`In Review`",
+        "wipLimit": 8
+      }
+    },
+    "automation": {
+      "workflows": ["project-sync.yml", "project-audit.yml"],
+      "scripts": [
+        "scripts/ops/idea-intake.mjs",
+        "scripts/ops/reconcile-status.mjs",
+        "scripts/ops/report.mjs"
+      ]
+    }
+  },
+  "notes": "Lifecycle v3 schema cache. Update via pnpm ops:report --yes --refresh when field IDs change."
+}

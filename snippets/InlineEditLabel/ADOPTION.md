@@ -6,7 +6,7 @@ Inline edits shrink the distance between noticing a typo and fixing it. The Inli
 
 - Default snippet already ships with optimistic-save UX, keyboard coverage, and minimal DOM footprint.
 - Persistence lives behind the `onSave` seam; callers own domain validation and sanitisation.
-- Tests: Vitest unit spec (`InlineEditLabel.spec.tsx`) and Storybook 9 interaction stories powered by `storybook/test` (`pnpm storybook:test`).
+- Tests: Vitest unit spec (`InlineEditLabel.spec.tsx`) and Storybook 9 interaction + docs smoke suite (`pnpm storybook:test`).
 
 ## Planned improvements
 
@@ -27,7 +27,7 @@ See `guides/contracts/inline-edit-label-plan.md` for the SOLID refactor roadmap.
 ## Rollout guardrails
 
 - Ship behind a feature flag or rollout toggle.
-- Run `pnpm storybook:test` to cover interaction flows in CI; the stories already import from `storybook/test`.
+- Run `pnpm storybook:test` to cover interaction flows and docs metadata checks in CI; the stories already import from `storybook/test`.
 - Add a smoke test in your app (Playwright/Cypress) that hits the headless controller if you diverge from the default UI.
 - Keep the 10-minute manual script handy for qualitative verification.
 

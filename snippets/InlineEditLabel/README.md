@@ -18,6 +18,10 @@ pnpm run new:snippet InlineEditLabel -- --dry-run
 - Import `InlineEditLabel` from `/snippets/InlineEditLabel/InlineEditLabel`.
 - Provide `value`, `onSave`, and `ariaLabel`; the controller handles focus + keys.
 - Switch to `InlineEditLabelHeadless` when design needs a custom render function.
+- Pass a `labels` object to surface tailored UI copy for `saving`, `success`,
+  `error`, or `discarded` states. Legacy `*Label` props still forward to the new
+  contract if you need a staggered migration.
+- Use `emptyValuePlaceholder` when the saved value can start empty to keep the button discoverable.
 
 ## Test
 
@@ -37,4 +41,5 @@ git restore snippets/InlineEditLabel
 - Storybook: /storybook/?path=/docs/patterns-inline-edit--docs
 - Playbook: /playbook/patterns/inline-edit-label.html
 
-_Owner: @lane-c_
+<!-- prettier-ignore -->
+_Owner: @lane-c

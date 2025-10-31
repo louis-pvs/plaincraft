@@ -1,8 +1,8 @@
 {
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
-      "file": "../guides/SCRIPTS-REFERENCE.md",
-      "text": "Every commit message must begin with the ticket ID in brackets: `[U-<slug>]`, `[C-<slug>]`, `[B-<slug>]`, `[ARCH-<slug>]`, `[PB-<slug>]`. The changelog and PR title should share that same tag."
+      "file": "./guides/guide-guardrails.md",
+      "text": "Commit messages must match the lifecycle pattern: `[ID] type(scope): subject` (e.g. `[ARCH-123] feat(api): add guardrail`)."
     }
   ]
 }

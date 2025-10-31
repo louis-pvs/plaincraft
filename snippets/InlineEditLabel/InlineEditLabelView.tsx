@@ -5,12 +5,14 @@ export type InlineEditLabelViewProps = {
   controller: InlineEditLabelControllerState;
   ariaLabel?: string;
   maxLength: number;
+  emptyValuePlaceholder?: string;
 };
 
 export function InlineEditLabelView({
   controller,
   ariaLabel = "Edit label",
   maxLength,
+  emptyValuePlaceholder = "Add label",
 }: InlineEditLabelViewProps) {
   const {
     displayValue,
@@ -36,6 +38,10 @@ export function InlineEditLabelView({
           ? "text-slate-700"
           : "text-slate-700";
 
+  const trimmedDisplayValue = displayValue.trim();
+  const showPlaceholder = trimmedDisplayValue.length === 0;
+  const buttonDisplay = showPlaceholder ? emptyValuePlaceholder : displayValue;
+
   return (
     <div className="w-full max-w-sm space-y-2 text-slate-950">
       <div className="text-xs font-medium uppercase tracking-wide text-slate-700">
@@ -50,7 +56,13 @@ export function InlineEditLabelView({
           onKeyDown={handleDisplayKeyDown}
           className="flex items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm transition outline-none focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
         >
-          <span className="truncate">{displayValue}</span>
+          <span
+            className={`truncate ${
+              showPlaceholder ? "text-slate-400 italic" : ""
+            }`}
+          >
+            {buttonDisplay}
+          </span>
           <span className="ml-3 text-xs text-slate-500">Enter to edit</span>
         </div>
       )}
@@ -106,7 +118,9 @@ export function InlineEditLabelView({
       >
         {isEditing
           ? "Enter to save, Esc to cancel, clicks outside save."
-          : `Press Enter or click to edit. Max ${maxLength} characters.`}
+          : showPlaceholder
+            ? `Press Enter or click to add a label. Max ${maxLength} characters.`
+            : `Press Enter or click to edit. Max ${maxLength} characters.`}
       </div>
       {message && (
         <div

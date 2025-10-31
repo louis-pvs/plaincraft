@@ -34,6 +34,7 @@ Templates and scaffolds are the single source of truth for every guide in this r
 
 - [`guide-scripts.md`](../guide-scripts.md) — Explains enforcement scripts tied to template metadata.
 - [`guide-workflow.md`](../guide-workflow.md) — Shows how templates chain together across lanes.
+- [`guide-guardrails.md`](../guide-guardrails.md) — Hard requirement checklist for running `pnpm guardrails` before every PR.
 - [`guide-roadmap-setup.md`](../guide-roadmap-setup.md) — Consumes roadmap and idea templates.
 
 If documentation starts duplicating template content, prune the guide and move details back into the scaffold. The template is the product; the guide is the map.

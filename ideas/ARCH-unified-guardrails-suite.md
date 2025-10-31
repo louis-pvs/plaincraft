@@ -56,3 +56,10 @@ errors are scattered. Without a universal orchestrator:
   developer docs updated, JSON summary tags each failure with
   `ARCH-unified-guardrails-suite`, and CI now runs the suite publishing
   `guardrails-report.json` artifacts.
+- 2025-11-03 — Guardrails baseline refreshed from 10 runs (workflow run 179 latest):
+  p50 runtime 36 s, p95 runtime 42.3 s (range 32–45 s, still 90 s headroom).
+  Artifacts steady — `guardrails-report` ≈2.3 KB (p95 2 623 B), `storybook-static`
+  ≈2.06 MB (p95 2 059 508 B), `demo-dist` steady at 51 825 B, `playbook-static`
+  ≈786 KB (p95 785 956 B). Latest snapshots live on run 179 with download URLs logged.
+- 2025-11-03 — Local `pnpm guardrails` run verified post policy-lint patch;
+  scripts|docs|pr|issues|recordings scopes all green.

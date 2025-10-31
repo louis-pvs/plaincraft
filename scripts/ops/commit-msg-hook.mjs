@@ -11,7 +11,8 @@
 
 import { readFileSync } from "node:fs";
 import { z } from "zod";
-import { Logger, parseFlags, fail, succeed } from "../_lib/core.mjs";
+import { Logger, parseFlags, fail, succeed, repoRoot } from "../_lib/core.mjs";
+import { loadLifecycleConfig } from "../_lib/lifecycle.mjs";
 
 const SCRIPT_NAME = "commit-msg-hook";
 
@@ -25,16 +26,15 @@ const ArgsSchema = z.object({
   commitMsgFile: z.string(),
 });
 
-// Valid ticket prefixes
-const TICKET_PREFIX_REGEX = /^\[(U|C|B|ARCH|PB)-[a-z0-9-]+\]/i;
-
 /**
  * Validate commit message
  * @param {string} commitMsg - Commit message
  * @param {Logger} log - Logger
+ * @param {RegExp} commitRegex - Lifecycle commit pattern
+ * @param {string} patternString - Pattern description
  * @returns {object} Validation result
  */
-function validateCommitMessage(commitMsg, log) {
+function validateCommitMessage(commitMsg, log, commitRegex, patternString) {
   log.debug(`Validating commit message: ${commitMsg}`);
 
   // Skip validation for merge/revert commits
@@ -47,19 +47,18 @@ function validateCommitMessage(commitMsg, log) {
     return { valid: true, skipped: true, reason: "merge/revert/empty" };
   }
 
-  // Check ticket prefix
-  if (!TICKET_PREFIX_REGEX.test(commitMsg)) {
+  const match = commitMsg.match(commitRegex);
+
+  if (!match) {
     return {
       valid: false,
-      error: "Missing ticket prefix",
+      error: "Invalid commit header",
       message: commitMsg,
-      details:
-        "Commit messages must start with: [U-slug], [C-slug], [B-slug], [ARCH-slug], or [PB-slug]",
+      details: `Commit messages must match lifecycle pattern: ${patternString}`,
     };
   }
 
-  const match = commitMsg.match(TICKET_PREFIX_REGEX);
-  const ticketPrefix = match[0];
+  const ticketPrefix = match[0].match(/^\[[^\]]+\]/)?.[0] ?? "";
 
   // Check space after prefix
   if (commitMsg[ticketPrefix.length] !== " ") {
@@ -76,13 +75,15 @@ function validateCommitMessage(commitMsg, log) {
   const [prefix, ...slugParts] = slugPart.split("-");
   const slug = slugParts.join("-");
 
-  if (slug !== slug.toLowerCase()) {
+  if (slug && slug !== slug.toLowerCase()) {
     log.warn(`Ticket slug should be lowercase: ${ticketPrefix}`);
     log.warn(`Suggested: [${prefix}-${slug.toLowerCase()}]`);
   }
 
   // Check message has meaningful content
-  const messageContent = commitMsg.slice(ticketPrefix.length + 1).trim();
+  const messageContent = commitMsg
+    .slice(ticketPrefix ? ticketPrefix.length + 1 : 0)
+    .trim();
   if (messageContent.length < 10) {
     log.warn("Commit message seems short (< 10 chars)");
     log.warn("Consider providing more detail");
@@ -127,10 +128,8 @@ Options:
   --cwd <path>        Working directory (default: current)
 
 Enforces:
-  - Commit messages start with [ticket-id] prefix
-  - Ticket ID must be numeric
-  - Allows [MAJOR], [MINOR], [PATCH] version markers
-  - Allows conventional commit types (feat:, fix:, etc.)
+  - Commit messages start with lifecycle ticket ID (e.g., [ARCH-123])
+  - Conventional commit style immediately after prefix (type(scope): subject)
   - Merge commits bypass validation
 
 Examples:
@@ -170,8 +169,14 @@ Note:
       });
     }
 
-    // Validate
-    const result = validateCommitMessage(commitMsg, log);
+    const root = await repoRoot(flags.cwd);
+    const config = await loadLifecycleConfig({ cwd: root });
+    const result = validateCommitMessage(
+      commitMsg,
+      log,
+      config.commits.regex,
+      config.commits.pattern,
+    );
 
     if (!result.valid && !result.skipped) {
       log.error("Invalid commit message format");

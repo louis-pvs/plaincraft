@@ -17,7 +17,7 @@ This folder orients you around snippet-level assets. Every component workflow st
 2. Review generated files inside `snippets/<Name>/` and keep the acceptance checklist intact.
 3. Wire the demo into `demo/src/App.tsx` so Storybook and the demo app stay aligned.
 4. Add unit and interaction tests using the respective templates above.
-5. Run `pnpm test` and `pnpm storybook:test` before opening a PR.
+5. Run `pnpm test` and `pnpm storybook:test` (interaction + docs smoke) before opening a PR.
 
 ## Related Guides
 

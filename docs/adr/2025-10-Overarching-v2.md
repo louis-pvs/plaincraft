@@ -23,3 +23,8 @@ Accepted — 2025-10-31
 - Storybook and Playbook now carry governance narratives (`Governance/Script Automation`, `Governance/Release Changelog`, `Governance/Ideas Pipeline`, `Governance/Roadmap Onboarding`) with matching Playbook patterns.
 - CI guardrails (`pnpm docs:lint`, `pnpm docs:views`) replace the retired guide ratio checks and fail fast on missing READMEs or duplicated step blocks.
 - Owners and scaffold references are tracked in every README so Lane C can audit coverage and Lane B knows who to pair with when narratives drift.
+
+## 2025-10 Migration Retro
+
+- 2025-10-31 — Locked the Plaincraft Roadmap schema to lifecycle v3 by caching field IDs in `.repo/projects.json`, wiring the `project-audit.yml` weekly workflow, and publishing `pnpm ops:report` for pilots to verify status drift.
+- 2025-10-31 — Added the Backlog Pilot Scripts-First Ops playbook so Lane D can run intake reviews, escalate automation failures, and replay the weekly audit without ad-hoc Slack threads.

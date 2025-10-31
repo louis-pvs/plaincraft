@@ -46,6 +46,13 @@ type Story = StoryObj<typeof InlineEditLabel>;
 
 export const Basic: Story = {};
 
+export const EmptyState: Story = {
+  args: {
+    value: "",
+    emptyValuePlaceholder: "Add label",
+  },
+};
+
 export const Interaction: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);

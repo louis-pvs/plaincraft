@@ -1,0 +1,41 @@
+import { Meta } from "storybook/blocks";
+
+<Meta title="Governance/Lifecycle Intake" />
+
+# Lifecycle Intake (view)
+
+Move an approved idea into the Scripts-First lifecycle without rewriting the narrative by hand. Intake keeps the idea file as the content source of truth while the GitHub Project card captures status, lane, and owner fields for reporting.
+
+## System of Record
+
+- **Content:** `/ideas/<ID>-*.md` (updated via idea file edits or automation)
+- **Status:** GitHub Projects – `Status`, `Lane`, `Priority`, `Owner` fields
+- **Automation:** `pnpm ideas:create <idea>` → `scripts/ops/ideas-to-issues.mjs`
+
+## Command Contract
+
+```bash
+# When a PB/ARCH/U idea is ready for work
+pnpm ideas:create ideas/PB-scripts-first-lifecycle-rollout.md --yes
+```
+
+- No arguments defaults to dry-run; pass `--yes` to write.
+- The script validates headings, acceptance, and metadata before touching GitHub.
+- Successful runs create/update the linked Issue and stamp the Project fields.
+
+## Worked Example
+
+`pnpm ideas:create ideas/PB-scripts-first-lifecycle-rollout.md --yes` validates the Playbook idea, syncs the metadata to GitHub, and ensures the Project card is present with `Status = Ticketed`. The dry-run output shows the idea diff plus the pending Issue payload so stakeholders can review before execution. Because `scripts/ops/ideas-to-issues.mjs` sources the story from the Markdown frontmatter, the Playbook and Projects stay in sync automatically.
+
+## Constraints
+
+- Keep `Lane`, `Priority`, and `Owner` fields inside the idea frontmatter; automation copies them to the Project card.
+- Acceptance checklists must use GitHub-flavoured markdown checkboxes so the script can sync completion state with the Issue body.
+- Avoid editing Project status manually; follow-up commands reconcile the source of truth based on scripted transitions.
+
+## Hand-off Links
+
+- Template README → `/templates/ideas/README.md`
+- Template USAGE → `/templates/ideas/USAGE.md`
+- Guardrail Script → `/scripts/checks/validate-ideas.mjs`
+- Lifecycle Overview → `/storybook/?path=/docs/governance-lifecycle-overview--docs`
