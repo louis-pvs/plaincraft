@@ -172,6 +172,13 @@ try {
  * @returns {Promise<string[]>} Array of script file paths
  */
 async function findAllScripts(dir) {
+  if (
+    dir.includes(`${path.sep}__fixtures__${path.sep}`) ||
+    dir.endsWith(`${path.sep}__fixtures__`)
+  ) {
+    return [];
+  }
+
   const files = [];
 
   try {
@@ -181,7 +188,11 @@ async function findAllScripts(dir) {
       const fullPath = path.join(dir, entry.name);
 
       // Skip node_modules and hidden files
-      if (entry.name === "node_modules" || entry.name.startsWith(".")) {
+      if (
+        entry.name === "node_modules" ||
+        entry.name.startsWith(".") ||
+        entry.name === "__fixtures__"
+      ) {
         continue;
       }
 

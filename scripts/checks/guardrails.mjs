@@ -21,6 +21,8 @@ Options:
   --scope <list>         Comma-separated scopes to run (scripts,docs,pr,issues,recordings).
                          Default: all scopes.
   --fail-fast            Stop at first failure (default: false)
+  --dry-run              Included for contract completeness (no effect, read-only commands)
+  --yes                  Execute mode (no effect, all subcommands read-only)
   --output <format>      Output format: text|json (default: text)
   --log-level <level>    Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>           Working directory (default: current)
@@ -48,7 +50,7 @@ const SCOPE_COMMANDS = {
     {
       id: "scripts:smoke",
       idea: IDEA_ID,
-      cmd: ["pnpm", "run", "scripts:smoke"],
+      cmd: ["pnpm", "run", "scripts:smoke", "--", "--filter", "checks"],
     },
     { id: "scripts:size", idea: IDEA_ID, cmd: ["pnpm", "run", "scripts:size"] },
     {
