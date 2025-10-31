@@ -47,11 +47,11 @@ CLI surface or CI enforcement to make it real. Missing automation leaves us with
 - [x] Lifecycle config file documents Project field IDs, status enums, and type
       mappings with validation.
 - [x] CI workflow added/updated to run lifecycle smoke tests (`pnpm scripts:lifecycle-smoke` or equivalent) on PRs.
-- [ ] Documentation updated (README snippets, ADR note) showing the four-command
+- [x] Documentation updated (README snippets, ADR note) showing the four-command
       workflow and how to recover from failed runs.
-- [ ] Passed `pnpm guardrails`
+- [x] Passed `pnpm guardrails`
 
 ## Status
 
 - 2025-10-31 - In progress: Lifecycle config + loaders landed (`scripts/config/lifecycle.json`, `scripts/_lib/lifecycle.mjs`), and intake/branch/PR commands now emit validated plans (`ops/idea-intake.mjs`, `ops/create-branch.mjs`, `ops/open-or-update-pr.mjs`). CI guardrail job calls `pnpm scripts:lifecycle-smoke` but Projects mutations (status reconcile, closeout, report) still pending.
-- 2025-11-03 - Latest: Added placeholder planners for `ops/reconcile-status.mjs`, `ops/closeout.mjs`, `ops/report.mjs`, extended lifecycle smoke to cover them, aligned CLI contracts so guardrails/policy lint pass locally, and shipped `checks/commit-guard.mjs` + `checks/drift.mjs` wired into guardrails. Remaining: documentation/ADR updates.
+- 2025-11-03 - Latest: Added placeholder planners for `ops/reconcile-status.mjs`, `ops/closeout.mjs`, `ops/report.mjs`, extended lifecycle smoke to cover them, aligned CLI contracts so guardrails/policy lint pass locally, and shipped `checks/commit-guard.mjs` + `checks/drift.mjs` wired into guardrails. Documentation (Playbook pattern, Storybook views, templates) now teaches the four-command workflow and guardrail recovery paths.

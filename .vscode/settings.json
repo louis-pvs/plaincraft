@@ -2,7 +2,7 @@
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
       "file": "./guides/guide-guardrails.md",
-      "text": "Every commit message must begin with the ticket ID in brackets: `[U-<issue-no>]`, `[C-<issue-no>]`, `[B-<issue-no>]`, `[ARCH-<issue-no>]`, `[PB-<issue-no>]`.."
+      "text": "Commit messages must match the lifecycle pattern: `[ID] type(scope): subject` (e.g. `[ARCH-123] feat(api): add guardrail`)."
     }
   ]
 }
