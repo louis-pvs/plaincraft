@@ -44,6 +44,10 @@ export type InlineEditLabelProps = {
     error?: string;
     discarded?: string;
   };
+  /**
+   * Placeholder shown when the current value is empty.
+   */
+  emptyValuePlaceholder?: string;
 };
 
 export function InlineEditLabel({
@@ -55,6 +59,7 @@ export function InlineEditLabel({
   successLabel,
   errorLabel,
   labels,
+  emptyValuePlaceholder = "Add label",
 }: InlineEditLabelProps) {
   const controller = useInlineEditLabelController({
     value,
@@ -73,6 +78,7 @@ export function InlineEditLabel({
       controller={controller}
       ariaLabel={ariaLabel}
       maxLength={maxLength}
+      emptyValuePlaceholder={emptyValuePlaceholder}
     />
   );
 }
