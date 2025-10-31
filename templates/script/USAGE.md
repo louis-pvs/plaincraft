@@ -116,6 +116,9 @@ pnpm scripts:test -- --filter <script-name>  # Focused unit coverage
 
 # Lifecycle guardrail (required when touching gh:worktree helpers)
 pnpm scripts:test -- --filter create-worktree-pr
+
+> Governance links: Review `/storybook/?path=/docs/governance-lifecycle-overview--docs` when scripts touch intake → closeout flows.
+
 ```
 
 ## Advanced Usage

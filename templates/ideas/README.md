@@ -51,4 +51,5 @@ All idea documents must include:
 - Playbook: `/playbook/patterns/ideas-source-of-truth.html`
 - Storybook: `/storybook/?path=/docs/governance-ideas-pipeline--docs`
 - Release storytelling: `/playbook/patterns/release-changelog-automation.html`
+- Lifecycle governance: `/storybook/?path=/docs/governance-lifecycle-intake--docs`
 - `/templates/ideas/USAGE.md` - Detailed usage examples
