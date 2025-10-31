@@ -44,6 +44,32 @@ jobs:
           path: test-results.json
           retention-days: 30
 
+  guardrails:
+    name: Guardrail Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run guardrails suite
+        run: |
+          set -o pipefail
+          pnpm guardrails --output json | tee guardrails-report.json
+      - name: Upload guardrail report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: guardrails-report
+          path: guardrails-report.json
+          retention-days: 14
+
   build-storybook:
     name: Build Storybook Static
     runs-on: ubuntu-latest

@@ -43,7 +43,7 @@ errors are scattered. Without a universal orchestrator:
 - [x] Universal guardrail script orchestrates lint/tests across docs, scripts,
       PR templates, ideas, recording validations, etc., with consistent exit codes.
 - [x] `package.json` exposes `pnpm guardrails` (full) plus scoped variants.
-- [ ] CI workflow updated to run the universal command and publish summary
+- [x] CI workflow updated to run the universal command and publish summary
       output/log artifacts.
 - [x] Lane B documentation updated with the new “one command before PR” flow,
       referencing the guardrail script (Lane C provides technical appendix).
@@ -53,5 +53,6 @@ errors are scattered. Without a universal orchestrator:
 ## Status
 
 - 2025-11-02 — Guardrail orchestrator exported via `pnpm guardrails`, scoped aliases wired,
-  developer docs updated, and JSON summary now tags each failure with
-  `ARCH-unified-guardrails-suite`. CI workflow wiring remains.
+  developer docs updated, JSON summary tags each failure with
+  `ARCH-unified-guardrails-suite`, and CI now runs the suite publishing
+  `guardrails-report.json` artifacts.
