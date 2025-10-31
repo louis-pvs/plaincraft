@@ -2,6 +2,8 @@
 
 All notable changes live here. Follow the [changelog guide](guides/CHANGELOG-GUIDE.md) for structure and authoring notes.
 
+## [0.19.2] - 2025-10-31
+
 ## [0.19.1] - 2025-10-31
 
 ## [0.19.0] - 2025-10-31
