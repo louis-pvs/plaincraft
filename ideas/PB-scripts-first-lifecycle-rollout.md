@@ -33,18 +33,18 @@ status, ideas, and branches stay in sync.
 
 ## Status
 
-- Storybook governance views published for Intake, Branch, PR Refresh, Closeout, plus an overview map with SoT callouts.
-- Playbook patterns added for lifecycle overview and rollback, index updated with rollout ties.
-- Template READMEs now link to the governance docs; legacy markdown has redirect stubs.
-- Training packet drafted for Lane D; ADR share scheduled after dry-run recordings finalize.
+- Storybook governance views published for Intake, Branch, PR Refresh, and Closeout, plus an overview map with SoT links.
+- Playbook patterns live for lifecycle overview and rollback with rollout references in the index.
+- Template READMEs and redirect stubs now point at the new governance docs.
+- Training packet drafted; ADR share pending dry-run transcript capture.
 
 ## Process
 
 1. Publish new Storybook governance docs for intake, branching, PR refresh, and
    closeout, each linking to helper APIs and CLI reference.
 2. Author Playbook patterns that translate the lifecycle into business-facing
-   language (e.g., “Ticketed → Branched” expectations, rollback play).
-3. Update template README “Links” sections (ideas, scripts, roadmap, changelog)
+   language (e.g., "Ticketed -> Branched" expectations, rollback play).
+3. Update template README "Links" sections (ideas, scripts, roadmap, changelog)
    to point at the new docs; add redirect stubs for legacy guidance.
 4. Draft a training packet (video or doc) targeted at Lane D and backlog leads,
    then circulate via ADR comment thread.
@@ -53,7 +53,8 @@ status, ideas, and branches stay in sync.
 
 - [x] Storybook governance docs live for Intake, Branch, PR Open, and Closeout
       flows referencing helper APIs.
-- [x] Playbook patterns published for lifecycle overview and rollback coverage, linked from Storybook pages.
+- [x] Playbook patterns published for lifecycle overview and rollback coverage,
+      linked from Storybook pages.
 - [x] Templates and script READMEs updated to reference the new docs; redirect
       stubs placed for superseded content.
 - [ ] Training packet shared with Lane D + ADR subscribers, including quick

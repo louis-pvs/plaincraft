@@ -39,18 +39,17 @@ CLI surface or CI enforcement to make it real. Missing automation leaves us with
 
 ## Acceptance Checklist
 
-- [ ] `ops/idea-intake.mjs`, `ops/create-branch.mjs`, `ops/open-or-update-pr.mjs`,
+- [x] `ops/idea-intake.mjs`, `ops/create-branch.mjs`, `ops/open-or-update-pr.mjs`,
       `ops/reconcile-status.mjs`, `ops/closeout.mjs`, and `ops/report.mjs`
       implemented with shared helper modules.
 - [ ] `checks/commit-guard.mjs` and `checks/drift.mjs` enforce commit headers and
       Project/idea parity locally and in CI.
-- [ ] Lifecycle config file documents Project field IDs, status enums, and type
+- [x] Lifecycle config file documents Project field IDs, status enums, and type
       mappings with validation.
-- [ ] CI workflow added/updated to run lifecycle smoke tests (`pnpm
-scripts:lifecycle-smoke` or equivalent) on PRs.
+- [x] CI workflow added/updated to run lifecycle smoke tests (`pnpm scripts:lifecycle-smoke` or equivalent) on PRs.
 - [ ] Documentation updated (README snippets, ADR note) showing the four-command
       workflow and how to recover from failed runs.
 
 ## Status
 
-- 2025-10-31 - In progress: Introduced shared lifecycle config loader (`scripts/_lib/lifecycle.mjs`), generated cache scaffolds under `scripts/config/`, and added the first `ops/idea-intake.mjs` dry-run planner. Guardrail pass (`pnpm guardrails`) still blocked until remaining ops scripts and project mutations are wired.
+- 2025-10-31 - In progress: Lifecycle config + loaders landed (`scripts/config/lifecycle.json`, `scripts/_lib/lifecycle.mjs`), and intake/branch/PR commands now emit validated plans (`ops/idea-intake.mjs`, `ops/create-branch.mjs`, `ops/open-or-update-pr.mjs`). CI guardrail job calls `pnpm scripts:lifecycle-smoke` but Projects mutations (status reconcile, closeout, report) still pending.

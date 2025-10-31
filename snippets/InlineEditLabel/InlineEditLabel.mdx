@@ -2,13 +2,12 @@ import { Meta, Markdown, ArgTypes, Canvas, Story } from "storybook/blocks";
 import * as Stories from "./InlineEditLabel.stories";
 import ReadmeSource from "./README.md?raw";
 
-const scaffoldRefMatch = ReadmeSource.match(/scaffold_ref:\s*([^\s]+)/i);
-const ownerMatch = ReadmeSource.match(/^_Owner:\s*(@[^\s]+)/im);
+export const scaffoldRefMatch = ReadmeSource.match(/scaffold_ref:\s*([^\s]+)/i);
+export const ownerMatch = ReadmeSource.match(/^_Owner:\s*(@[^\s]+)/im);
 
-const scaffoldRef = scaffoldRefMatch?.[1]?.trim() ?? "Missing scaffold_ref";
-const ownerHandle = ownerMatch?.[1]?.trim() ?? "Unassigned";
-const isScaffoldMissing = scaffoldRef === "Missing scaffold_ref";
-const isOwnerMissing = ownerHandle === "Unassigned";
+export const scaffoldRef =
+  scaffoldRefMatch?.[1]?.trim() ?? "Missing scaffold_ref";
+export const ownerHandle = ownerMatch?.[1]?.trim() ?? "Unassigned";
 
 <Meta of={Stories} />
 
@@ -19,7 +18,11 @@ const isOwnerMissing = ownerHandle === "Unassigned";
     </div>
     <code
       data-testid="docs-template-ref"
-      style={isScaffoldMissing ? { color: "var(--color-danger-text)" } : undefined}
+      style={
+        scaffoldRef === "Missing scaffold_ref"
+          ? { color: "var(--color-danger-text)" }
+          : undefined
+      }
     >
       {scaffoldRef}
     </code>
@@ -30,7 +33,11 @@ const isOwnerMissing = ownerHandle === "Unassigned";
     </div>
     <code
       data-testid="docs-owner-handle"
-      style={isOwnerMissing ? { color: "var(--color-danger-text)" } : undefined}
+      style={
+        ownerHandle === "Unassigned"
+          ? { color: "var(--color-danger-text)" }
+          : undefined
+      }
     >
       {ownerHandle}
     </code>
