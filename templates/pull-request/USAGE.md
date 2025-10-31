@@ -98,11 +98,8 @@ Fixes #456. Profile component was calling API twice on mount due to missing depe
 # Auto-generate PR body from issue
 node scripts/generate-pr-content.mjs --issue 123
 
-# Create issue + worktree + PR draft atomically
-node scripts/create-worktree-pr.mjs \
-  --template issue-unit \
-  --title "Fix login bug" \
-  --create-pr
+# Create issue + worktree + PR; updates idea Issue/Status metadata automatically
+pnpm gh:worktree 123 --no-draft
 
 # Update PR checklist after sub-issue merge
 node scripts/manual-update-pr-checkboxes.mjs --pr 456
