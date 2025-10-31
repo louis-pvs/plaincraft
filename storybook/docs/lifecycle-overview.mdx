@@ -1,0 +1,44 @@
+import { Meta } from "storybook/blocks";
+
+<Meta title="Governance/Lifecycle Overview" />
+
+# Scripts-First Lifecycle Overview (view)
+
+The Scripts-First lifecycle keeps ideas, branches, PRs, and releases aligned through four sanctioned commands. Each stage honours two sources of truth:
+
+- **Content SoT:** the idea file under `/ideas/`
+- **Status SoT:** the GitHub Project item for that ID
+
+Automation bridges the two so humans never hand-edit status fields.
+
+## Command Map
+
+| Stage     | Command / Shortcut                           | Primary Script                                 | Status Transition      |
+| --------- | --------------------------------------------- | ---------------------------------------------- | ---------------------- |
+| Intake    | `pnpm ideas:create <idea>`                    | `scripts/ops/ideas-to-issues.mjs`              | Draft → Ticketed       |
+| Branch    | `pnpm gh:worktree <issue>`                    | `scripts/ops/create-worktree-pr.mjs`           | Ticketed → Branched    |
+| PR Refresh| `pnpm pr:generate --yes` (+ `pnpm pr:verify`) | `scripts/ops/generate-pr-content.mjs`          | Branched → PR Open     |
+| Closeout  | `pnpm changelog -- --yes` + archive command   | `scripts/ops/consolidate-changelog.mjs` + `archive-idea-for-issue.mjs` | In Review → Archived   |
+
+## Signals to Watch
+
+- Dry-run output attaches to project status notes; if a command lacks a dry-run transcript, the stage likely happened manually.
+- Status fields in GitHub Projects should only change after the corresponding command runs. Manual edits are reconciled back to the scripted value during the next run.
+- Idea files must keep `Issue` and `Status` lines in frontmatter so automation can stamp transitions without merge conflicts.
+
+## Recovery Play
+
+If a branch must be backed out after promotion:
+
+1. Run `node scripts/ops/remove-worktree.mjs <issue> --yes` to clean up local worktrees.
+2. Re-run `pnpm gh:worktree <issue>` in dry-run mode to confirm the idea file still reflects the previous status.
+3. Use `pnpm pr:generate` to refresh the PR body if the rollback involves checklist resets.
+4. Attach the dry-run transcripts to the Playbook rollback pattern for auditing.
+
+## Hand-off Links
+
+- Intake View → `/storybook/?path=/docs/governance-lifecycle-intake--docs`
+- Branch View → `/storybook/?path=/docs/governance-lifecycle-branch--docs`
+- PR Refresh View → `/storybook/?path=/docs/governance-lifecycle-pr-refresh--docs`
+- Closeout View → `/storybook/?path=/docs/governance-lifecycle-closeout--docs`
+- Playbook Pattern → `/playbook/patterns/scripts-first-lifecycle-overview.html`
