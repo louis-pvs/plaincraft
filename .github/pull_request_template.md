@@ -1,14 +1,27 @@
-# Related Issue
+# Overview
 
-- [ ] I referenced the ticket with `Closes #<issue-number>` (required for merge)
-- [ ] Every commit message begins with the ticket ID in brackets (e.g. `[U-inline-edit]`)
+- Purpose:
+- Scope / decisions touched:
+- Rollback plan:
+
+# Ticket & Automation Contract
+
+- [ ] Closes #<issue-number> (required for merge)
 - Ticket ID: ``
-
-# Lane + Contracts
-
 - Lane label applied: ``
-- Scope summary:
-- Rollout notes:
+- [ ] Type label applied (`type:unit|composition|bug|architecture|playbook`)
+- Related idea or ADR:
+
+# Implementation Notes
+
+- Summary of changes:
+- Dependencies / follow-up work:
+
+# Testing
+
+- [ ] `pnpm pr:check` (typecheck, lint, tests)
+- [ ] Storybook / recording checks (if applicable)
+- [ ] Other verification:
 
 # Acceptance Checklist
 
@@ -17,3 +30,8 @@
 ```markdown
 - [ ]
 ```
+
+# Rollout / Comms
+
+- Docs / Playbook updates:
+- Release or feature flag notes:
