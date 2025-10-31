@@ -54,11 +54,9 @@ jobs:
           echo "number=" >> "$GITHUB_OUTPUT"
           echo "⚠️  No project configured or project missing"
 
-      - name: Setup Node.js
+      - name: Install GitHub CLI
         if: steps.check.outputs.exists == 'false'
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+        run: sudo apt-get update && sudo apt-get install -y gh
 
       - name: Setup pnpm
         if: steps.check.outputs.exists == 'false'
@@ -106,6 +104,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      - name: Install GitHub CLI
+        run: sudo apt-get update && sudo apt-get install -y gh
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
