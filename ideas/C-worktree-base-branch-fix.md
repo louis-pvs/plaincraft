@@ -57,7 +57,7 @@ Linked Composition: `ARCH-ci-cd-implementation`
 ## Guardrails
 
 - Extend `scripts/checks/policy-lint.mjs` (or add a dedicated lint) to fail CI if `pnpm` appears inside `.husky/` or the `prepare` script to prevent regressions.
-- Add a bootstrap check (e.g. `pnpm scripts:guardrails`) that runs `corepack prepare pnpm@<version>` when `pnpm -v` mismatches, enforcing the Corepack workflow locally and in CI.
+- Add a bootstrap check (e.g. `pnpm guardrails`) that runs `corepack prepare pnpm@<version>` when `pnpm -v` mismatches, enforcing the Corepack workflow locally and in CI.
 - Document the hook expectations in `docs/scripts-reference.md` and the developer onboarding guide so contributors know to modify package scripts rather than Husky/Lint-Staged directly.
 
 ## Invariants

@@ -27,14 +27,17 @@ This directory follows strict guardrails to ensure all scripts are rerunnable, t
 ### Run Guardrails Check
 
 ```bash
-pnpm scripts:guardrails
+pnpm guardrails
 ```
 
-This runs:
+This orchestrates:
 
-1. **Policy lint** - Validates script structure and safety
-2. **Unit tests** - Tests pure functions in `_lib/`
-3. **Smoke tests** - Ensures all scripts respond to `--help`
+1. **Script suite** — Policy lint, unit tests, smoke tests, size + deprecation checks
+2. **Docs suite** — README + template coverage, view dedupe, Playbook link guard
+3. **PR/Issue checks** — PR template lint, issue template lint
+4. **Recording probe** — Optional Storybook recording smoke (`--help`) to ensure tooling is available
+
+Use `pnpm guardrails:<scope>` (`docs`, `scripts`, `ideas`, `pr`, `recordings`) for focused runs.
 
 ### Create a New Script
 
@@ -421,7 +424,7 @@ When adding or modifying scripts:
 4. **Write tests** for pure functions
 5. **Run guardrails** before committing:
    ```bash
-   pnpm scripts:guardrails
+   pnpm guardrails
    ```
 
 ---

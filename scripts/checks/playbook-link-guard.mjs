@@ -8,13 +8,7 @@
 
 import path from "node:path";
 import { readdir, readFile } from "node:fs/promises";
-import {
-  parseFlags,
-  Logger,
-  repoRoot,
-  succeed,
-  fail,
-} from "../_lib/core.mjs";
+import { parseFlags, Logger, repoRoot, succeed, fail } from "../_lib/core.mjs";
 
 const SCRIPT_NAME = "playbook-link-guard";
 const args = parseFlags(process.argv.slice(2));

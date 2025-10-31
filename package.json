@@ -58,7 +58,6 @@
     "scripts:smoke": "node scripts/checks/smoke.mjs",
     "scripts:size": "node scripts/checks/size-check.mjs",
     "scripts:deprecation": "node scripts/checks/deprecation-sweeper.mjs",
-    "scripts:guardrails": "pnpm scripts:lint && pnpm scripts:test && pnpm scripts:smoke && pnpm scripts:size && pnpm scripts:deprecation && pnpm pr:template && pnpm issues:lint",
     "docs:lint": "node scripts/checks/readme-lint.mjs && node scripts/checks/template-coverage.mjs",
     "docs:coverage": "node scripts/checks/template-coverage.mjs",
     "docs:views": "node scripts/checks/view-dedupe.mjs",
@@ -73,7 +72,15 @@
     "guides:dedupe": "node scripts/checks/dedupe-guides.mjs",
     "guides:ttl": "node scripts/ops/archive-expired-guides.mjs",
     "guides:index": "node scripts/ops/index-guides.mjs",
-    "guides:check": "pnpm guides:lint && pnpm guides:dedupe && pnpm guides:ttl --dry-run"
+    "guides:check": "pnpm guides:lint && pnpm guides:dedupe && pnpm guides:ttl --dry-run",
+    "guardrails": "node scripts/checks/guardrails.mjs",
+    "guardrails:scripts": "node scripts/checks/guardrails.mjs --scope scripts",
+    "guardrails:docs": "node scripts/checks/guardrails.mjs --scope docs",
+    "guardrails:pr": "node scripts/checks/guardrails.mjs --scope pr",
+    "guardrails:issues": "node scripts/checks/guardrails.mjs --scope issues",
+    "guardrails:recordings": "node scripts/checks/guardrails.mjs --scope recordings",
+    "guardrails:ci": "node scripts/checks/guardrails.mjs --output json",
+    "scripts:guardrails": "pnpm guardrails"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.2",

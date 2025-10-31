@@ -6,7 +6,7 @@ Automated enforcement of script quality, safety, and lifecycle management.
 
 ```bash
 # Run all guardrail checks
-pnpm scripts:guardrails
+pnpm guardrails
 
 # Run individual checks
 pnpm scripts:lint        # Policy compliance
@@ -127,7 +127,7 @@ Every script must support:
 
 ## CI Enforcement
 
-The `scripts:guardrails` job runs in CI and fails fast on violations.
+The `guardrails` job runs in CI and fails fast on violations.
 
 ### Policy Lint
 
@@ -157,7 +157,7 @@ The `scripts:guardrails` job runs in CI and fails fast on violations.
 3. **Implement CLI contract** with all required flags
 4. **Use `_lib/core.mjs`** for common utilities
 5. **Write tests** in `*.spec.mjs` file
-6. **Run guardrails**: `pnpm scripts:guardrails`
+6. **Run guardrails**: `pnpm guardrails`
 7. **Add to package.json** if it's a common operation
 
 ## Deprecating a Script
@@ -187,7 +187,7 @@ pnpm scripts:test
 pnpm scripts:smoke
 
 # Run all checks
-pnpm scripts:guardrails
+pnpm guardrails
 ```
 
 ## Network Allowlist

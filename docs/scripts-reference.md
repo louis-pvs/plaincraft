@@ -8,7 +8,7 @@ Template scaffolds: `/templates/script/`.
 
 ```bash
 # Guardrails bundle
-pnpm scripts:guardrails
+pnpm guardrails
 
 # Individual checks
 pnpm scripts:lint     # policy + headers
@@ -33,10 +33,11 @@ All scripts honour the shared CLI contract:
 | `scripts/checks/lint-guides.mjs`               | Validate guide frontmatter, TTL, executable commands           | Any documentation PR touching `/guides/**`                  |
 | `scripts/checks/dedupe-guides.mjs`             | Similarity guardrail for guides                                | Pair with `lint-guides` in CI or local preflight            |
 | `scripts/checks/validate-ideas.mjs`            | Structural validation for idea files                           | Before calling `ideas-to-issues` or merging idea PRs        |
-| `scripts/checks/pr-requirements.mjs`           | Ensures PR metadata + checklist compliance                     | Pre-merge or as part of `scripts:guardrails`                |
+| `scripts/checks/pr-requirements.mjs`           | Ensures PR metadata + checklist compliance                     | Pre-merge or as part of `pnpm guardrails`                   |
 | `scripts/checks/pr-template-lint.mjs`          | Confirms PR template placeholders match pipeline config        | Whenever `.github/pull_request_template.md` changes         |
 | `scripts/checks/template-coverage.mjs`         | Enforces template-to-guide ratio                               | When adding new templates/guides                            |
 | `scripts/checks/playbook-link-guard.mjs`       | Verifies Playbook pattern links point to canonical docs        | Any change under `playbook/patterns/**`                     |
+| `scripts/checks/guardrails.mjs`                | Runs the full guardrail suite with JSON/text summary output    | `pnpm guardrails` locally or in CI                          |
 
 ## Idea Workflow Helpers
 

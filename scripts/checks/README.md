@@ -36,5 +36,6 @@ git restore scripts/checks/my-check.mjs
 - USAGE: /templates/script/USAGE.md
 - Storybook: /storybook/?path=/docs/governance-script-automation--docs
 - Playbook: /playbook/patterns/script-automation-guardrails.html
+- Guardrails suite: `pnpm guardrails`
 
 _Owner: @lane-c_

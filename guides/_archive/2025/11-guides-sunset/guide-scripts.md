@@ -54,7 +54,7 @@ last_verified: 2025-10-28
 
 5. **Run all guardrails:**
    ```bash
-   pnpm scripts:guardrails
+   pnpm guardrails
    # Runs lint, test, smoke, size, deprecation checks
    ```
 

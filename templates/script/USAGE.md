@@ -106,7 +106,7 @@ node scripts/your-script.mjs --yes
 
 ```bash
 # Run all guardrails
-pnpm scripts:guardrails
+pnpm guardrails
 
 # Or individual checks
 pnpm scripts:lint    # Header, CLI contract, patterns
