@@ -1,3 +1,20 @@
+---
+id: ARCH-scripts-first-project-governance
+owner: lane.d
+lane: D
+type: architecture
+priority: P1
+state: ready
+next_state: in-progress
+issue: 99
+acceptance:
+  - Project schema created or updated to match lifecycle v3 fields, with IDs captured for automation.
+  - Automation workflow (`project-sync.yml` or updated `project.yml`) listens for lifecycle events and queues status transitions.
+  - Weekly audit script/report (`ops/report.mjs` or similar) scheduled to flag drift, missing Owner, or duplicate IDs.
+  - Backlog operating procedure published (doc or Playbook entry) covering intake review, rollback flow, and escalation.
+  - Migration retro recorded in ADR comment with links to scripts and Project snapshots.
+---
+
 # ARCH-scripts-first-project-governance
 
 Lane: D (Backlog & Project Stewardship)
@@ -49,3 +66,7 @@ direction doc. Without a governed project:
       intake review, rollback flow, and escalation.
 - [ ] Migration retro recorded in ADR comment with links to scripts and Project
       snapshots.
+
+## Status
+
+- 2025-10-31 - Advanced to `ready` after normalizing idea frontmatter and confirming Plaincraft Roadmap card automation scope.

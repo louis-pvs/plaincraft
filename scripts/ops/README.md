@@ -44,6 +44,7 @@ git restore scripts/ops/my-automation.mjs
 
 - USAGE: /templates/script/USAGE.md
 - Storybook: /storybook/?path=/docs/governance-script-automation--docs
-- Playbook: /playbook/patterns/script-automation-guardrails.html
+- Playbook (Guardrails): /playbook/patterns/script-automation-guardrails.html
+- Playbook (Lifecycle kickoff): /playbook/patterns/scripts-first-lifecycle-rollout.html
 
 _Owner: @lane-c_

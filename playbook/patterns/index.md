@@ -57,6 +57,19 @@ Ensures every ops script ships with the template contract so guardrails stay pre
 
 ---
 
+### [Scripts-First Lifecycle Rollout](/patterns/scripts-first-lifecycle-rollout)
+
+Keeps idea metadata, branches, and draft PRs aligned the moment work begins so lifecycle reporting never drifts.
+
+**Key Features:**
+
+- `pnpm gh:worktree` stamps `Issue`/`Status` directly on the idea file
+- Bootstrap commit + draft PR give stakeholders an immediate artifact
+- Dry-run logs capture the contract diff before anything is written
+- Links back to the script template so new lifecycle commands stay consistent
+
+---
+
 ### [Roadmap Project Onboarding](/patterns/roadmap-project-onboarding)
 
 Codifies the GitHub Projects setup so roadmap automation, lane views, and stakeholders stay aligned.
