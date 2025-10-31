@@ -219,28 +219,19 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Sync project fields
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run lifecycle smoke checks
         run: |
-          echo "Syncing project fields..."
-          # This would call a sync script if needed
-          # For now, just verify the project exists
+          set -euo pipefail
+          pnpm scripts:lifecycle-smoke --yes --output json | tee lifecycle-smoke-report.json
 
-          if [ -f .github/pipeline-config.json ]; then
-            PROJECT_NUMBER=$(jq -r '.project.number // empty' .github/pipeline-config.json)
-            
-            if [ -n "$PROJECT_NUMBER" ]; then
-              echo "Project #$PROJECT_NUMBER configured"
-              gh project view $PROJECT_NUMBER --owner "${{ github.repository_owner }}"
-            else
-              echo "⚠️  No project configured in pipeline-config.json"
-            fi
-          else
-            echo "⚠️  No pipeline-config.json found"
-          fi
+      - name: Upload lifecycle report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecycle-smoke-report
+          path: lifecycle-smoke-report.json
+          retention-days: 14

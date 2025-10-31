@@ -1,0 +1,44 @@
+name: Project Governance Audit
+
+on:
+  schedule:
+    - cron: "0 9 * * MON"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  weekly-audit:
+    name: Run lifecycle governance report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate governance report
+        run: |
+          set -euo pipefail
+          pnpm ops:report --yes --output json | tee project-governance-report.json
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-governance-report
+          path: project-governance-report.json
+          retention-days: 14
