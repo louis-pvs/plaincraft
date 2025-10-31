@@ -1,0 +1,41 @@
+import { Meta } from "storybook/blocks";
+
+<Meta title="Governance/Lifecycle Branch" />
+
+# Lifecycle Branch (view)
+
+Branch creation is the first irreversible signal that work has started. The `pnpm gh:worktree` command keeps the branch, idea file, and draft PR aligned so Projects can promote the ticket without manual edits.
+
+## System of Record
+
+- **Content:** `/ideas/<ID>-*.md` (Issue number + status written during bootstrap)
+- **Status:** GitHub Projects – `Status` moves from `Ticketed` → `Branched`
+- **Automation:** `pnpm gh:worktree <issue>` → `scripts/ops/create-worktree-pr.mjs`
+
+## Command Contract
+
+```bash
+# Bootstrap a worktree + branch for issue #91
+pnpm gh:worktree 91 --yes
+```
+
+- Dry-run prints the planned branch name, idea diff, and PR metadata.
+- `--yes` creates the worktree, pushes a bootstrap commit, and opens a draft PR.
+- `--base <branch>` lets you pivot off something other than `main`.
+
+## Worked Example
+
+`pnpm gh:worktree 91 --yes` finds the Playbook idea, writes `Issue: #91` and `Status: in-progress` into the frontmatter, and commits the change so the branch exists before code lands. The command opens a draft PR with the acceptance checklist pulled from the idea and bumps the Project item to `Branched`. Dry-run JSON is attached to status updates so stakeholders can follow along even before the first commit lands.
+
+## Constraints
+
+- Leave `Issue` and `Status` lines in the idea frontmatter; the script mutates them in-place.
+- Keep idea titles prefixed with `[ID]` so the command can locate the source document.
+- Do not hand-create branches that bypass the bootstrap commit—PR creation relies on the scripted branch push.
+
+## Hand-off Links
+
+- Unit README → `/scripts/ops/README.md`
+- Unit Script → `/scripts/ops/create-worktree-pr.mjs`
+- Template README → `/templates/script/README.md`
+- Template USAGE → `/templates/script/USAGE.md`

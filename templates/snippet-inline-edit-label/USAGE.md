@@ -32,7 +32,7 @@ function Example({ name, onRename }) {
 
 ## 3. Validate
 
-- `pnpm storybook:test` — runs Interaction, Cancel, and Retry stories.
+- `pnpm storybook:test` — runs Interaction, Cancel, Retry stories, plus docs metadata smoke checks.
 - `pnpm test -- InlineEditLabel` — unit tests for controller and view seams.
 - `pnpm typecheck` — ensures consuming surface stays type-safe.
 

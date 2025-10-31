@@ -2,17 +2,11 @@ import { Meta, Markdown, ArgTypes, Canvas, Story } from "storybook/blocks";
 import * as Stories from "./TemplateSnippet.stories";
 import ReadmeSource from "./README.md?raw";
 
-const scaffoldRefMatch =
-  ReadmeSource.match(/#\s*scaffold_ref:\s*([^\s]+)/i) ??
-  ReadmeSource.match(/scaffold_ref:\s*([^\s]+)/i);
-const ownerCommentMatch = ReadmeSource.match(/<!--\s*_Owner:\s*(@[^\s>]+)\s*-->/i);
-const ownerLineMatch = ReadmeSource.match(/^Owner:\s*(@[^\s]+)/im);
+const scaffoldRefMatch = ReadmeSource.match(/scaffold_ref:\s*([^\s]+)/i);
+const ownerMatch = ReadmeSource.match(/^_Owner:\s*(@[^\s]+)/im);
 
-const scaffoldRef = scaffoldRefMatch ? scaffoldRefMatch[1].trim() : "Missing scaffold_ref";
-const ownerHandle =
-  ownerCommentMatch?.[1]?.trim() ??
-  ownerLineMatch?.[1]?.trim() ??
-  "Unassigned";
+const scaffoldRef = scaffoldRefMatch?.[1]?.trim() ?? "Missing scaffold_ref";
+const ownerHandle = ownerMatch?.[1]?.trim() ?? "Unassigned";
 const isScaffoldMissing = scaffoldRef === "Missing scaffold_ref";
 const isOwnerMissing = ownerHandle === "Unassigned";
 
@@ -23,13 +17,23 @@ const isOwnerMissing = ownerHandle === "Unassigned";
     <div style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted-color)" }}>
       Template
     </div>
-    <code style={isScaffoldMissing ? { color: "var(--color-danger-text)" } : undefined}>{scaffoldRef}</code>
+    <code
+      data-testid="docs-template-ref"
+      style={isScaffoldMissing ? { color: "var(--color-danger-text)" } : undefined}
+    >
+      {scaffoldRef}
+    </code>
   </div>
   <div>
     <div style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted-color)" }}>
       Owner
     </div>
-    <code style={isOwnerMissing ? { color: "var(--color-danger-text)" } : undefined}>{ownerHandle}</code>
+    <code
+      data-testid="docs-owner-handle"
+      style={isOwnerMissing ? { color: "var(--color-danger-text)" } : undefined}
+    >
+      {ownerHandle}
+    </code>
   </div>
 </div>
 

@@ -17,13 +17,23 @@ const isOwnerMissing = ownerHandle === "Unassigned";
     <div style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted-color)" }}>
       Template
     </div>
-    <code style={isScaffoldMissing ? { color: "var(--color-danger-text)" } : undefined}>{scaffoldRef}</code>
+    <code
+      data-testid="docs-template-ref"
+      style={isScaffoldMissing ? { color: "var(--color-danger-text)" } : undefined}
+    >
+      {scaffoldRef}
+    </code>
   </div>
   <div>
     <div style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted-color)" }}>
       Owner
     </div>
-    <code style={isOwnerMissing ? { color: "var(--color-danger-text)" } : undefined}>{ownerHandle}</code>
+    <code
+      data-testid="docs-owner-handle"
+      style={isOwnerMissing ? { color: "var(--color-danger-text)" } : undefined}
+    >
+      {ownerHandle}
+    </code>
   </div>
 </div>
 

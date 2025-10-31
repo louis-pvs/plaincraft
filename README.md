@@ -62,7 +62,7 @@ pnpm dev
 - Serve locally: `pnpm storybook`
 - Build static bundle: `pnpm build:storybook`
 - Install Playwright browsers once: `pnpm exec playwright install --with-deps`
-- Headless interaction tests: `TARGET_URL=http://127.0.0.1:6006 pnpm storybook:test`
+- Headless interaction + docs checks: `TARGET_URL=http://127.0.0.1:6006 pnpm storybook:test`
 
 Each scaffolded snippet ships with:
 
@@ -74,7 +74,7 @@ Each scaffolded snippet ships with:
 
 - Clean clone:
   - `pnpm i && pnpm storybook` succeeds
-  - `pnpm storybook:test` passes against the static build
+  - `pnpm storybook:test` (stories + docs) passes against the static build
   - `pnpm new:snippet <Name>` generates working stories/docs without edits
 - GitHub Actions:
   - `app-checks` runs format, typecheck, lint, unit tests, and build

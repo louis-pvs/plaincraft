@@ -125,7 +125,7 @@ function AdvancedExample() {
 # Run unit tests
 pnpm test TemplateSnippet
 
-# Run Storybook interaction tests
+# Run Storybook interaction + docs smoke tests
 pnpm storybook:test
 
 # View in Storybook
@@ -172,6 +172,4 @@ See `ADOPTION.md` for detailed guidance on:
 - **DEVELOPMENT.md** (in `/guides/`) - Architecture standards
 - **InlineEditLabel** - Reference implementation
 
-<!-- _Owner: @lane-x -->
-
-Owner: @lane-x
+\_Owner: @lane-x

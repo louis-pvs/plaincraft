@@ -1,0 +1,42 @@
+import { Meta } from "storybook/blocks";
+
+<Meta title="Governance/Lifecycle PR Refresh" />
+
+# Lifecycle PR Refresh (view)
+
+Refreshing the PR body keeps reviewers synced with the latest acceptance state and makes sure automation can reconcile checklists. Use the `pnpm pr:generate` helper alongside the verification guardrail so the Playbook, Issue, and PR always agree.
+
+## System of Record
+
+- **Content:** `/ideas/<ID>-*.md` (acceptance checklist + context copied into PR)
+- **Status:** GitHub Projects – promotion from `Branched` → `PR Open`
+- **Automation:** `pnpm pr:generate` → `scripts/ops/generate-pr-content.mjs`
+
+## Command Contract
+
+```bash
+# Refresh PR body for the active branch
+pnpm pr:generate --yes
+pnpm pr:verify    # optional: confirm checklist sync
+```
+
+- Default dry-run prints the proposed PR body diff.
+- Pass `--head <branch>` or `--issue <number>` to target a specific lifecycle item.
+- Pair with `pnpm pr:verify` (runs `scripts/checks/pr-requirements.mjs --verify-pr`) before requesting review.
+
+## Worked Example
+
+After landing design feedback, run `pnpm pr:generate --yes` to rehydrate the PR body from the idea file. The command keeps the acceptance checklist ordered and mirrors the summary so the narrative matches Playbook status notes. `pnpm pr:verify` confirms the merged checklist state and flags any missing reviewer tasks before you re-request review, preventing status drift in Projects.
+
+## Constraints
+
+- Acceptance checklist items must be GitHub checkboxes; the generator toggles them to match Issue progress.
+- Keep idea metadata (`Lane`, `Owner`, `Priority`) current—PR refresh picks them up for the header.
+- Do not edit the generated PR body by hand; rerun the generator so automation sees the change and dry-run history stays auditable.
+
+## Hand-off Links
+
+- Unit Script → `/scripts/ops/generate-pr-content.mjs`
+- Verification Script → `/scripts/checks/pr-requirements.mjs`
+- Template README → `/templates/script/README.md`
+- Lifecycle Branch View → `/storybook/?path=/docs/governance-lifecycle-branch--docs`
