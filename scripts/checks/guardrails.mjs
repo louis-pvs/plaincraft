@@ -8,7 +8,14 @@
 
 import { performance } from "node:perf_hooks";
 import { execa } from "execa";
-import { parseFlags, Logger, repoRoot, fail, succeed } from "../_lib/core.mjs";
+import {
+  parseFlags,
+  resolveLogLevel,
+  Logger,
+  repoRoot,
+  fail,
+  succeed,
+} from "../_lib/core.mjs";
 
 const args = parseFlags(process.argv.slice(2));
 
@@ -41,7 +48,7 @@ Exit codes:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel || "info");
+const logger = new Logger(resolveLogLevel({ flags: args }));
 
 const IDEA_ID = "ARCH-unified-guardrails-suite";
 const DEFAULT_CONCURRENCY = 3;
@@ -129,6 +136,13 @@ const DEFAULT_SCOPE_ORDER = [
     const effectiveConcurrency =
       failFast || sequentialMode ? 1 : resolvedConcurrency;
 
+    logger.info("Guardrails initialised", {
+      scopes: scopes.join(", "),
+      failFast,
+      sequential: sequentialMode,
+      concurrency: effectiveConcurrency,
+    });
+
     const taskQueue = buildTaskQueue(scopes);
     const progress = createProgressReporter(taskQueue.length, logger);
     progress.start();
@@ -189,6 +203,16 @@ const DEFAULT_SCOPE_ORDER = [
       scopes,
       results,
     };
+
+    const skipped = results.filter(
+      (entry) => entry.status === "skipped",
+    ).length;
+    logger.info("Guardrails summary", {
+      ok: failures === 0,
+      total: results.length,
+      failures,
+      skipped,
+    });
 
     if (failures === 0) {
       succeed({ ...summary, message: "All guardrails passed" }, args.output);
@@ -253,33 +277,37 @@ function createProgressReporter(totalTasks, logger) {
   return {
     start() {
       if (totalTasks === 0) {
-        logger.info("[progress] No guardrail commands queued");
+        logger.debug("Progress idle", { total: totalTasks });
         return;
       }
-      logger.info(
-        `[progress] 0/${totalTasks} ${renderProgressBar(0, totalTasks)}`,
-      );
+      logger.debug("Progress started", {
+        total: totalTasks,
+        completed,
+        bar: renderProgressBar(0, totalTasks),
+      });
     },
     advance(task, result) {
       if (totalTasks === 0) return;
       completed = Math.min(totalTasks, completed + 1);
-      const statusLabel = formatStatusLabel(result.status);
-      logger.info(
-        `[progress] ${completed}/${totalTasks} ${renderProgressBar(
-          completed,
-          totalTasks,
-        )} ${task.id}${statusLabel}`,
-      );
+      logger.debug("Progress step", {
+        id: task.id,
+        scope: task.scope,
+        status: result.status,
+        completed,
+        total: totalTasks,
+        optional: Boolean(task.optional),
+        bar: renderProgressBar(completed, totalTasks),
+      });
     },
     finish() {
       if (totalTasks === 0) return;
       const label = completed >= totalTasks ? "complete" : "halted";
-      logger.info(
-        `[progress] ${label} ${completed}/${totalTasks} ${renderProgressBar(
-          completed,
-          totalTasks,
-        )}`,
-      );
+      logger.debug("Progress finished", {
+        status: label,
+        completed,
+        total: totalTasks,
+        bar: renderProgressBar(completed, totalTasks),
+      });
     },
   };
 }
@@ -290,13 +318,6 @@ function renderProgressBar(completed, total) {
   const safeCompleted = Math.min(Math.max(completed, 0), safeTotal);
   const pending = safeTotal - safeCompleted;
   return `[${"=".repeat(safeCompleted)}${".".repeat(pending)}]`;
-}
-
-function formatStatusLabel(status) {
-  if (!status || status === "passed") return "";
-  if (status === "failed") return " (failed)";
-  if (status === "skipped") return " (skipped)";
-  return ` (${status})`;
 }
 
 function resolveConcurrency(value) {
@@ -322,11 +343,14 @@ function buildTaskQueue(scopes) {
   for (const scope of scopes) {
     const commands = SCOPE_COMMANDS[scope];
     if (!commands || commands.length === 0) {
-      logger.warn(`Unknown or empty scope "${scope}" - skipping.`);
+      logger.warn("Skipping unknown scope", { scope });
       continue;
     }
 
-    logger.info(`Running guardrail scope: ${scope}`);
+    logger.info("Queued guardrail scope", {
+      scope,
+      commands: commands.length,
+    });
 
     for (const command of commands) {
       tasks.push({ scope, ...command });
@@ -339,7 +363,6 @@ function buildTaskQueue(scopes) {
 async function runGuardrailTask(task, root) {
   const { scope, id, cmd, optional, idea } = task;
   const start = performance.now();
-  logger.info(`→ ${id}`);
 
   let status = "passed";
   let stdout = "";
@@ -363,7 +386,6 @@ async function runGuardrailTask(task, root) {
   }
 
   const durationMs = Math.round(performance.now() - start);
-
   let failed = status === "failed" || exitCode !== 0;
 
   if (failed && optional) {
@@ -385,6 +407,27 @@ async function runGuardrailTask(task, root) {
         ? summarizeOutput(stdout, stderr)
         : undefined,
   };
+
+  const logPayload = {
+    id,
+    scope,
+    duration: `${durationMs}ms`,
+    exitCode,
+    optional: Boolean(optional),
+  };
+
+  if (status === "skipped") {
+    logger.warn("Guardrail skipped (optional)", logPayload);
+  } else if (failed) {
+    logger.error("Guardrail failed", logPayload);
+    logger.debug("Guardrail output", {
+      id,
+      scope,
+      output: summarizeOutput(stdout, stderr),
+    });
+  } else {
+    logger.info("Guardrail passed", logPayload);
+  }
 
   return { result, failed };
 }

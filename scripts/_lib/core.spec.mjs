@@ -10,6 +10,7 @@ import {
   repoRoot,
   atomicWrite,
   parseFlags,
+  resolveLogLevel,
   now,
   generateRunId,
   formatOutput,
@@ -39,31 +40,31 @@ describe("Logger", () => {
   it("should log trace messages when level is trace", () => {
     const logger = new Logger("trace");
     logger.trace("test message");
-    expect(consoleErrorSpy).toHaveBeenCalledWith("[TRACE]", "test message");
+    expect(consoleErrorSpy).toHaveBeenCalledWith("[TRACE] test message");
   });
 
   it("should log debug messages when level is debug", () => {
     const logger = new Logger("debug");
     logger.debug("test message");
-    expect(consoleErrorSpy).toHaveBeenCalledWith("[DEBUG]", "test message");
+    expect(consoleErrorSpy).toHaveBeenCalledWith("[DEBUG] test message");
   });
 
   it("should log info messages when level is info", () => {
     const logger = new Logger("info");
     logger.info("test message");
-    expect(consoleErrorSpy).toHaveBeenCalledWith("[INFO]", "test message");
+    expect(consoleErrorSpy).toHaveBeenCalledWith("[INFO] test message");
   });
 
   it("should log warn messages when level is warn", () => {
     const logger = new Logger("warn");
     logger.warn("test message");
-    expect(consoleErrorSpy).toHaveBeenCalledWith("[WARN]", "test message");
+    expect(consoleErrorSpy).toHaveBeenCalledWith("[WARN] test message");
   });
 
   it("should log error messages when level is error", () => {
     const logger = new Logger("error");
     logger.error("test message");
-    expect(consoleErrorSpy).toHaveBeenCalledWith("[ERROR]", "test message");
+    expect(consoleErrorSpy).toHaveBeenCalledWith("[ERROR] test message");
   });
 
   it("should not log trace when level is info", () => {
@@ -83,24 +84,56 @@ describe("Logger", () => {
     logger.debug("test message");
     expect(consoleErrorSpy).not.toHaveBeenCalled();
     logger.info("test message");
-    expect(consoleErrorSpy).toHaveBeenCalledWith("[INFO]", "test message");
+    expect(consoleErrorSpy).toHaveBeenCalledWith("[INFO] test message");
   });
 
   it("should handle invalid level gracefully", () => {
     const logger = new Logger("invalid");
     logger.info("test message");
-    expect(consoleErrorSpy).toHaveBeenCalledWith("[INFO]", "test message");
+    expect(consoleErrorSpy).toHaveBeenCalledWith("[INFO] test message");
   });
 
   it("should log multiple arguments", () => {
     const logger = new Logger("info");
     logger.info("test", "message", 123);
+    expect(consoleErrorSpy).toHaveBeenCalledWith("[INFO] test message 123");
+  });
+
+  it("should flatten meta objects into key value pairs", () => {
+    const logger = new Logger("info");
+    logger.info("deploy", { status: "ok", version: "1.2.3" });
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "[INFO]",
-      "test",
-      "message",
-      123,
+      "[INFO] deploy status=ok version=1.2.3",
     );
+  });
+
+  it("should support step helper with duration", () => {
+    const hrSpy = vi
+      .spyOn(process.hrtime, "bigint")
+      .mockReturnValueOnce(BigInt(0))
+      .mockReturnValueOnce(BigInt(600_000_000));
+
+    const logger = new Logger("info");
+    const step = logger.step("plan", { target: "guardrails" });
+    step.done({ actions: 3 });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "[INFO] plan actions=3 duration=600ms status=ok target=guardrails",
+    );
+
+    consoleErrorSpy.mockClear();
+    hrSpy.mockReset();
+    hrSpy
+      .mockReturnValueOnce(BigInt(0))
+      .mockReturnValueOnce(BigInt(1_000_000_000));
+
+    const failure = logger.step("plan", { target: "guardrails" });
+    failure.fail(new Error("boom"));
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("status=error target=guardrails"),
+    );
+
+    hrSpy.mockRestore();
   });
 });
 
@@ -280,6 +313,11 @@ describe("parseFlags", () => {
     expect(result.logLevel).toBe("debug");
   });
 
+  it("should fall back to info when log level invalid", () => {
+    const result = parseFlags(["--log-level", "invalid"]);
+    expect(result.logLevel).toBe("info");
+  });
+
   it("should parse --cwd flag", () => {
     const result = parseFlags(["--cwd", "/custom/path"]);
     expect(result.cwd).toBe("/custom/path");
@@ -314,13 +352,49 @@ describe("parseFlags", () => {
     expect(result.output).toBe("json");
   });
 
+  it("should mark verbose and set debug level", () => {
+    const result = parseFlags(["--verbose"]);
+    expect(result.verbose).toBe(true);
+    expect(result.logLevel).toBe("debug");
+  });
+
+  it("should prefer explicit log level over verbose", () => {
+    const result = parseFlags(["--verbose", "--log-level", "error"]);
+    expect(result.verbose).toBe(true);
+    expect(result.logLevel).toBe("error");
+  });
+
+  it("should mark quiet and force error level", () => {
+    const result = parseFlags(["--quiet"]);
+    expect(result.quiet).toBe(true);
+    expect(result.logLevel).toBe("error");
+  });
+
+  it("should prefer quiet over verbose when both set", () => {
+    const result = parseFlags(["--verbose", "--quiet"]);
+    expect(result.verbose).toBe(true);
+    expect(result.quiet).toBe(true);
+    expect(result.logLevel).toBe("error");
+  });
+
+  it("should use LOG_LEVEL env when provided", () => {
+    const result = parseFlags([], { env: { LOG_LEVEL: "warn" } });
+    expect(result.logLevel).toBe("warn");
+  });
+
+  it("should ignore invalid LOG_LEVEL env", () => {
+    const result = parseFlags([], { env: { LOG_LEVEL: "nope" } });
+    expect(result.logLevel).toBe("info");
+  });
+
   it("should use default values", () => {
     const result = parseFlags([]);
     expect(result.dryRun).toBe(true);
     expect(result.yes).toBe(false);
     expect(result.output).toBe("text");
     expect(result.logLevel).toBe("info");
-    expect(result.help).toBe(false);
+    expect(result.verbose).toBe(false);
+    expect(result.quiet).toBe(false);
     expect(result._).toEqual([]);
   });
 
@@ -333,6 +407,44 @@ describe("parseFlags", () => {
     expect(result._).toEqual(["test"]);
 
     process.argv = originalArgv;
+  });
+});
+
+describe("resolveLogLevel", () => {
+  it("should prioritise explicit log level flag", () => {
+    const level = resolveLogLevel({
+      flags: { logLevel: "trace" },
+      env: {},
+      explicit: true,
+    });
+    expect(level).toBe("trace");
+  });
+
+  it("should respect quiet over verbose", () => {
+    const level = resolveLogLevel({
+      flags: { quiet: true, verbose: true },
+      env: {},
+    });
+    expect(level).toBe("error");
+  });
+
+  it("should use verbose when no explicit level", () => {
+    const level = resolveLogLevel({
+      flags: { verbose: true },
+    });
+    expect(level).toBe("debug");
+  });
+
+  it("should fall back to env level", () => {
+    const level = resolveLogLevel({
+      flags: {},
+      env: { LOG_LEVEL: "warn" },
+    });
+    expect(level).toBe("warn");
+  });
+
+  it("should default to info", () => {
+    expect(resolveLogLevel()).toBe("info");
   });
 });
 
