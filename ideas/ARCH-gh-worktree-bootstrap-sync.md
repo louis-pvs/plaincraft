@@ -44,11 +44,11 @@ in sync from the first commit.
 
 ## Acceptance Checklist
 
-- [ ] Worktree bootstrap resolves the correct idea file from the issue ID and
+- [x] Worktree bootstrap resolves the correct idea file from the issue ID and
       updates/inserts the `Issue: #` line.
-- [ ] Idea frontmatter reflects `status: in-progress` after bootstrap.
-- [ ] Bootstrap commit includes the updated idea file with message
+- [x] Idea frontmatter reflects `status: in-progress` after bootstrap.
+- [x] Bootstrap commit includes the updated idea file with message
       `[ID] Bootstrap worktree for issue #NN [skip ci]`.
-- [ ] Fallback path preserves current behavior when the idea file is missing.
-- [ ] Unit tests cover metadata replacement (pending → numbered, missing status,
+- [x] Fallback path preserves current behavior when the idea file is missing.
+- [x] Unit tests cover metadata replacement (pending → numbered, missing status,
       unusual spacing) and run via `pnpm scripts:test`.
