@@ -4,8 +4,8 @@ owner: lane.d
 lane: D
 type: architecture
 priority: P1
-state: ready
-next_state: in-progress
+state: delivered
+next_state: archive
 issue: 99
 acceptance:
   - Project schema created or updated to match lifecycle v3 fields, with IDs captured for automation.
@@ -56,17 +56,19 @@ direction doc. Without a governed project:
 
 ## Acceptance Checklist
 
-- [ ] Project schema created or updated to match lifecycle v3 fields, with IDs
+- [x] Project schema created or updated to match lifecycle v3 fields, with IDs
       captured for automation.
-- [ ] Automation workflow (`project-sync.yml` or updated `project.yml`) listens
+- [x] Automation workflow (`project-sync.yml` or updated `project.yml`) listens
       for lifecycle events and queues status transitions.
-- [ ] Weekly audit script/report (`ops/report.mjs` or similar) scheduled to flag
+- [x] Weekly audit script/report (`ops/report.mjs` or similar) scheduled to flag
       drift, missing Owner, or duplicate IDs.
-- [ ] Backlog operating procedure published (doc or Playbook entry) covering
+- [x] Backlog operating procedure published (doc or Playbook entry) covering
       intake review, rollback flow, and escalation.
-- [ ] Migration retro recorded in ADR comment with links to scripts and Project
+- [x] Migration retro recorded in ADR comment with links to scripts and Project
       snapshots.
 
 ## Status
 
 - 2025-10-31 - Advanced to `ready` after normalizing idea frontmatter and confirming Plaincraft Roadmap card automation scope.
+- 2025-10-31 - Locked lifecycle schema via `.repo/projects.json`, added `project-audit.yml`, and refreshed `project.yml` with lifecycle sync checks.
+- 2025-10-31 - Published Backlog Pilot Scripts-First Ops playbook and logged the migration retro in `docs/adr/2025-10-Overarching-v2.md`.
