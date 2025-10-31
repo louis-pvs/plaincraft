@@ -10,6 +10,7 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import {
   parseFlags,
+  resolveLogLevel,
   formatOutput,
   fail,
   succeed,
@@ -58,10 +59,10 @@ Exit codes:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel);
+const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 
-logger.info("Starting policy lint");
+logger.info("Policy lint started");
 
 try {
   const root = await repoRoot(args.cwd);
@@ -107,7 +108,10 @@ try {
     });
   }
 
-  logger.info(`Found ${scriptFiles.length} script files to validate`);
+  logger.info("Scripts queued for validation", {
+    count: scriptFiles.length,
+    strict: Boolean(args.strict),
+  });
 
   const results = [];
   let totalErrors = 0;
@@ -115,7 +119,7 @@ try {
 
   for (const scriptPath of scriptFiles) {
     const relativePath = path.relative(root, scriptPath);
-    logger.debug(`Validating ${relativePath}`);
+    logger.debug("Validating script", { file: relativePath });
 
     const content = await readFile(scriptPath, "utf-8");
     const result = {
@@ -217,8 +221,16 @@ try {
     process.exit(exitCode);
   }
 } catch (error) {
-  logger.error("Policy lint failed:", error.message);
-  fail(11, "validation_error", error.message, args.output);
+  logger.error("Policy lint failed", {
+    error: error?.message || String(error),
+  });
+  fail({
+    exitCode: 11,
+    script: "policy-lint",
+    message: "Policy lint failed",
+    error: error?.message || String(error),
+    output: args.output,
+  });
 }
 
 /**

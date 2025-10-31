@@ -10,6 +10,7 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import {
   parseFlags,
+  resolveLogLevel,
   formatOutput,
   fail,
   Logger,
@@ -45,11 +46,13 @@ Exit codes:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel);
+const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const MAX_DEPRECATED_DAYS = 90;
 
-logger.info("Starting deprecation sweep");
+logger.info("Deprecation sweep started", {
+  maxDays: MAX_DEPRECATED_DAYS,
+});
 
 try {
   const root = await repoRoot(args.cwd);
@@ -61,7 +64,9 @@ try {
   const expiredScripts = [];
   const warningScripts = [];
 
-  logger.info(`Checking ${allScripts.length} scripts for deprecation`);
+  logger.info("Scanning scripts for @deprecated", {
+    total: allScripts.length,
+  });
 
   for (const scriptPath of allScripts) {
     const relativePath = path.relative(root, scriptPath);
@@ -93,16 +98,23 @@ try {
 
       if (daysDeprecated > MAX_DEPRECATED_DAYS) {
         expiredScripts.push(scriptInfo);
-        logger.error(
-          `EXPIRED: ${relativePath} (deprecated ${daysDeprecated} days ago)`,
-        );
+        logger.error("Deprecated script expired", {
+          file: relativePath,
+          daysDeprecated,
+          replacement: replacementScript,
+        });
       } else if (daysRemaining <= 14) {
         warningScripts.push(scriptInfo);
-        logger.warn(
-          `WARNING: ${relativePath} expires in ${daysRemaining} days`,
-        );
+        logger.warn("Deprecated script nearing expiry", {
+          file: relativePath,
+          daysRemaining,
+          replacement: replacementScript,
+        });
       } else {
-        logger.debug(`OK: ${relativePath} (expires in ${daysRemaining} days)`);
+        logger.debug("Deprecated script tracked", {
+          file: relativePath,
+          daysRemaining,
+        });
       }
     }
   }
@@ -125,14 +137,15 @@ try {
           daysRemaining: 0,
           replacement: "check file header",
         });
-        logger.error(
-          `EXPIRED: ${relativePath} in DEPRECATED/ (${ageInDays} days old)`,
-        );
+        logger.error("Deprecated folder script expired", {
+          file: relativePath,
+          daysOld: ageInDays,
+        });
       }
     }
   } catch {
     // DEPRECATED directory doesn't exist yet
-    logger.debug("DEPRECATED/ directory not found (OK if unused)");
+    logger.debug("DEPRECATED directory not found");
   }
 
   const durationMs = Date.now() - start;
@@ -158,6 +171,9 @@ try {
     process.exit(0);
   }
 } catch (error) {
+  logger.error("Deprecation sweep failed", {
+    error: error?.message || String(error),
+  });
   fail({
     runId,
     script: "deprecation-sweeper",

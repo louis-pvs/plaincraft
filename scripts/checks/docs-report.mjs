@@ -10,6 +10,7 @@ import path from "node:path";
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import {
   parseFlags,
+  resolveLogLevel,
   fail,
   succeed,
   Logger,
@@ -53,9 +54,15 @@ Examples:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel || "info");
+const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const quiet = args.quiet === true;
+
+logger.info("Docs governance report started", {
+  saveMetrics: Boolean(args.save),
+  quietMode: quiet,
+  output: args.output || "text",
+});
 
 async function analyzeGuideHealth(root) {
   const guidesDir = path.join(root, "guides");
@@ -288,7 +295,7 @@ try {
   if (args.save) {
     const metricsPath = path.join(root, "docs", "metrics.json");
     await writeFile(metricsPath, JSON.stringify(reportData, null, 2));
-    if (!quiet) logger.info(`Metrics saved to ${metricsPath}`);
+    logger.info("Docs governance metrics saved", { path: metricsPath });
   }
 
   // Output
@@ -298,6 +305,13 @@ try {
     console.log(generateTextReport(reportData));
   }
 
+  logger.info("Docs governance report generated", {
+    templates: reportData.templates,
+    guides: reportData.guides,
+    ratio: Number(reportData.ratio.toFixed(2)),
+    recommendations: reportData.recommendations.length,
+  });
+
   succeed({
     runId,
     script: "docs-report",
@@ -306,10 +320,13 @@ try {
     durationMs: Date.now() - start,
   });
 } catch (error) {
+  logger.error("Docs report failed", {
+    error: error?.message || String(error),
+  });
   fail({
     runId,
     script: "docs-report",
-    error: error.message,
+    error: error?.message || String(error),
     durationMs: Date.now() - start,
   });
   process.exit(11);

@@ -10,6 +10,7 @@ import path from "node:path";
 import { execa } from "execa";
 import {
   parseFlags,
+  resolveLogLevel,
   fail,
   succeed,
   Logger,
@@ -44,7 +45,7 @@ Description:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel);
+const logger = new Logger(resolveLogLevel({ flags: args }));
 const dryRun = args.dryRun !== false && args.yes !== true;
 
 (async () => {
@@ -86,9 +87,12 @@ const dryRun = args.dryRun !== false && args.yes !== true;
 
     await ensureGhAvailable(logger);
 
-    logger.info(
-      `Collecting latest ${limit} run(s) for ${repo} workflow ${workflow}`,
-    );
+    logger.info("Collecting workflow metrics", {
+      repo,
+      workflow,
+      jobName,
+      limit,
+    });
 
     const runs = await fetchWorkflowRuns({ repo, workflow, limit });
 
@@ -157,7 +161,9 @@ const dryRun = args.dryRun !== false && args.yes !== true;
       runs: summaries,
     });
   } catch (error) {
-    logger.error(error?.message || error);
+    logger.error("Guardrails baseline failed", {
+      error: error?.message || String(error),
+    });
     await fail({
       script: "guardrails-baseline",
       message: "Failed to collect guardrails metrics",

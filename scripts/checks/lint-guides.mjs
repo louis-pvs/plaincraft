@@ -10,6 +10,7 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import {
   parseFlags,
+  resolveLogLevel,
   fail,
   succeed,
   Logger,
@@ -49,7 +50,7 @@ Exit codes:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel || "info");
+const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 
 const REQUIRED_FRONTMATTER = [
@@ -67,7 +68,7 @@ const REQUIRED_FRONTMATTER = [
 const MAX_WORDS = 600;
 const MAX_GUIDES = 12;
 
-logger.info("Starting guide lint");
+logger.info("Guide lint started");
 
 try {
   const root = await repoRoot(args.cwd || process.cwd());
@@ -79,7 +80,7 @@ try {
     (f) => f.endsWith(".md") && f.startsWith("guide-") && f !== "README.md",
   );
 
-  logger.info(`Found ${guideFiles.length} guide files`);
+  logger.info("Guides discovered", { count: guideFiles.length });
 
   // Check guide count limit
   if (guideFiles.length > MAX_GUIDES) {

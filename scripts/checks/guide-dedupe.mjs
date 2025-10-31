@@ -10,6 +10,7 @@ import path from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 import {
   parseFlags,
+  resolveLogLevel,
   fail,
   succeed,
   Logger,
@@ -52,7 +53,7 @@ Examples:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel || "info");
+const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const threshold = args.threshold || 30;
 
@@ -210,9 +211,15 @@ function generateTextReport(data, threshold) {
 
 try {
   const root = await repoRoot(args.cwd);
-  logger.info(`Starting guide deduplication check (threshold: ${threshold}%)`);
+  logger.info("Guide dedupe started", { threshold });
+
+  logger.info("Guide dedupe started", { threshold });
 
   const results = await compareGuides(root);
+  logger.info("Guide comparisons complete", {
+    totalComparisons: results.totalComparisons,
+    highSimilarityPairs: results.highSimilarityPairs,
+  });
 
   // Output
   if (args.output === "json") {
@@ -244,6 +251,9 @@ try {
     process.exit(11);
   }
 } catch (error) {
+  logger.error("Guide dedupe failed", {
+    error: error?.message || String(error),
+  });
   fail({
     runId,
     script: "guide-dedupe",

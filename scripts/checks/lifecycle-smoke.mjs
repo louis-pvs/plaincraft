@@ -8,6 +8,7 @@
 
 import {
   parseFlags,
+  resolveLogLevel,
   succeed,
   fail,
   Logger,
@@ -42,7 +43,7 @@ Description:
 }
 
 const dryRun = args.dryRun !== false && args.yes !== true;
-const logger = new Logger(args.logLevel);
+const logger = new Logger(resolveLogLevel({ flags: args }));
 
 const CHECKS = [
   {
@@ -136,6 +137,9 @@ const CHECKS = [
     const root = await repoRoot(args.cwd);
 
     if (dryRun) {
+      logger.info("Lifecycle smoke dry-run plan generated", {
+        checks: CHECKS.length,
+      });
       await succeed({
         script: "lifecycle-smoke",
         output: args.output,
@@ -158,7 +162,11 @@ const CHECKS = [
 
     for (const check of CHECKS) {
       const start = Date.now();
-      logger.info(`Running ${check.id} (${check.description})`);
+      logger.info("Running lifecycle check", {
+        id: check.id,
+        description: check.description,
+        lane: check.lane,
+      });
 
       try {
         const { exitCode } = await execCommand(
@@ -205,6 +213,11 @@ const CHECKS = [
     }
 
     if (failed > 0) {
+      logger.error("Lifecycle smoke failed", {
+        passed,
+        failed,
+        durationMs: Date.now() - startedAt,
+      });
       await fail({
         script: "lifecycle-smoke",
         exitCode: 11,
@@ -221,6 +234,11 @@ const CHECKS = [
       return;
     }
 
+    logger.info("Lifecycle smoke passed", {
+      passed,
+      durationMs: Date.now() - startedAt,
+    });
+
     await succeed({
       script: "lifecycle-smoke",
       output: args.output,
@@ -231,7 +249,9 @@ const CHECKS = [
       results,
     });
   } catch (error) {
-    logger.error(error?.message || error);
+    logger.error("Lifecycle smoke errored", {
+      error: error?.message || String(error),
+    });
     await fail({
       script: "lifecycle-smoke",
       exitCode: 10,

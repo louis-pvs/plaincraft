@@ -9,6 +9,7 @@
 import { z } from "zod";
 import {
   parseFlags,
+  resolveLogLevel,
   fail,
   succeed,
   repoRoot,
@@ -57,8 +58,8 @@ Options:
     process.exit(0);
   }
 
+  const logger = new Logger(resolveLogLevel({ flags: rawFlags }));
   const flags = FLAG_SCHEMA.parse(rawFlags);
-  const logger = new Logger(flags.logLevel);
 
   try {
     const root = await repoRoot(flags.cwd);
@@ -67,9 +68,11 @@ Options:
     const commitRegex = config.commits.regex;
 
     const { range, source } = await resolveRange(flags, root);
-    logger.info(
-      `Validating commits in range: ${range}${source ? ` (${source})` : ""}`,
-    );
+    logger.info("Validating commit headers", {
+      range,
+      source: source ?? "manual",
+      max: flags.max ?? 50,
+    });
 
     const commits = await collectCommits(range, flags.max, root);
 
@@ -106,6 +109,11 @@ Options:
       return;
     }
 
+    logger.info("Commit headers valid", {
+      range,
+      commits: commits.length,
+    });
+
     await succeed({
       script: "commit-guard",
       output: flags.output,
@@ -116,9 +124,12 @@ Options:
       violations: [],
     });
   } catch (error) {
+    logger.error("Commit guard failed", {
+      error: error?.message || String(error),
+    });
     await fail({
       script: "commit-guard",
-      output: flags.output,
+      output: rawFlags.output,
       message: "Commit guard failed",
       error: error?.message || String(error),
     });

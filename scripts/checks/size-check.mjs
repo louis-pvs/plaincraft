@@ -10,6 +10,7 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import {
   parseFlags,
+  resolveLogLevel,
   formatOutput,
   fail,
   succeed,
@@ -46,26 +47,29 @@ Exit codes:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel);
+const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const MAX_SCRIPT_LINES = 300;
 const MAX_FUNCTION_LINES = 60;
 
-logger.info("Starting size compliance check");
+logger.info("Size compliance check started", {
+  maxScriptLines: MAX_SCRIPT_LINES,
+  maxFunctionLines: MAX_FUNCTION_LINES,
+});
 
 try {
   const root = await repoRoot(args.cwd);
   const scriptsDir = path.join(root, "scripts");
 
   const scriptFiles = await findScriptFiles(scriptsDir);
-  logger.info(`Checking ${scriptFiles.length} script files`);
+  logger.info("Scanning scripts", { count: scriptFiles.length });
 
   const results = [];
   let totalViolations = 0;
 
   for (const scriptPath of scriptFiles) {
     const relativePath = path.relative(root, scriptPath);
-    logger.debug(`Checking ${relativePath}`);
+    logger.debug("Checking script", { file: relativePath });
 
     const content = await readFile(scriptPath, "utf-8");
     const lines = content.split("\n");

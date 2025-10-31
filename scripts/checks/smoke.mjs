@@ -11,6 +11,7 @@ import path from "node:path";
 import { execa } from "execa";
 import {
   parseFlags,
+  resolveLogLevel,
   formatOutput,
   fail,
   succeed,
@@ -47,11 +48,11 @@ Exit codes:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel);
+const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const timeout = parseInt(args.timeout) || 5000;
 
-logger.info("Starting smoke tests");
+logger.info("Smoke tests started", { timeoutMs: timeout });
 
 try {
   const root = await repoRoot(args.cwd);
@@ -70,7 +71,7 @@ try {
     });
   }
 
-  logger.info(`Found ${scriptFiles.length} executable scripts to test`);
+  logger.info("Executable scripts detected", { count: scriptFiles.length });
 
   const results = [];
   let passed = 0;
@@ -78,7 +79,7 @@ try {
 
   for (const scriptPath of scriptFiles) {
     const relativePath = path.relative(root, scriptPath);
-    logger.debug(`Testing ${relativePath}`);
+    logger.debug("Testing script", { file: relativePath });
 
     const result = {
       file: relativePath,
@@ -128,8 +129,16 @@ try {
     process.exit(11);
   }
 } catch (error) {
-  logger.error("Smoke test failed:", error.message);
-  fail(11, "smoke_test_error", error.message, args.output);
+  logger.error("Smoke test failed", {
+    error: error?.message || String(error),
+  });
+  fail({
+    exitCode: 11,
+    script: "smoke",
+    message: "Smoke test failed",
+    error: error?.message || String(error),
+    output: args.output,
+  });
 }
 
 /**

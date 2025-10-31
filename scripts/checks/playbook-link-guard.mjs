@@ -8,11 +8,18 @@
 
 import path from "node:path";
 import { readdir, readFile } from "node:fs/promises";
-import { parseFlags, Logger, repoRoot, succeed, fail } from "../_lib/core.mjs";
+import {
+  parseFlags,
+  resolveLogLevel,
+  Logger,
+  repoRoot,
+  succeed,
+  fail,
+} from "../_lib/core.mjs";
 
 const SCRIPT_NAME = "playbook-link-guard";
 const args = parseFlags(process.argv.slice(2));
-const logger = new Logger(args.logLevel || "info");
+const logger = new Logger(resolveLogLevel({ flags: args }));
 
 if (args.help) {
   console.log(`
@@ -116,6 +123,9 @@ async function main() {
   }
 
   if (errors.length > 0) {
+    logger.error("Playbook link validation failed", {
+      errors: errors.length,
+    });
     fail({
       script: SCRIPT_NAME,
       message: "validation_failed",
@@ -126,7 +136,10 @@ async function main() {
     });
   }
 
-  logger.info(`Validated ${results.length} Playbook pattern files.`);
+  logger.info("Playbook pattern links validated", {
+    patterns: results.length,
+    errors: errors.length,
+  });
   succeed({
     script: SCRIPT_NAME,
     ok: true,
@@ -143,6 +156,9 @@ function extractLinksSection(content) {
 }
 
 main().catch((error) => {
+  logger.error("Playbook link guard failed", {
+    error: error instanceof Error ? error.message : String(error),
+  });
   fail({
     script: SCRIPT_NAME,
     message: "execution_error",

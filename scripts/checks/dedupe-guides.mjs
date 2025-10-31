@@ -11,6 +11,7 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import {
   parseFlags,
+  resolveLogLevel,
   fail,
   succeed,
   Logger,
@@ -45,11 +46,13 @@ Exit codes:
   process.exit(0);
 }
 
-const logger = new Logger(args.logLevel || "info");
+const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const SIMILARITY_THRESHOLD = parseInt(args.threshold) || 30;
 
-logger.info("Starting guide deduplication check");
+logger.info("Guide deduplication check started", {
+  threshold: SIMILARITY_THRESHOLD,
+});
 
 try {
   const root = await repoRoot(args.cwd || process.cwd());
@@ -61,7 +64,7 @@ try {
     (f) => f.endsWith(".md") && f.startsWith("guide-"),
   );
 
-  logger.info(`Comparing ${guideFiles.length} guides`);
+  logger.info("Loaded guides", { count: guideFiles.length });
 
   const guides = [];
 
@@ -130,8 +133,16 @@ try {
 
   succeed(output, args.output || "text");
 } catch (error) {
-  logger.error("Deduplication check failed:", error.message);
-  fail(11, "dedupe_error", error.message, args.output || "text");
+  logger.error("Guide deduplication failed", {
+    error: error?.message || String(error),
+  });
+  fail({
+    exitCode: 11,
+    script: "dedupe-guides",
+    message: "Guide deduplication failed",
+    error: error?.message || String(error),
+    output: args.output || "text",
+  });
 }
 
 /**
