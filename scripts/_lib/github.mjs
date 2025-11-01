@@ -251,13 +251,54 @@ function mapFieldValues(nodes) {
  * @param {string} options.fieldId - Field ID containing the lookup value
  * @param {string} options.value - Value to match exactly
  * @param {string} [options.cwd] - Working directory
+ * @param {number} [options.retries] - Number of retries for eventual consistency (default: 3)
+ * @param {number} [options.retryDelay] - Initial retry delay in ms (default: 1000)
  * @returns {Promise<{item: object, fields: Map<string, object>}|null>}
  */
 export async function findProjectItemByFieldValue(options) {
-  const { projectId, fieldId, value, cwd } = options;
+  const {
+    projectId,
+    fieldId,
+    value,
+    cwd,
+    retries = 3,
+    retryDelay = 1000,
+  } = options;
   if (!projectId || !fieldId) {
     throw new Error("projectId and fieldId required to locate project item");
   }
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const result = await findProjectItemByFieldValueOnce({
+        projectId,
+        fieldId,
+        value,
+        cwd,
+      });
+      if (result) return result;
+
+      // Item not found, retry if attempts remain
+      if (attempt < retries) {
+        const delay = retryDelay * Math.pow(2, attempt);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    } catch (error) {
+      if (attempt === retries) throw error;
+      const delay = retryDelay * Math.pow(2, attempt);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Find a project item (single attempt, no retry)
+ * @private
+ */
+async function findProjectItemByFieldValueOnce(options) {
+  const { projectId, fieldId, value, cwd } = options;
   let cursor = null;
 
   const query = `
