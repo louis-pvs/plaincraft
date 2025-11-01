@@ -137,6 +137,38 @@ These gaps mean developers must manually intervene at 6+ points in the workflow,
 
 **Value**: GraphQL fixes complete. Real E2E testing revealed additional workflow integration work needed for 95% automation target.
 
+**E2E Test C-147 Results (Nov 2, 2025)**: Validated complete workflow from idea → issue → branch → PR
+
+1. ✅ **Issue Creation Works**: `ideas-to-issues` script successfully created issue #147
+   - Required fixing idea file format (added Lane, Metric Hypothesis, Units In Scope sections)
+   - Issue created with proper labels and checklist
+
+2. ✅ **PR Creation Works**: `open-or-update-pr` script successfully created PR #148
+   - PR body auto-generated with proper formatting
+   - Draft PR created correctly
+   - Branch must be pushed to remote before PR creation
+
+3. ❌ **Project Status Update Failed**: "Status option 'PR Open' not found in project cache"
+   - Confirms Phase 3 issue: project status field options don't match lifecycle states
+   - Script attempted to update but couldn't find "PR Open" option
+   - Need to update project status field options to match lifecycle
+
+4. ⚠️ **Branch/ID Mismatch Issue**: Branch named `feat/C-144-*` but issue is #147
+   - `open-or-update-pr` validates branch name matches ID
+   - Existing branch from different ticket was reused
+   - This is expected behavior - validates proper branch/issue linkage
+
+5. ⚠️ **gh CLI Hangs on Interactive Commands**: All `gh` commands without explicit non-interactive flags hang
+   - Need to ensure all automation uses `--json` or other non-interactive flags
+   - Affects CI/CD and automated workflows
+
+**Next Steps for 95% Automation**:
+
+- Update GitHub Project status field options via web UI or GraphQL
+- Implement project item auto-add when issues are created
+- Ensure all `gh` CLI commands use non-interactive flags
+- Add project status update to `create-branch` script (currently returns exit code 10)
+
 ## Acceptance Checklist
 
 ### Phase 1 (Quick Wins) - ✅ COMPLETED
