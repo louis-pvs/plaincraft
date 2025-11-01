@@ -1,5 +1,5 @@
 {
-  "cachedAt": "2025-11-01T13:35:11.193Z",
+  "cachedAt": "2025-11-01T22:41:26.142Z",
   "version": 3,
   "project": {
     "id": "PVT_kwHOAHTeus4BG_AC",
@@ -7,10 +7,101 @@
     "name": "Plaincraft Lifecycle",
     "url": "https://github.com/users/louis-pvs/projects/1",
     "fields": {
+      "Title": {
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xac",
+        "type": "TITLE",
+        "description": "Title",
+        "required": false
+      },
+      "Assignees": {
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xag",
+        "type": "ASSIGNEES",
+        "description": "Assignees",
+        "required": false
+      },
+      "Status": {
+        "id": "PVTSSF_lAHOAHTeus4BG_ACzg33xak",
+        "type": "SINGLE_SELECT",
+        "options": [
+          {
+            "id": "f75ad846",
+            "name": "Ticketed",
+            "color": "GRAY"
+          },
+          {
+            "id": "47fc9ee4",
+            "name": "Branched",
+            "color": "BLUE"
+          },
+          {
+            "id": "7e656307",
+            "name": "PR Open",
+            "color": "PURPLE"
+          },
+          {
+            "id": "98236657",
+            "name": "In Review",
+            "color": "YELLOW"
+          },
+          {
+            "id": "a7e6aafb",
+            "name": "Merged",
+            "color": "ORANGE"
+          },
+          {
+            "id": "a41e0e98",
+            "name": "Archived",
+            "color": "YELLOW"
+          }
+        ],
+        "required": true
+      },
+      "Labels": {
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xao",
+        "type": "LABELS",
+        "description": "Labels",
+        "required": false
+      },
+      "Linked pull requests": {
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xas",
+        "type": "LINKED_PULL_REQUESTS",
+        "description": "Linked pull requests",
+        "required": false
+      },
+      "Milestone": {
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xaw",
+        "type": "MILESTONE",
+        "description": "Milestone",
+        "required": false
+      },
+      "Repository": {
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xa0",
+        "type": "REPOSITORY",
+        "description": "Repository",
+        "required": false
+      },
+      "Reviewers": {
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xa4",
+        "type": "REVIEWERS",
+        "description": "Reviewers",
+        "required": false
+      },
+      "Parent issue": {
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xa8",
+        "type": "PARENT_ISSUE",
+        "description": "Parent issue",
+        "required": false
+      },
+      "Sub-issues progress": {
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xbA",
+        "type": "SUB_ISSUES_PROGRESS",
+        "description": "Sub-issues progress",
+        "required": false
+      },
       "ID": {
         "id": "PVTF_lAHOAHTeus4BG_ACzg33xhY",
         "type": "TEXT",
-        "description": "Ticket identifier",
+        "description": "ID",
         "required": true
       },
       "Type": {
@@ -19,27 +110,33 @@
         "options": [
           {
             "id": "4464d63e",
-            "name": "Architecture"
+            "name": "Architecture",
+            "color": "GRAY"
           },
           {
             "id": "f6c63ee7",
-            "name": "Component"
+            "name": "Component",
+            "color": "GRAY"
           },
           {
             "id": "f42877cc",
-            "name": "Bug"
+            "name": "Bug",
+            "color": "GRAY"
           },
           {
             "id": "af8dc8c5",
-            "name": "Policy"
+            "name": "Policy",
+            "color": "GRAY"
           },
           {
             "id": "f4309723",
-            "name": "Update"
+            "name": "Update",
+            "color": "GRAY"
           },
           {
             "id": "2023f891",
-            "name": "Chore"
+            "name": "Chore",
+            "color": "GRAY"
           }
         ],
         "required": true
@@ -50,87 +147,76 @@
         "options": [
           {
             "id": "818a3b7e",
-            "name": "A"
+            "name": "A",
+            "color": "GRAY"
           },
           {
             "id": "b08d27d8",
-            "name": "B"
+            "name": "B",
+            "color": "GRAY"
           },
           {
             "id": "913fa367",
-            "name": "C"
+            "name": "C",
+            "color": "GRAY"
           },
           {
             "id": "1b63675b",
-            "name": "D"
+            "name": "D",
+            "color": "GRAY"
           },
           {
             "id": "f7a73603",
-            "name": "E"
+            "name": "E",
+            "color": "GRAY"
           },
           {
             "id": "97d554d4",
-            "name": "X"
-          }
-        ],
-        "required": true
-      },
-      "Status": {
-        "id": "PVTSSF_lAHOAHTeus4BG_ACzg33xak",
-        "type": "SINGLE_SELECT",
-        "options": [
-          {
-            "id": "f75ad846",
-            "name": "Todo",
-            "category": "TODO"
-          },
-          {
-            "id": "47fc9ee4",
-            "name": "In Progress",
-            "category": "IN_PROGRESS"
-          },
-          {
-            "id": "98236657",
-            "name": "Done",
-            "category": "DONE"
+            "name": "X",
+            "color": "GRAY"
           }
         ],
         "required": true
       },
       "Owner": {
-        "id": "PVTF_lAHOAHTeus4BG_ACzg33xiw",
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33yQY",
         "type": "TEXT",
-        "required": false
+        "description": "Owner",
+        "required": true
       },
       "Priority": {
-        "id": "PVTSSF_lAHOAHTeus4BG_ACzg33xjE",
+        "id": "PVTSSF_lAHOAHTeus4BG_ACzg33yQ0",
         "type": "SINGLE_SELECT",
         "options": [
           {
-            "id": "dce8e9a3",
-            "name": "P0"
+            "id": "74dd078e",
+            "name": "P0",
+            "color": "GRAY"
           },
           {
-            "id": "86093db0",
-            "name": "P1"
+            "id": "4c6b1769",
+            "name": "P1",
+            "color": "GRAY"
           },
           {
-            "id": "a0cf3f25",
-            "name": "P2"
+            "id": "c48b2a43",
+            "name": "P2",
+            "color": "GRAY"
           },
           {
-            "id": "efdee8e5",
-            "name": "P3"
+            "id": "9ec8a6e8",
+            "name": "P3",
+            "color": "GRAY"
           }
         ],
-        "required": false
+        "required": true
       },
       "Release": {
-        "id": "PVTF_lAHOAHTeus4BG_ACzg33xjY",
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33ySw",
         "type": "TEXT",
+        "description": "Release",
         "required": false
       }
     }
-  },
-  "notes": "User-level project for testing E2E automation"
+  }
 }

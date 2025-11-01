@@ -50,7 +50,7 @@ Examples:
     // Get current user
     const userQuery = `query { viewer { login } }`;
     const userData = await graphqlRequest(userQuery, {}, flags.cwd);
-    const username = userData.viewer.login;
+    const username = userData.data.viewer.login;
 
     // Fetch project metadata
     const projectQuery = `
@@ -105,13 +105,13 @@ Examples:
       flags.cwd,
     );
 
-    if (!result.user?.projectV2) {
+    if (!result.data?.user?.projectV2) {
       return fail(
         `Project #${flags.projectNumber} not found for user ${username}`,
       );
     }
 
-    const project = result.user.projectV2;
+    const project = result.data.user.projectV2;
 
     // Transform to cache format
     const fields = {};
