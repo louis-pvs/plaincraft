@@ -1,13 +1,47 @@
+import { fileURLToPath } from "node:url";
+import { defineConfig } from "eslint/config";
+import globals from "globals";
 import js from "@eslint/js";
 import tseslint from "@typescript-eslint/eslint-plugin";
-import tsparser from "@typescript-eslint/parser";
 import importPlugin from "eslint-plugin-import";
 import unusedImports from "eslint-plugin-unused-imports";
-import prettier from "eslint-plugin-prettier";
+import prettierPlugin from "eslint-plugin-prettier";
 import prettierConfig from "eslint-config-prettier";
+import storybook from "eslint-plugin-storybook";
 
-export default [
-  // Global ignores
+const TS_FILE_GLOBS = ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"];
+const JS_FILE_GLOBS = ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"];
+const JS_AND_TS_FILES = [...JS_FILE_GLOBS, ...TS_FILE_GLOBS];
+const TS_CONFIG_ROOT = fileURLToPath(new URL(".", import.meta.url));
+
+const typescriptRecommended = tseslint.configs["flat/recommended"].map(
+  (config) => ({
+    ...config,
+    files: config.files ?? TS_FILE_GLOBS,
+  }),
+);
+
+const importRecommended = {
+  ...importPlugin.flatConfigs.recommended,
+  languageOptions: {
+    ...importPlugin.flatConfigs.recommended.languageOptions,
+    ecmaVersion: "latest",
+    sourceType: "module",
+  },
+};
+
+const storybookRecommended = storybook.configs["flat/recommended"].map(
+  (config) => ({
+    ...config,
+    files: config.files ?? [
+      "**/*.stories.@(ts|tsx|js|jsx|mjs|cjs)",
+      "**/*.story.@(ts|tsx|js|jsx|mjs|cjs)",
+      ".storybook/**/*.*",
+    ],
+  }),
+);
+
+export default defineConfig([
   {
     ignores: [
       "dist/**",
@@ -18,65 +52,49 @@ export default [
       "**/*.json",
       "**/DEPRECATED/**",
       "**/_archive/**",
+      "docs/.vitepress/**",
+      "docs/.vitepress/cache/**",
+      "docs/.vitepress/dist/**",
+      "templates/**",
+      "eslint.config.js",
     ],
   },
 
-  // Base config for all files
+  {
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+  },
+
   js.configs.recommended,
 
-  // TypeScript and React files
+  ...typescriptRecommended,
+
+  importRecommended,
+
   {
-    files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
-    languageOptions: {
-      parser: tsparser,
-      parserOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-      },
-      globals: {
-        // Browser APIs
-        console: "readonly",
-        window: "readonly",
-        document: "readonly",
-        globalThis: "readonly",
-        setTimeout: "readonly",
-        clearTimeout: "readonly",
-        setInterval: "readonly",
-        clearInterval: "readonly",
-        requestAnimationFrame: "readonly",
-        cancelAnimationFrame: "readonly",
-        HTMLElement: "readonly",
-        HTMLInputElement: "readonly",
-        HTMLDivElement: "readonly",
-        HTMLButtonElement: "readonly",
-        Element: "readonly",
-        Event: "readonly",
-        InputEvent: "readonly",
-        MouseEvent: "readonly",
-        KeyboardEvent: "readonly",
-        // React
-        React: "readonly",
-        JSX: "readonly",
-        // Node.js (for scripts and config files)
-        process: "readonly",
-        __dirname: "readonly",
-        __filename: "readonly",
-        URL: "readonly",
-      },
-    },
+    ...importPlugin.flatConfigs.typescript,
+    files: TS_FILE_GLOBS,
+  },
+
+  {
+    files: JS_AND_TS_FILES,
     plugins: {
       "@typescript-eslint": tseslint,
-      import: importPlugin,
       "unused-imports": unusedImports,
-      prettier: prettier,
+      prettier: prettierPlugin,
+    },
+    settings: {
+      "import/resolver": {
+        typescript: true,
+      },
     },
     rules: {
-      // TypeScript rules
-      ...tseslint.configs.recommended.rules,
-      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
-      "@typescript-eslint/no-unused-vars": "off", // Handled by unused-imports
-
-      // Import rules
       "import/no-default-export": "error",
       "import/order": [
         "error",
@@ -92,8 +110,9 @@ export default [
           "newlines-between": "never",
         },
       ],
-
-      // Unused imports
+      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+      "@typescript-eslint/no-unused-vars": "off",
+      "no-unused-vars": "off",
       "unused-imports/no-unused-imports": "error",
       "unused-imports/no-unused-vars": [
         "warn",
@@ -104,28 +123,24 @@ export default [
           argsIgnorePattern: "^_",
         },
       ],
-
-      // Console
       "no-console": ["warn", { allow: ["info", "warn", "error"] }],
-
-      // Prettier
       ...prettierConfig.rules,
       "prettier/prettier": "error",
     },
   },
 
-  // Allow default exports in specific files
+  ...storybookRecommended,
+
   {
     files: [
       "*.config.*",
       "scripts/**/*.*",
       ".storybook/**/*.*",
-      "**/*.stories.ts",
-      "**/*.stories.tsx",
+      "**/*.stories.@(ts|tsx|js|jsx|mjs|cjs)",
     ],
     rules: {
       "import/no-default-export": "off",
       "no-console": "off",
     },
   },
-];
+]);

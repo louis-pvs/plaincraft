@@ -11,9 +11,7 @@ import path from "node:path";
 import {
   parseFlags,
   resolveLogLevel,
-  formatOutput,
   fail,
-  succeed,
   Logger,
   repoRoot,
   generateRunId,
@@ -226,11 +224,23 @@ try {
   if (reportMode) {
     console.log(JSON.stringify({ "policy-lint": output }, null, 2));
     process.exitCode = exitCode;
-  } else if (exitCode === 0) {
-    succeed(output, args.output);
   } else {
-    process.stdout.write(formatOutput(output, args.output));
-    process.exit(exitCode);
+    if (exitCode === 0) {
+      process.exitCode = 0;
+    } else {
+      console.error("policy-lint detected issues:");
+      if (output.results) {
+        for (const result of output.results) {
+          const messages = [...result.errors, ...result.warnings];
+          if (messages.length === 0) continue;
+          console.error(`- ${result.file}`);
+          for (const message of messages) {
+            console.error(`    • ${message}`);
+          }
+        }
+      }
+      process.exit(exitCode);
+    }
   }
 } catch (error) {
   logger.error("Policy lint failed", {

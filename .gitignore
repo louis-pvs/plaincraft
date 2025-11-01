@@ -5,5 +5,6 @@ dist
 storybook-static
 playbook-static
 docs/.vitepress/dist
+docs/.vitepress/cache
 _tmp
 _*.* 

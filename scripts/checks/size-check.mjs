@@ -125,9 +125,9 @@ try {
     if (reportMode) {
       console.log(JSON.stringify({ "size-check": payload }, null, 2));
       process.exitCode = 0;
-      return;
+    } else {
+      succeed({ ...payload, output: args.output });
     }
-    succeed({ ...payload, output: args.output });
   } else {
     const output = {
       runId,
@@ -141,19 +141,17 @@ try {
         ? "Size violations found (strict mode)"
         : "Size violations found (warning only, will be enforced after 30 days)",
     };
-
     if (reportMode) {
       console.log(JSON.stringify({ "size-check": output }, null, 2));
       process.exitCode = args.strict ? 11 : 0;
-      return;
-    }
-
-    formatOutput(output, args.output);
-
-    if (args.strict) {
-      process.exit(11);
     } else {
-      process.exit(0);
+      formatOutput(output, args.output);
+
+      if (args.strict) {
+        process.exit(11);
+      } else {
+        process.exit(0);
+      }
     }
   }
 } catch (error) {

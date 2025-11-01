@@ -92,6 +92,7 @@ const SCOPE_COMMANDS = {
       idea: IDEA_ID,
       cmd: ["pnpm", "run", "scripts:deprecation"],
     },
+    { id: "yaml:lint", idea: IDEA_ID, cmd: ["pnpm", "run", "yaml:lint"] },
     {
       id: "drift:check",
       idea: IDEA_ID,
@@ -356,7 +357,7 @@ function createProgressReporter(totalTasks, showProgress) {
         ),
       );
     },
-    advance(task, result) {
+    advance(_task, _result) {
       if (!showProgress || totalTasks === 0) return;
       completed = Math.min(totalTasks, completed + 1);
       console.log(

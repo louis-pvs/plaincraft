@@ -4,3 +4,11 @@ pnpm-lock.yaml
 **/*.mdx
 **/DEPRECATED/*
 **/_archive/*
+node_modules
+.DS_Store
+storybook-static
+playbook-static
+docs/.vitepress/dist
+docs/.vitepress/cache
+_tmp
+_*.* 

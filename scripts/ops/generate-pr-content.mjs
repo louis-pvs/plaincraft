@@ -9,8 +9,7 @@
  * Integrates with PR template structure and issue metadata.
  */
 
-import { existsSync } from "node:fs";
-import { appendFileSync } from "node:fs";
+import { existsSync, appendFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
