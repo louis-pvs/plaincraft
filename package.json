@@ -14,6 +14,7 @@
     "build:playbook": "vitepress build playbook",
     "build:storybook": "storybook build",
     "changelog": "node scripts/ops/consolidate-changelog.mjs",
+    "changelog:extract": "node scripts/ops/extract-pr-changelog.mjs",
     "ci:check": "node scripts/checks/check-ci.mjs",
     "ci:watch": "node scripts/checks/check-ci.mjs --watch",
     "format:check": "prettier --check .",
