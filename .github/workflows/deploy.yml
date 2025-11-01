@@ -66,6 +66,14 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
+      - name: Build docs site
+        run: pnpm run docs:build
+
+      - name: Copy docs build
+        run: |
+          mkdir -p _deploy/docs
+          cp -r docs/.vitepress/dist/* _deploy/docs/
+
       - name: Generate root index.html
         run: node scripts/generate-gh-pages-index.mjs _deploy --yes
 
@@ -109,9 +117,16 @@ jobs:
             echo "| Playbook | ⚠️ Missing |" >> $GITHUB_STEP_SUMMARY
           fi
 
+          if [ -d "_deploy/docs" ]; then
+            echo "| Docs | ✅ Deployed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Docs | ⚠️ Missing |" >> $GITHUB_STEP_SUMMARY
+          fi
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "🌐 **Live URLs:**" >> $GITHUB_STEP_SUMMARY
           echo "- [Root](https://${{ github.repository_owner }}.github.io/plaincraft/)" >> $GITHUB_STEP_SUMMARY
           echo "- [Demo](https://${{ github.repository_owner }}.github.io/plaincraft/demo/)" >> $GITHUB_STEP_SUMMARY
           echo "- [Storybook](https://${{ github.repository_owner }}.github.io/plaincraft/storybook/)" >> $GITHUB_STEP_SUMMARY
           echo "- [Playbook](https://${{ github.repository_owner }}.github.io/plaincraft/playbook/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Docs](https://${{ github.repository_owner }}.github.io/plaincraft/docs/)" >> $GITHUB_STEP_SUMMARY

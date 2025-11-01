@@ -6,7 +6,7 @@ import { mermaidPlugin } from "./plugins/mermaid";
 export default defineConfig({
   title: "Plaincraft Docs",
   description: "Scripts-first governance, workflows, and runbooks.",
-  base: "/plaincraft/",
+  base: "/plaincraft/docs/",
   srcDir: ".",
   cleanUrls: true,
   lastUpdated: true,
