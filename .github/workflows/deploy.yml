@@ -67,7 +67,7 @@ jobs:
         continue-on-error: true
 
       - name: Generate root index.html
-        run: node scripts/generate-gh-pages-index.mjs _deploy
+        run: node scripts/generate-gh-pages-index.mjs _deploy --yes
 
       - name: Add .nojekyll file
         run: touch _deploy/.nojekyll

@@ -192,7 +192,7 @@ EXAMPLES:
 
   try {
     await atomicWrite(outputPath, html);
-    log.success(`Generated root index.html at ${outputPath}`);
+    log.info(`Generated root index.html at ${outputPath}`);
 
     if (flags.output === "json") {
       console.log(
