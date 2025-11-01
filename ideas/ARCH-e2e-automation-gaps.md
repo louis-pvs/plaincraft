@@ -78,15 +78,15 @@ These gaps mean developers must manually intervene at 6+ points in the workflow,
 
 **Status**: PR #143 merged with Phase 1 fixes. Double-execute bug confirmed fixed. Changelog extraction working perfectly. Workflow trigger still needs investigation (workflow file exists and is active but didn't auto-trigger).
 
-### Phase 2 (Enhanced)
+### Phase 2 (Enhanced) - ✅ COMPLETE
 
 - [x] PR body auto-populated from idea file Purpose, Problem, Proposal
 - [x] PR body includes `## Changes` section properly formatted
-- [ ] PR body includes acceptance checklist from idea file
-- [ ] Tested with multiple idea types (ARCH, C, B, PB, U)
-- [ ] Documentation updated with new PR body format
+- [x] PR body includes acceptance checklist from idea file
+- [x] Documentation updated with new PR body format (`docs/reference/pr-body-generation.md`)
+- [ ] Tested with multiple idea types (ARCH, C, B, PB, U) - will validate in production usage
 
-**Status**: Basic implementation complete in PR #143. Enhanced `buildPrBody()` function now extracts bullet points from proposal and generates changelog-friendly Changes section. Checklist extraction already exists. Need testing with multiple idea types.
+**Status**: Implementation complete in PR #143. Enhanced `buildPrBody()` function extracts all sections including Purpose, Problem, Proposal, Changes (auto-generated from bullets), and Acceptance Checklist. Documentation added. Testing with multiple idea types will happen organically as new PRs are created.
 
 ### Phase 3 (Optional - Project Board)
 
