@@ -2,8 +2,15 @@
 /**
  * guardrails.mjs
  * @since 2025-11-01
- * @version 0.3.0
+ * @version 0.4.0
  * Summary: Orchestrate all guardrail commands with structured reporting
+ *
+ * Features:
+ * - Automatic retry logic for transient pnpm errors (ENOTEMPTY, EBUSY, EEXIST)
+ * - Exponential backoff (1s, 2s, 3s) for up to 3 retries
+ * - Parallel execution with configurable concurrency
+ * - JSON and text output formats
+ * - Per-scope filtering and fail-fast mode
  */
 
 import { performance } from "node:perf_hooks";
@@ -476,24 +483,85 @@ async function runGuardrailTask(task, root) {
   let stderr = "";
   let exitCode = 0;
 
-  try {
-    const { all, exitCode: cmdExitCode } = await execa(
-      commandWithReport[0],
-      commandWithReport.slice(1),
-      {
-        cwd: root,
-        all: true,
-        reject: false,
-      },
-    );
-    stdout = all || "";
-    exitCode = typeof cmdExitCode === "number" ? cmdExitCode : 0;
-    status = exitCode === 0 ? "passed" : "failed";
-  } catch (error) {
-    status = "failed";
-    exitCode = error.exitCode ?? 1;
-    stdout = error.all || error.stdout || "";
-    stderr = error.stderr || "";
+  // Retry logic for transient pnpm errors (ENOTEMPTY, lock contention)
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY_MS = 1000;
+  let attempt = 0;
+
+  while (attempt <= MAX_RETRIES) {
+    try {
+      const { all, exitCode: cmdExitCode } = await execa(
+        commandWithReport[0],
+        commandWithReport.slice(1),
+        {
+          cwd: root,
+          all: true,
+          reject: false,
+        },
+      );
+      stdout = all || "";
+      exitCode = typeof cmdExitCode === "number" ? cmdExitCode : 0;
+      status = exitCode === 0 ? "passed" : "failed";
+
+      // Check if this is a transient pnpm error that should be retried
+      const isPnpmCommand = commandWithReport[0] === "pnpm";
+      const hasRetryableError =
+        stdout.includes("ENOTEMPTY") ||
+        stdout.includes("directory not empty") ||
+        stdout.includes("EBUSY") ||
+        stdout.includes("EEXIST");
+
+      if (isPnpmCommand && hasRetryableError && attempt < MAX_RETRIES) {
+        attempt++;
+        logger.debug("Retrying pnpm command", {
+          id,
+          attempt,
+          maxRetries: MAX_RETRIES,
+          example: "Transient pnpm lock contention, retrying...",
+        });
+        await new Promise((resolve) =>
+          setTimeout(resolve, RETRY_DELAY_MS * attempt),
+        );
+        continue;
+      }
+
+      // Success or non-retryable failure
+      break;
+    } catch (error) {
+      status = "failed";
+      exitCode = error.exitCode ?? 1;
+      stdout = error.all || error.stdout || "";
+      stderr = error.stderr || "";
+
+      // Check if this is a transient error worth retrying
+      const isPnpmCommand = commandWithReport[0] === "pnpm";
+      const errorMessage = error.message || "";
+      const hasRetryableError =
+        errorMessage.includes("ENOTEMPTY") ||
+        errorMessage.includes("directory not empty") ||
+        errorMessage.includes("EBUSY") ||
+        errorMessage.includes("EEXIST") ||
+        stdout.includes("ENOTEMPTY") ||
+        stdout.includes("directory not empty");
+
+      if (isPnpmCommand && hasRetryableError && attempt < MAX_RETRIES) {
+        attempt++;
+        logger.debug("Retrying pnpm command after error", {
+          id,
+          attempt,
+          maxRetries: MAX_RETRIES,
+          error: errorMessage,
+          example: "Transient pnpm error, retrying with backoff...",
+        });
+        await new Promise((resolve) =>
+          setTimeout(resolve, RETRY_DELAY_MS * attempt),
+        );
+        continue;
+      }
+
+      // Non-retryable error or max retries exceeded
+      break;
+    }
   }
 
   const durationMs = Math.round(performance.now() - start);
