@@ -345,7 +345,7 @@ Next steps:
 ````markdown
 ---
 id: guide-feature-requests
-owner: @username
+owner: "@username"
 lane: D
 artifact_id: ARCH-feature-request-workflow
 scaffold_ref: /templates/feature-request@v0.1
@@ -713,7 +713,7 @@ cp templates/bug-report/bug-report.md .github/ISSUE_TEMPLATE/
 ```
 ````
 
-[View README](./bug-report/README.md) | [View Usage](./bug-report/USAGE.md)
+[View README](https://github.com/louis-pvs/plaincraft/blob/main/templates/bug-report/README.md) | [View Usage](https://github.com/louis-pvs/plaincraft/blob/main/templates/bug-report/USAGE.md)
 
 ---
 
@@ -732,7 +732,7 @@ cp templates/issue-unit/issue-unit.md my-issue.md
 gh issue create --title "Title" --body-file my-issue.md
 ```
 
-[View README](./issue-unit/README.md) | [View Usage](./issue-unit/USAGE.md)
+[View README](https://github.com/louis-pvs/plaincraft/blob/main/templates/issue-unit/README.md) | [View Usage](https://github.com/louis-pvs/plaincraft/blob/main/templates/issue-unit/USAGE.md)
 
 ---
 

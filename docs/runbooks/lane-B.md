@@ -1,6 +1,6 @@
 ---
 id: runbook-lane-b
-owner: @lane-b
+owner: "@lane-b"
 lane: B
 version: 1.0.0
 created: 2025-11-01

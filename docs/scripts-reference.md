@@ -15,6 +15,7 @@ pnpm scripts:lint     # policy + headers
 pnpm scripts:smoke    # --help / --dry-run probes
 pnpm scripts:size     # LOC budget
 pnpm scripts:test     # unit tests
+pnpm yaml:lint        # validate YAML workflows/configs parse
 ```
 
 `pnpm guardrails` now drives build, lint, typecheck, and test alongside the script/doc guardrails, fanning out up to three jobs at a time to stay inside the +90s budget. Watch the `[progress]` bar for dot updates, pass `--concurrency <n>` to tune throughput, or `--sequential` to match the legacy single-file order during incident response.
@@ -32,6 +33,8 @@ All scripts honour the shared CLI contract:
 | `scripts/ops/consolidate-changelog.mjs`        | Merge `_tmp` release notes into `CHANGELOG.md` with guardrails | Before publishing a new release                             |
 | `scripts/ops/create-issues-from-changelog.mjs` | Raise follow-up issues for each changelog section              | Immediately after changelog consolidation                   |
 | `scripts/ops/setup-project.mjs`                | Provision the roadmap GitHub Project + required fields         | First-time project bootstrap or when cloning to another org |
+| `vitepress dev docs`                           | Serve the GitHub Pages docs site locally                       | Preview sidebar/nav changes (`pnpm docs:dev`)               |
+| `vitepress build docs`                         | Build static docs output                                       | Before publishing to GitHub Pages (`pnpm docs:build`)       |
 | `scripts/checks/lint-guides.mjs`               | Legacy guide lint (archive only)                               | Rarely — when editing files under `guides/_archive/**`      |
 | `scripts/checks/dedupe-guides.mjs`             | Legacy guide similarity guard                                  | Same as above (historical maintenance only)                 |
 | `scripts/checks/validate-ideas.mjs`            | Structural validation for idea files                           | Before calling `ideas-to-issues` or merging idea PRs        |

@@ -1,6 +1,6 @@
 ---
 id: runbook-observer
-owner: @lane-d
+owner: "@lane-d"
 version: 1.0.0
 created: 2025-11-01
 ttl_days: 60
