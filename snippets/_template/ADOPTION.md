@@ -410,7 +410,7 @@ const label = count > 0 ? `Process ${count} items` : "Process";
 - **README.md** - API documentation
 - **TemplateSnippet.stories.tsx** - Interactive examples
 - **useTemplateSnippetController.spec.ts** - Test examples
-- **DEVELOPMENT.md** (`/guides/`) - Architecture details
+- **Architecture Standards** — See [GitHub Pages](https://louis-pvs.github.io/plaincraft/) for controller/view guidance
 
 ## Support
 

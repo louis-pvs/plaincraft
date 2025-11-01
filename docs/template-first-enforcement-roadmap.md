@@ -598,12 +598,12 @@ High similarity pairs: 1 (threshold: 30%)
 
 **Purpose:** Force template-first thinking at proposal stage
 
-**Template:**
+**Template (Historical — guides directory is sunset):**
 
 ```markdown
 ---
 name: New Guide Proposal
-about: Propose a new guide for the /guides/ directory
+about: [DEPRECATED] Propose a new guide for the /guides/ directory
 title: "New Guide: [Guide Name]"
 labels: ["documentation", "guide-proposal"]
 assignees: ""
@@ -637,7 +637,7 @@ assignees: ""
 2. Submit PR with the template
 3. After template is merged, reopen this proposal
 
-See: `/templates/guide/` for how to create a guide template.
+See: `/templates/guide/` for how the legacy guide template worked. New documentation must publish on GitHub Pages or in the Playbook.
 
 ## Justification
 
@@ -652,10 +652,10 @@ See: `/templates/guide/` for how to create a guide template.
 
 ## Ratio Impact
 
-**Current ratio:** [Templates]:[Guides] = [Ratio]
+**Current ratio:** [Templates]:[Guides] = [Ratio] (historical metric)
 **After this guide:** [Templates]:[Guides+1] = [New Ratio]
 
-⚠️ **If new ratio < 3:1, this proposal requires adding templates first**
+⚠️ **If new ratio < 3:1, this proposal required adding templates first (legacy rule)**
 
 ## Checklist
 

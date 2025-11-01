@@ -32,12 +32,12 @@ All scripts honour the shared CLI contract:
 | `scripts/ops/consolidate-changelog.mjs`        | Merge `_tmp` release notes into `CHANGELOG.md` with guardrails | Before publishing a new release                             |
 | `scripts/ops/create-issues-from-changelog.mjs` | Raise follow-up issues for each changelog section              | Immediately after changelog consolidation                   |
 | `scripts/ops/setup-project.mjs`                | Provision the roadmap GitHub Project + required fields         | First-time project bootstrap or when cloning to another org |
-| `scripts/checks/lint-guides.mjs`               | Validate guide frontmatter, TTL, executable commands           | Any documentation PR touching `/guides/**`                  |
-| `scripts/checks/dedupe-guides.mjs`             | Similarity guardrail for guides                                | Pair with `lint-guides` in CI or local preflight            |
+| `scripts/checks/lint-guides.mjs`               | Legacy guide lint (archive only)                               | Rarely — when editing files under `guides/_archive/**`      |
+| `scripts/checks/dedupe-guides.mjs`             | Legacy guide similarity guard                                  | Same as above (historical maintenance only)                 |
 | `scripts/checks/validate-ideas.mjs`            | Structural validation for idea files                           | Before calling `ideas-to-issues` or merging idea PRs        |
 | `scripts/checks/pr-requirements.mjs`           | Ensures PR metadata + checklist compliance                     | Pre-merge or as part of `pnpm guardrails`                   |
 | `scripts/checks/pr-template-lint.mjs`          | Confirms PR template placeholders match pipeline config        | Whenever `.github/pull_request_template.md` changes         |
-| `scripts/checks/template-coverage.mjs`         | Enforces template-to-guide ratio                               | When adding new templates/guides                            |
+| `scripts/checks/template-coverage.mjs`         | Ensures templates ship README/USAGE/config                     | When adding or updating templates                           |
 | `scripts/checks/playbook-link-guard.mjs`       | Verifies Playbook pattern links point to canonical docs        | Any change under `playbook/patterns/**`                     |
 | `scripts/checks/guardrails.mjs`                | Runs the full guardrail suite with JSON/text summary output    | `pnpm guardrails` locally or in CI                          |
 

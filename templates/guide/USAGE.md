@@ -1,33 +1,26 @@
 # Using the Guide Template
 
+> ⚠️ Guides have been sunset. Use GitHub Pages, Storybook, and Playbook for new documentation. This usage guide is retained only for historical context.
+
 ## Purpose
 
-Create template-first guides that remain current through TTL enforcement and strict governance.
+Legacy instructions for the pre-migration guide workflow. Follow the migration checklist below when encountering an old guide.
 
-## When to Use
+## Migration Steps
 
-- Documenting a repeatable workflow
-- Pointing users to templates and scripts
-- Creating decision-making checklists
-- Explaining when to use a template
+1. **Identify canonical home** — Move runnable steps to the owning template README or `/docs/runbooks/`. Publish narrative context to the Playbook.
+2. **Link Storybook** — Ensure Storybook governance docs point at the new Playbook/README content.
+3. **Archive the guide** — Relocate the legacy file under `guides/_archive/` and update references to the GitHub Pages site.
+4. **Update templates** — Regenerate any catalogues (`pnpm templates:catalog --yes`) so links point at GitHub Pages instead of `/guides`.
 
-## Steps
+## Historical Reference
 
-### 1. Check Prerequisites
-
-```bash
-# Ensure template or script exists first
-ls templates/your-template/
-# or
-ls scripts/your-script.mjs
-
-# If not, create template BEFORE guide
-```
-
-### 2. Copy Template
+If you must inspect an old guide, the original flow was:
 
 ```bash
 cp templates/guide/guide-template.md guides/guide-your-topic.md
+wc -w guides/guide-your-topic.md  # verify < 600 words
+pnpm guides:lint                  # legacy guardrail (rarely needed now)
 ```
 
 ### 3. Fill Frontmatter
@@ -70,9 +63,9 @@ List 3-5 anti-patterns:
 - Changes without corresponding tickets
 ```
 
-### 6. Write Executable Steps
+### 6. Write Executable Steps (Historical)
 
-Each step needs:
+Each step needed:
 
 1. Bold title with colon
 2. Executable command in bash code block
@@ -123,27 +116,23 @@ Each step needs:
 
 ### 9. Add Links Section
 
-```markdown
-# Links
+````markdown
+# Links (Current)
 
-- Template: `/templates/ideas/`
-- Script: `/scripts/ideas-to-issues.mjs`
-- Guide: `/guides/guide-related.md`
-- Docs: `/docs/related.md`
-```
+- Documentation hub: [https://louis-pvs.github.io/plaincraft/](https://louis-pvs.github.io/plaincraft/)
+- Runbooks & policies: [/docs/](/docs/)
+- Archived guides: [/guides/\_archive/](../../guides/_archive/)
 
-### 10. Validate
+### 10. Validate (Historical flow)
 
 ```bash
-# Check word count (must be < 600)
+# Legacy word-count check (< 600 words)
 wc -w guides/guide-your-topic.md
 
-# Verify it runs
-# Execute commands from guide on clean checkout
-
-# Update guides README
+# Legacy README maintenance
 # Add entry to /guides/README.md Active Guides list
 ```
+````
 
 ## Word Count Tips
 
@@ -214,7 +203,8 @@ Guides expire after `ttl_days` from `last_verified`:
 
 ## Related
 
-- Governance rules: `/guides/README.md`
-- Example guides: `/guides/guide-*.md`
+- GitHub Pages portal: [https://louis-pvs.github.io/plaincraft/](https://louis-pvs.github.io/plaincraft/)
+- Playbook patterns: [https://louis-pvs.github.io/plaincraft/playbook/](https://louis-pvs.github.io/plaincraft/playbook/)
+- Historical guides: `/guides/_archive/**`
 - Templates directory: `/templates/`
 ```

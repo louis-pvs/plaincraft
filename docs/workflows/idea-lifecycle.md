@@ -68,43 +68,9 @@ Commits: [ID] type(scope): subject (no slugs).
 
 Project status is authoritative; reconcile updates idea frontmatter.
 
-Links
+## Links
 
 - Policy enforcement: /docs/policy/workflow-enforcement.md
 - Project schema: /docs/reference/project-schema.md
 - Runbooks: /docs/runbooks/
-
----
-
-```md
----
-id: adr-2025-10-idea-lifecycle
-owner: @lane-d
-version: 1.0.0
-created: 2025-10-28
-status: Accepted
----
-```
-
-# ADR: Idea Lifecycle, Sources of Truth, and Enforcement Split
-
-## Context
-
-Guides bloat and process drift made status untrustworthy. We needed one canonical workflow, one status source, and automated enforcement.
-
-## Decision
-
-- **Content SoT:** Issues/idea files.
-- **Status SoT:** GitHub Projects (custom fields).
-- **Docs split:** Canonical in `/docs/workflows`, unit steps in READMEs, Storybook for behavior, Playbook for narrative.
-- **Enforcement:** Lane C via commit/PR checks and dashboards.
-
-## Consequences
-
-- Clear ownership (D/B/A/C).
-- Faster onboarding and smaller docs.
-- Policy changes require D approval; C cannot silently alter rules.
-
-## Review
-
-Revisit in 6 months or if >3 exceptions are granted in a quarter.
+- ADR: /docs/adr/2025-10-idea-lifecycle.md

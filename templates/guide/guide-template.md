@@ -10,6 +10,8 @@ ttl_days: 90
 last_verified: 2025-10-28
 ---
 
+> ⚠️ Guides have been sunset. Migrate content to GitHub Pages/Playbook/Storybook instead of publishing new files in `/guides/`.
+
 # When to use
 
 - [Specific scenario 1]

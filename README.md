@@ -15,37 +15,34 @@ pnpm dev
 
 ## Workflow & Docs
 
-- Canonical: [/docs/workflows/idea-lifecycle.md](/docs/workflows/idea-lifecycle.md)
-- Enforcement: [/docs/policy/workflow-enforcement.md](/docs/policy/workflow-enforcement.md)
-- Project schema: [/docs/reference/project-schema.md](/docs/reference/project-schema.md)
-- Runbooks:
-  - Lane A: [/docs/runbooks/lane-A.md](/docs/runbooks/lane-A.md)
-  - Lane B: [/docs/runbooks/lane-B.md](/docs/runbooks/lane-B.md)
-  - Lane C: [/docs/runbooks/lane-C.md](/docs/runbooks/lane-C.md)
-  - Lane D: [/docs/runbooks/lane-D.md](/docs/runbooks/lane-D.md)
-  - Observer: [/docs/runbooks/observer.md](/docs/runbooks/observer.md)
-- ADR: [/docs/adr/2025-10-idea-lifecycle.md](/docs/adr/2025-10-idea-lifecycle.md)
+- GitHub Pages (canonical hub): [https://louis-pvs.github.io/plaincraft/](https://louis-pvs.github.io/plaincraft/)
+- Storybook governance views: [https://louis-pvs.github.io/plaincraft/storybook/](https://louis-pvs.github.io/plaincraft/storybook/)
+- Playbook patterns: [https://louis-pvs.github.io/plaincraft/playbook/](https://louis-pvs.github.io/plaincraft/playbook/)
+- Repo sources:
+  - Workflow: [/docs/workflows/idea-lifecycle.md](/docs/workflows/idea-lifecycle.md)
+  - Enforcement: [/docs/policy/workflow-enforcement.md](/docs/policy/workflow-enforcement.md)
+  - Project schema: [/docs/reference/project-schema.md](/docs/reference/project-schema.md)
+  - Runbooks: [/docs/runbooks/](/docs/runbooks/)
+  - ADR: [/docs/adr/2025-10-idea-lifecycle.md](/docs/adr/2025-10-idea-lifecycle.md)
 
 ## Documentation Index
 
-- `guides/README.md` — How the guide system works, rules, and active inventory (≤12 live guides).
-- `guides/components/README.md` — Component-focused playbooks that point to snippet templates.
-- `guides/workflows/README.md` — End-to-end delivery flows, worktree automation, and CI touchpoints.
-- `guides/templates/README.md` — Catalog of scaffolds, schema references, and usage docs.
-- `guides/_archive/` — Auto-managed graveyard for anything past TTL or lacking an owner. Treat entries here as historical only; do not revive or follow them for active work.
+- GitHub Pages portal: [https://louis-pvs.github.io/plaincraft/](https://louis-pvs.github.io/plaincraft/)
+- Storybook governance docs: [https://louis-pvs.github.io/plaincraft/storybook/](https://louis-pvs.github.io/plaincraft/storybook/)
+- Playbook patterns: [https://louis-pvs.github.io/plaincraft/playbook/](https://louis-pvs.github.io/plaincraft/playbook/)
+- Runbooks & policies (repo): [/docs/](/docs/)
+- Archived guides (historical reference only): [/guides/\_archive/](guides/_archive/)
 
 ### Archived & Deprecated Directories
 
 - `guides/_archive/**`
 - `scripts/DEPRECATED/**`
 
-These folders exist purely for historical reference. Leave them untouched unless a ticket explicitly calls for pruning; all active guidance lives in the non-archived guides and templates listed above.
-
-Guides are thin overlays. They always defer to scaffolds living in `/templates/**`, scripts under `/scripts/**`, or snippet READMEs.
+These folders exist purely for historical reference. Active guidance now lives on GitHub Pages, Storybook, Playbook, or the templates and runbooks referenced above.
 
 ## Template-First Toolkit
 
-- `/templates/guide/guide-template.md` — Frontmatter-complete starting point for any new guide.
+- `/templates/guide/guide-template.md` — Legacy scaffold retained for historical reference (do not use for new docs).
 - `/templates/issue-unit/` — Backlog-ready unit issue scaffold with CLI helpers.
 - `/templates/issue-composition/` — Cross-cutting composition issue scaffold.
 - `/templates/pull-request/` — Standardized PR body with acceptance checklist slots.
@@ -61,7 +58,7 @@ pnpm dev
 ```
 
 - Snippets live in `snippets/<Name>/<Name>.tsx` and expose both the component and `Demo`.
-- Architecture follows controller + view seams with invariants enforced up front. Extended rationale lives in `guides/DEVELOPMENT.md`.
+- Architecture follows controller + view seams with invariants enforced up front. Extended rationale now lives on [GitHub Pages](https://louis-pvs.github.io/plaincraft/).
 
 ## 10 Minute Runnable Contract
 

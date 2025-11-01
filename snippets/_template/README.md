@@ -173,7 +173,7 @@ See `ADOPTION.md` for detailed guidance on:
 ## See Also
 
 - **ADOPTION.md** - Adoption guide and best practices
-- **DEVELOPMENT.md** (in `/guides/`) - Architecture standards
+- **Architecture Standards** — See [GitHub Pages](https://louis-pvs.github.io/plaincraft/) for the latest controller/view guidance
 - **InlineEditLabel** - Reference implementation
 
 \_Owner: @lane-x

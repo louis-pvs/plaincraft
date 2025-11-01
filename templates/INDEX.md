@@ -1,9 +1,9 @@
 # Template Catalog
 
-**Auto-generated:** 2025-10-28  
-**Total Templates:** 12
+**Auto-generated:** 2025-11-01  
+**Total Templates:** 13
 
-> 📖 See `/guides/` directory for usage guides that reference these templates
+> 📖 Canonical documentation now lives on GitHub Pages: https://louis-pvs.github.io/plaincraft/
 
 ---
 
@@ -21,8 +21,9 @@
 - **Planning** (2)
   - [roadmap-project](#roadmap-project)
   - [user-story](#user-story)
-- **Tooling** (1)
+- **Tooling** (2)
   - [script](#script)
+  - [Snippet - Inline Edit Label](#snippet-inline-edit-label)
 - **Testing** (2)
   - [Test (Integration)](#test-integration)
   - [Test (Unit)](#test-unit)
@@ -38,7 +39,7 @@ Structured bug report template for consistent issue reporting
 **Version:** 0.1.0  
 **Category:** workflow  
 **Created:** 2025-01-28  
-**Referenced by:** ⚠️ None (consider creating a guide)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -57,7 +58,7 @@ Changelog consolidation template with \_tmp/ workflow
 **Version:** 0.1.0  
 **Category:** workflow  
 **Created:** 2025-10-28  
-**Referenced by:** ⚠️ None (consider creating a guide)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -113,7 +114,7 @@ cp ./changelog/CHANGELOG.md .
 **Version:** 0.1.0  
 **Category:** workflow  
 **Created:** 2025-10-28  
-**Referenced by:** [ideas-source-of-truth](../playbook/patterns/ideas-source-of-truth.md)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -132,7 +133,7 @@ Multi-component issue template for complex features with sub-tasks
 **Version:** 0.1.0  
 **Category:** workflow  
 **Created:** 2025-01-28  
-**Referenced by:** [ideas-source-of-truth](../playbook/patterns/ideas-source-of-truth.md)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -151,7 +152,7 @@ Single-purpose issue template for bugs, small features, or focused tasks
 **Version:** 0.1.0  
 **Category:** workflow  
 **Created:** 2025-01-28  
-**Referenced by:** [ideas-source-of-truth](../playbook/patterns/ideas-source-of-truth.md)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -170,7 +171,7 @@ Standard PR description template with context, changes, and verification checkli
 **Version:** 0.1.0  
 **Category:** workflow  
 **Created:** 2025-01-28  
-**Referenced by:** [ideas-source-of-truth](../playbook/patterns/ideas-source-of-truth.md)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -191,7 +192,7 @@ Template-first guide template with frontmatter and TTL tracking
 **Version:** 0.1.0  
 **Category:** documentation  
 **Created:** 2025-10-28  
-**Referenced by:** [roadmap-project-onboarding](../playbook/patterns/roadmap-project-onboarding.md)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -252,7 +253,7 @@ GitHub Projects V2 template for roadmap and sprint tracking
 **Version:** 0.1.0  
 **Category:** planning  
 **Created:** 2025-10-28  
-**Referenced by:** ⚠️ None (consider creating a guide)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -295,7 +296,7 @@ Template for creating development-ready user stories that connect ideas to roadm
 **Version:** 0.1.0  
 **Category:** planning  
 **Created:** 2025-10-28  
-**Referenced by:** ⚠️ None (consider creating a guide)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -336,7 +337,7 @@ Compliant script template with full CLI contract and guardrails
 **Version:** 0.1.0  
 **Category:** tooling  
 **Created:** 2025-10-28  
-**Referenced by:** [script-automation-guardrails](../playbook/patterns/script-automation-guardrails.md)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -382,6 +383,25 @@ cp ./script/template-script.mjs .
 
 ---
 
+### Snippet - Inline Edit Label
+
+Scaffold the InlineEditLabel snippet with controller, default view, headless variant, tests, Storybook docs, and README.
+
+**Version:** 0.1.0  
+**Category:** tooling  
+**Created:** 2025-02-18  
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
+
+**Quick Start:**
+
+```bash
+cp ./snippet-inline-edit-label/snippets/InlineEditLabel/InlineEditLabel.tsx .
+```
+
+📁 [View in repo](./snippet-inline-edit-label) | 📖 [README](./snippet-inline-edit-label/README.md) | 🚀 [USAGE](./snippet-inline-edit-label/USAGE.md)
+
+---
+
 ## Testing Templates
 
 ### Test (Integration)
@@ -391,7 +411,7 @@ Integration test template for multi-component and API interaction testing
 **Version:** 0.1.0  
 **Category:** testing  
 **Created:** 2025-01-28  
-**Referenced by:** [script-automation-guardrails](../playbook/patterns/script-automation-guardrails.md)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -410,7 +430,7 @@ Unit test template for component and function testing with Vitest
 **Version:** 0.1.0  
 **Category:** testing  
 **Created:** 2025-01-28  
-**Referenced by:** [script-automation-guardrails](../playbook/patterns/script-automation-guardrails.md)
+**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)
 
 **Quick Start:**
 
@@ -421,15 +441,6 @@ cp ./test-unit/test-unit.spec.tsx .
 📁 [View in repo](./test-unit) | 📖 [README](./test-unit/README.md) | 🚀 [USAGE](./test-unit/USAGE.md)
 
 ---
-
-## ⚠️ Orphaned Templates
-
-These templates are not referenced by any guides. Consider creating a guide or removing if unused.
-
-- **bug-report** (0.1.0) - Structured bug report template for consistent issue reporting
-- **changelog** (0.1.0) - Changelog consolidation template with \_tmp/ workflow
-- **roadmap-project** (0.1.0) - GitHub Projects V2 template for roadmap and sprint tracking
-- **user-story** (0.1.0) - Template for creating development-ready user stories that connect ideas to roadmap execution
 
 ---
 

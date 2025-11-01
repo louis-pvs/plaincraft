@@ -212,7 +212,7 @@ function generateCatalog(templates, categorized, guideRefs) {
   let md = `# Template Catalog\n\n`;
   md += `**Auto-generated:** ${timestamp}  \n`;
   md += `**Total Templates:** ${templates.length}\n\n`;
-  md += `> 📖 See \`/guides/\` directory for usage guides that reference these templates\n\n`;
+  md += `> 📖 Canonical documentation now lives on GitHub Pages: https://louis-pvs.github.io/plaincraft/\n\n`;
   md += `---\n\n`;
 
   // Table of contents
@@ -230,22 +230,28 @@ function generateCatalog(templates, categorized, guideRefs) {
     md += `## ${capitalize(category)} Templates\n\n`;
 
     for (const template of temps) {
-      md += generateTemplateSection(template, guideRefs);
+      md += generateTemplateSection(template);
       md += `\n---\n\n`;
     }
   }
 
   // Orphaned templates (no guide references)
-  const orphaned = templates.filter(
-    (t) => !guideRefs[t.id] || guideRefs[t.id].length === 0,
+  const totalGuideRefs = Object.values(guideRefs).reduce(
+    (sum, refs) => sum + (refs?.length || 0),
+    0,
   );
-  if (orphaned.length > 0) {
-    md += `## ⚠️ Orphaned Templates\n\n`;
-    md += `These templates are not referenced by any guides. Consider creating a guide or removing if unused.\n\n`;
-    for (const t of orphaned) {
-      md += `- **${t.id}** (${t.config.version}) - ${t.config.description}\n`;
+  if (totalGuideRefs > 0) {
+    const orphaned = templates.filter(
+      (t) => !guideRefs[t.id] || guideRefs[t.id].length === 0,
+    );
+    if (orphaned.length > 0) {
+      md += `## ⚠️ Orphaned Templates\n\n`;
+      md += `These templates are not referenced by any legacy guides. Consider linking them from the GitHub Pages site if they remain active.\n\n`;
+      for (const t of orphaned) {
+        md += `- **${t.id}** (${t.config.version}) - ${t.config.description}\n`;
+      }
+      md += `\n`;
     }
-    md += `\n`;
   }
 
   md += `---\n\n`;
@@ -258,9 +264,8 @@ function generateCatalog(templates, categorized, guideRefs) {
 /**
  * Generate section for a single template
  */
-function generateTemplateSection(template, guideRefs) {
+function generateTemplateSection(template) {
   const { id, config, path } = template;
-  const refs = guideRefs[id] || [];
 
   let md = `### ${config.name || id}\n\n`;
 
@@ -272,11 +277,7 @@ function generateTemplateSection(template, guideRefs) {
   md += `**Category:** ${config.category}  \n`;
   md += `**Created:** ${config.created}  \n`;
 
-  if (refs.length > 0) {
-    md += `**Referenced by:** ${refs.map((g) => `[${g}](../guides/${g})`).join(", ")}  \n`;
-  } else {
-    md += `**Referenced by:** ⚠️ None (consider creating a guide)  \n`;
-  }
+  md += `**Documentation:** [GitHub Pages](https://louis-pvs.github.io/plaincraft/)  \n`;
 
   md += `\n`;
 

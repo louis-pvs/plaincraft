@@ -3,9 +3,11 @@
 Version: 0.1.0  
 Last Updated: 2025-10-28
 
+> ⚠️ Guides have been sunset. Use GitHub Pages, Storybook, and Playbook for all new documentation. This template remains in the repo for archival compatibility only.
+
 ## Overview
 
-Template for creating compliant guides that follow the template-first governance model.
+Legacy template for creating governance guides prior to the GitHub Pages migration. New documentation must live on [https://louis-pvs.github.io/plaincraft/](https://louis-pvs.github.io/plaincraft/), not in `/guides`.
 
 ## Files
 
@@ -16,24 +18,11 @@ Template for creating compliant guides that follow the template-first governance
 
 ## Quick Start
 
-```bash
-# 1. Copy template
-cp templates/guide/guide-template.md guides/guide-your-topic.md
+Do **not** create new guides. Instead:
 
-# 2. Fill frontmatter
-# - Update id, owner, lane, artifact_id, scaffold_ref
-# - Set created date and last_verified
-
-# 3. Write content
-# - When to use / not use
-# - Executable steps only
-# - Rollback procedures
-# - Requirements
-# - Links to templates/scripts
-
-# 4. Validate
-wc -w guides/guide-your-topic.md  # Must be < 600 words
-```
+1. Publish long-form narrative in the Playbook: [https://louis-pvs.github.io/plaincraft/playbook/](https://louis-pvs.github.io/plaincraft/playbook/)
+2. Capture runnable steps in the owning template README or runbook under `/docs/`
+3. Point Storybook governance pages at the new canonical documentation
 
 ## Required Frontmatter
 
@@ -99,7 +88,7 @@ References to templates, scripts, related guides
 
 ## Related
 
-- Governance: `/guides/README.md` (rules and guardrails)
-- Active guides: `/guides/guide-*.md` (examples)
-- Historical docs in `/guides/_archive/**` are reference-only—never copy them into new work.
-- Templates: `/templates/` (what guides reference)
+- GitHub Pages portal: [https://louis-pvs.github.io/plaincraft/](https://louis-pvs.github.io/plaincraft/)
+- Playbook patterns: [https://louis-pvs.github.io/plaincraft/playbook/](https://louis-pvs.github.io/plaincraft/playbook/)
+- Storybook governance docs: [https://louis-pvs.github.io/plaincraft/storybook/](https://louis-pvs.github.io/plaincraft/storybook/)
+- Historical guides: `/guides/_archive/**` (reference only)

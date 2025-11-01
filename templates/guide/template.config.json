@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "category": "documentation",
   "entrypoint": "guide-template.md",
-  "description": "Template-first guide template with frontmatter and TTL tracking",
+  "description": "Legacy guide template retained for archival compatibility (do not create new guides)",
   "created": "2025-10-28",
   "lastUpdated": "2025-10-28",
   "schema": {
@@ -51,5 +51,9 @@
     "Word count check",
     "TTL archiver (planned)"
   ],
-  "relatedFiles": ["/guides/README.md", "/guides/guide-*.md", "/templates/"]
+  "relatedFiles": [
+    "/guides/_archive/",
+    "/docs/",
+    "https://louis-pvs.github.io/plaincraft/"
+  ]
 }
