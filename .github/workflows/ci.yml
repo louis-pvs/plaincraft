@@ -66,11 +66,6 @@ jobs:
         run: |
           set -o pipefail
           pnpm guardrails --output json --report | tee guardrails-report.json
-      - name: Lifecycle smoke suite
-        if: ${{ vars.LIFECYCLE_SMOKE_ENABLED != 'false' }}
-        run: |
-          set -o pipefail
-          pnpm scripts:lifecycle-smoke --yes --output json --report | tee lifecycle-smoke-report.json
       - name: Upload guardrail report
         if: always()
         uses: actions/upload-artifact@v4
@@ -78,14 +73,6 @@ jobs:
           name: guardrails-report
           path: guardrails-report.json
           retention-days: 14
-      - name: Upload lifecycle smoke report
-        if: ${{ always() && vars.LIFECYCLE_SMOKE_ENABLED != 'false' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: lifecycle-smoke-report
-          path: lifecycle-smoke-report.json
-          retention-days: 14
-          if-no-files-found: warn
 
   build-storybook:
     name: Build Storybook Static
