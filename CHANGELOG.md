@@ -4,6 +4,15 @@ All notable changes live here. Follow the [changelog guide](guides/CHANGELOG-GUI
 
 ## [0.22.11] - 2025-11-01
 
+### E2e Automation Gaps
+
+This PR implements Phase 1 (Quick Wins) of the automation gap fixes:
+
+- Fixed double-execute bug in `consolidate-changelog.mjs` by adding explicit return after dry-run succeed() call
+- Enhanced PR body generation to include changelog-friendly "Changes" section
+- Auto-extract bullet points from proposal or generate summary for easier changelog extraction
+- Improved PR body structure for better workflow integration
+
 ### E2e Workflow Validation
 
 - Added E2E workflow validation test suite in tests/e2e-workflow-validation.spec.ts
