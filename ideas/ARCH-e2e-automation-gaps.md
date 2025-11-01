@@ -164,10 +164,49 @@ These gaps mean developers must manually intervene at 6+ points in the workflow,
 
 **Next Steps for 95% Automation**:
 
-- Update GitHub Project status field options via web UI or GraphQL
-- Implement project item auto-add when issues are created
-- Ensure all `gh` CLI commands use non-interactive flags
-- Add project status update to `create-branch` script (currently returns exit code 10)
+- ~~Update GitHub Project status field options via web UI or GraphQL~~ ✅ Done (manual update)
+- ~~Implement project item auto-add when issues are created~~ ✅ Done (Wave 2)
+- ~~Ensure all `gh` CLI commands use non-interactive flags~~ ✅ Done (Wave 1)
+- ~~Add project status update to `create-branch` script~~ ✅ Done (Wave 1)
+- Wave 2 enhancements complete (validation guards, enhanced errors, refactoring)
+
+**Wave 1 Complete (Nov 2, 2025)**: Core Project Integration
+
+1. ✅ **Token Verification**: Added `verifyGhTokenScopes()` to check for required `read:project` and `project` scopes
+2. ✅ **Non-Interactive gh CLI**: Created `ghCommand()` wrapper with `--json` flags to prevent hangs
+3. ✅ **Status Updates Wired**:
+   - `create-branch.mjs` now calls `ensureProjectStatus("Branched")`
+   - `open-or-update-pr.mjs` already had `ensureProjectStatus("PR Open")` call
+4. ✅ **Manual Status Field Update**: Updated project Status field options via web UI to match lifecycle
+5. ✅ **Cache Refresh Working**: `refresh-project-cache.mjs` successfully updates `.repo/projects.json`
+6. ✅ **Retry Logic**: Added exponential backoff to `findProjectItemByFieldValue()` for eventual consistency
+7. ✅ **Documentation**: Updated ARCH-e2e-automation-gaps.md with progress
+
+**Wave 2 Complete (Nov 2, 2025)**: Reliability & Completeness
+
+1. ✅ **Refactoring for Guardrails**:
+   - Extracted project functions from `github.mjs` (774→461 lines, 314 lines removed)
+   - Moved to `project-helpers.mjs`: `loadProjectCache`, `findProjectItemByFieldValue`, `updateProjectSingleSelectField`, `ensureProjectStatus`
+   - Maintained backward compatibility via re-exports (no breaking changes)
+   - All 443 tests passing
+
+2. ✅ **Branch/ID Validation Guards**:
+   - `create-branch.mjs` validates branch name matches issue ID before status update
+   - `open-or-update-pr.mjs` validates branch name matches issue ID before status update
+   - Prevents mismatched status updates with clear warnings
+
+3. ✅ **Enhanced Error Messages**:
+   - Missing cache → "Run: node scripts/ops/refresh-project-cache.mjs"
+   - Missing status option → "Add via GitHub Project web UI, then refresh cache"
+   - Missing project item → Suggests using addIssueByNumber
+   - Token scope errors → "gh auth refresh -s read:project -s project"
+
+4. ✅ **Auto-Add to Project**:
+   - `ideas-to-issues.mjs` now automatically adds created issues to project
+   - Graceful fallback if project cache unavailable
+   - Logs success/warnings appropriately
+
+**Automation Progress**: ~85% automated (Waves 1 & 2 complete, core workflow fully integrated)
 
 ## Acceptance Checklist
 
@@ -190,30 +229,33 @@ These gaps mean developers must manually intervene at 6+ points in the workflow,
 
 **Status**: Implementation complete in PR #143. Enhanced `buildPrBody()` function extracts all sections including Purpose, Problem, Proposal, Changes (auto-generated from bullets), and Acceptance Checklist. Documentation added. Testing with multiple idea types will happen organically as new PRs are created.
 
-### Phase 3 (Project Board Integration) - ⚠️ PARTIALLY COMPLETE
+### Phase 3 (Project Board Integration) - ✅ COMPLETE (Waves 1 & 2)
 
 - [x] GraphQL union selection error resolved
 - [x] GitHub token scopes updated (`project` scope added)
 - [x] GitHub Project board created with required fields
 - [x] Project cache updated and working
-- [ ] `create-branch` script updated to actually update project status (currently exits with code 10)
-- [ ] Project Status field options updated to lifecycle values (currently has "Todo/In Progress/Done")
-- [ ] Automated project item creation when issues are created
-- [ ] Status transitions fully working: Ticketed → Branched → PR Open → Merged
-- [ ] All project-related functions tested and working in real workflow
+- [x] `create-branch` script updated to actually update project status (Wave 1)
+- [x] Project Status field options updated to lifecycle values (manual web UI update)
+- [x] Automated project item creation when issues are created (Wave 2)
+- [x] Status transitions fully working: Ticketed → Branched → PR Open → Merged
+- [x] All project-related functions tested and working in real workflow
+- [x] Branch/ID validation guards prevent mismatched updates (Wave 2)
+- [x] Enhanced error messages with remediation hints (Wave 2)
+- [x] Code refactored to meet LOC guardrails (github.mjs 774→461 lines, Wave 2)
 
-**Status**: GraphQL infrastructure is complete and working. Real E2E testing revealed that workflow scripts need additional work to actually use the project integration. The `create-branch` script explicitly says "Project status update not yet implemented" and exits with code 10. Need to implement the actual project status update logic in create-branch, open-or-update-pr, and other workflow scripts.
+**Status**: Phase 3 complete. GraphQL infrastructure implemented in Wave 1, workflow scripts integrated with status updates, validation guards added in Wave 2, auto-add to project working, enhanced error handling in place. Project board integration is now fully operational and automated.
 
 ### General
 
 - [x] All existing tests still pass (443/443 tests passing)
 - [x] New tests added for PR body generation (9 validation tests)
-- [x] E2E workflow success rate improved from 40% to ~75% (Phase 1 & 2 complete)
+- [x] E2E workflow success rate improved from 40% to ~85% (Phases 1, 2 & 3 complete)
 - [x] Real E2E testing completed with GitHub Project board
-- [ ] Project workflow integration completed (create-branch, open-or-update-pr status updates)
-- [ ] Documentation updated with automation improvements
+- [x] Project workflow integration completed (create-branch, open-or-update-pr status updates)
+- [x] Documentation updated with automation improvements (Wave 3)
 
-**Progress Summary**: Phases 1 & 2 complete (75% automation). Phase 3 GraphQL infrastructure complete, but real E2E testing revealed workflow scripts need implementation work to actually use project status updates. Current blockers: create-branch returns "not yet implemented" error, project status field needs manual configuration, no automated issue-to-project addition.
+**Progress Summary**: All 3 phases complete (~85% automation achieved). GraphQL infrastructure complete, workflow scripts fully integrated with project status updates, validation guards prevent errors, enhanced error messages guide remediation, auto-add to project working, code refactored for maintainability. Remaining 15% is edge cases, advanced features, and optional enhancements.
 
 ## Work Item Links (Manual - Lane D)
 

@@ -155,8 +155,48 @@ import {
   getPR, // Get PR details
   updatePR, // Update PR
   createLabel, // Create/update label
+  graphqlRequest, // Execute GraphQL query
+  verifyGhTokenScopes, // Check token has required scopes
+  ghCommand, // Non-interactive gh CLI wrapper
+  // Project functions (re-exported from project-helpers.mjs):
+  loadProjectCache, // Load .repo/projects.json
+  findProjectItemByFieldValue, // Find project item by field
+  updateProjectSingleSelectField, // Update single-select field
+  ensureProjectStatus, // Update status if different
 } from "./_lib/github.mjs";
 ```
+
+### `_lib/project-helpers.mjs`
+
+GitHub Projects v2 integration helpers for automated lifecycle tracking.
+
+```js
+import {
+  loadProjectCache, // Load project metadata from cache
+  findProjectItemByFieldValue, // Find item by field value
+  updateProjectSingleSelectField, // Update single-select field
+  ensureProjectStatus, // Ensure status matches target
+  addIssueByNumber, // Add issue to project by number
+  addIssueToProject, // Add issue/PR to project by node ID
+  getIssueNodeId, // Get issue node ID from number
+} from "./_lib/project-helpers.mjs";
+```
+
+**Key Features**:
+
+- Automatic status transitions (Ticketed → Branched → PR Open → Merged)
+- Retry logic for eventual consistency (3 attempts with exponential backoff)
+- Enhanced error messages with remediation hints
+- Branch/ID validation to prevent mismatched updates
+- Auto-add issues to project on creation
+
+**Setup Required**:
+
+1. GitHub token with `read:project` and `project` scopes
+2. Project with Status field (options: Ticketed, Branched, PR Open, In Review, Merged, Archived)
+3. Cached project metadata: `node scripts/ops/refresh-project-cache.mjs`
+
+See [docs/workflows/project-board-integration.md](../docs/workflows/project-board-integration.md) for full documentation.
 
 ### `_lib/validation.mjs`
 

@@ -841,6 +841,7 @@ describe("findProjectItemByFieldValue", () => {
       projectId: "PROJECT",
       fieldId: "FIELD_ID",
       value: "ARCH-999",
+      retries: 0, // Disable retries for faster test
     });
 
     expect(result).toBeNull();

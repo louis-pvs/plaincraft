@@ -15,6 +15,10 @@ import { Logger, parseFlags, fail, succeed, repoRoot } from "../_lib/core.mjs";
 import { execCommand } from "../_lib/git.mjs";
 import { createIssue, getIssue, updateIssue } from "../_lib/github.mjs";
 import {
+  loadProjectCache,
+  addIssueByNumber,
+} from "../_lib/project-helpers.mjs";
+import {
   findIdeaFiles,
   validateIdeaFile,
   extractChecklistItems,
@@ -290,6 +294,31 @@ async function processIdeaFile(filePath, filename, args, log) {
 
     if (issueNumber) {
       log.info(`Created issue #${issueNumber}: ${metadata.title}`);
+
+      // Add issue to project if cache is available
+      try {
+        const projectCache = await loadProjectCache({ cwd: args.cwd });
+        const projectId = projectCache.cache.project?.id;
+
+        if (projectId) {
+          const addResult = await addIssueByNumber({
+            issueNumber,
+            projectId,
+            cwd: args.cwd,
+          });
+          log.info(
+            `Added issue #${issueNumber} to project (item ID: ${addResult.itemId})`,
+          );
+        } else {
+          log.debug(
+            "Project ID not found in cache, skipping auto-add to project",
+          );
+        }
+      } catch (projectError) {
+        log.warn(
+          `Could not add issue to project: ${projectError.message}. Issue created successfully, add to project manually if needed.`,
+        );
+      }
 
       // Process sub-issues
       const subIssues = extractSubIssues(content);

@@ -288,21 +288,32 @@ Options:
       };
 
       if (scopeCheck.valid) {
-        projectResult = await ensureProjectStatus({
-          cwd: root,
-          cacheInfo: projectCacheInfo,
-          id: flags.id,
-          status: plan.projectStatus.to,
-        });
+        // Validate branch name contains the ID
+        const branchIdMatch = branchName.match(/\/([^-/]+)-/);
+        const branchId = branchIdMatch ? branchIdMatch[1] : null;
 
-        if (projectResult.updated) {
+        if (branchId !== flags.id) {
           console.log(
-            `[INFO] Project status updated: ${projectResult.previous || "none"} → ${plan.projectStatus.to}`,
+            `[WARN] Branch validation failed: branch contains '${branchId}' but ID is '${flags.id}'. Skipping project status update.`,
           );
+          projectResult.message = `Branch ID mismatch: ${branchId} !== ${flags.id}`;
         } else {
-          console.log(
-            `[WARN] Project status not updated: ${projectResult.message}`,
-          );
+          projectResult = await ensureProjectStatus({
+            cwd: root,
+            cacheInfo: projectCacheInfo,
+            id: flags.id,
+            status: plan.projectStatus.to,
+          });
+
+          if (projectResult.updated) {
+            console.log(
+              `[INFO] Project status updated: ${projectResult.previous || "none"} → ${plan.projectStatus.to}`,
+            );
+          } else {
+            console.log(
+              `[WARN] Project status not updated: ${projectResult.message}`,
+            );
+          }
         }
       } else {
         console.log(`[WARN] ${scopeCheck.message}`);

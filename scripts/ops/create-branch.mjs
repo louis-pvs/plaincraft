@@ -101,7 +101,7 @@ Options:
     await execCommand("git", ["pull", "--ff-only"], { cwd: root });
     await execCommand("git", ["switch", "-c", branchName], { cwd: root });
 
-    // Update project status
+    // Update project status - validate branch matches ID
     const scopeCheck = await verifyGhTokenScopes(
       ["read:project", "project"],
       root,
@@ -112,20 +112,30 @@ Options:
     };
 
     if (scopeCheck.valid) {
-      projectStatus = await ensureProjectStatus({
-        id: flags.id,
-        status: "Branched",
-        cwd: root,
-      });
+      // Validate branch name contains the ID
+      const branchIdMatch = branchName.match(/\/([^-/]+)-/);
+      const branchId = branchIdMatch ? branchIdMatch[1] : null;
 
-      if (projectStatus.updated) {
+      if (branchId !== flags.id) {
         console.log(
-          `[INFO] Project status updated: ${projectStatus.previous || "none"} → Branched`,
+          `[WARN] Branch validation failed: branch contains '${branchId}' but ID is '${flags.id}'. Skipping project status update.`,
         );
       } else {
-        console.log(
-          `[WARN] Project status not updated: ${projectStatus.message}`,
-        );
+        projectStatus = await ensureProjectStatus({
+          id: flags.id,
+          status: "Branched",
+          cwd: root,
+        });
+
+        if (projectStatus.updated) {
+          console.log(
+            `[INFO] Project status updated: ${projectStatus.previous || "none"} → Branched`,
+          );
+        } else {
+          console.log(
+            `[WARN] Project status not updated: ${projectStatus.message}`,
+          );
+        }
       }
     } else {
       console.log(`[WARN] ${scopeCheck.message}`);
