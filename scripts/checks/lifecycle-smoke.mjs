@@ -6,6 +6,8 @@
  * Verify Scripts-First lifecycle guardrails that exist today.
  */
 
+import path from "node:path";
+import fs from "node:fs/promises";
 import {
   parseFlags,
   resolveLogLevel,
@@ -27,6 +29,8 @@ Options:
   --help                Show this help
   --dry-run             Preview which lifecycle checks will run (default)
   --yes                 Execute the lifecycle smoke checks
+  --execute             Run write-mode checks against a sandbox repository
+  --sandbox <path>      Absolute path to sandbox repo (defaults to LIFECYCLE_SANDBOX_REPO)
   --output <format>     Output format: json|text (default: text)
   --log-level <level>   Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>          Working directory (default: current)
@@ -42,8 +46,37 @@ Description:
   process.exit(0);
 }
 
-const dryRun = args.dryRun !== false && args.yes !== true;
+const executeMode = Boolean(args.execute);
+const yesMode = args.yes === true || executeMode;
+const dryRun = args.dryRun !== false && !yesMode;
 const logger = new Logger(resolveLogLevel({ flags: args }));
+const sandboxFlag = args.sandbox || args.sandboxRepo;
+const sandboxEnv = process.env.LIFECYCLE_SANDBOX_REPO;
+
+async function resolveSandboxRoot(defaultRoot) {
+  if (!executeMode) return defaultRoot;
+
+  const candidate = sandboxFlag || sandboxEnv;
+  if (!candidate) {
+    throw new Error(
+      "--execute requires --sandbox <path> or LIFECYCLE_SANDBOX_REPO environment variable.",
+    );
+  }
+
+  const fullPath = path.resolve(candidate);
+  try {
+    const stats = await fs.stat(fullPath);
+    if (!stats.isDirectory()) {
+      throw new Error(`Sandbox path ${fullPath} is not a directory.`);
+    }
+  } catch (error) {
+    throw new Error(
+      `Unable to access sandbox repository at ${fullPath}: ${error.message || error}`,
+    );
+  }
+
+  return fullPath;
+}
 
 const CHECKS = [
   {
@@ -85,6 +118,18 @@ const CHECKS = [
         "lifecycle-smoke",
       ],
     ],
+    executeCommand: [
+      "pnpm",
+      [
+        "ops:create-branch",
+        "--",
+        "--id",
+        "ARCH-123",
+        "--slug",
+        "lifecycle-smoke",
+        "--yes",
+      ],
+    ],
   },
   {
     id: "ops-open-pr-smoke",
@@ -99,6 +144,18 @@ const CHECKS = [
         "ARCH-123",
         "--branch",
         "feat/ARCH-123-lifecycle-smoke",
+      ],
+    ],
+    executeCommand: [
+      "pnpm",
+      [
+        "ops:open-or-update-pr",
+        "--",
+        "--id",
+        "ARCH-123",
+        "--branch",
+        "feat/ARCH-123-lifecycle-smoke",
+        "--yes",
       ],
     ],
   },
@@ -117,24 +174,48 @@ const CHECKS = [
         "ideas/ARCH-ideas-folder-pipeline.md",
       ],
     ],
+    executeCommand: [
+      "pnpm",
+      [
+        "ops:reconcile-status",
+        "--",
+        "--id",
+        "ARCH-ideas",
+        "--file",
+        "ideas/ARCH-ideas-folder-pipeline.md",
+        "--yes",
+      ],
+    ],
   },
   {
     id: "ops-closeout-smoke",
     lane: "C",
     description: "Dry-run closeout plan",
     command: ["pnpm", ["ops:closeout", "--", "--id", "ARCH-123"]],
+    executeCommand: [
+      "pnpm",
+      ["ops:closeout", "--", "--id", "ARCH-123", "--yes", "--archive", "false"],
+    ],
   },
   {
     id: "ops-report-smoke",
     lane: "C",
     description: "Dry-run lifecycle report",
     command: ["pnpm", ["ops:report"]],
+    executeCommand: ["pnpm", ["ops:report", "--", "--yes"]],
   },
 ];
 
 (async () => {
   try {
     const root = await repoRoot(args.cwd);
+    const runRoot = await resolveSandboxRoot(root);
+    if (executeMode) {
+      logger.info("Lifecycle smoke execute mode", {
+        sandbox: runRoot,
+        checks: CHECKS.length,
+      });
+    }
 
     if (dryRun) {
       logger.info("Lifecycle smoke dry-run plan generated", {
@@ -147,12 +228,28 @@ const CHECKS = [
         output: args.output,
         dryRun: true,
         generatedAt: now(),
-        plan: CHECKS.map(({ id, lane, description, command }) => ({
-          id,
-          lane,
-          description,
-          command: ["cd", root, "&&", command[0], ...command[1]],
-        })),
+        plan: CHECKS.map(
+          ({ id, lane, description, command, executeCommand }) => {
+            const targetCommand =
+              executeMode && executeCommand ? executeCommand : command;
+            const targetRoot = executeMode
+              ? sandboxFlag || sandboxEnv || "<sandbox>"
+              : root;
+
+            return {
+              id,
+              lane,
+              description,
+              command: [
+                "cd",
+                targetRoot,
+                "&&",
+                targetCommand[0],
+                ...targetCommand[1],
+              ],
+            };
+          },
+        ),
       });
       return;
     }
@@ -164,19 +261,25 @@ const CHECKS = [
 
     for (const check of CHECKS) {
       const start = Date.now();
+      const selectedCommand =
+        executeMode && check.executeCommand
+          ? check.executeCommand
+          : check.command;
+
       logger.info("Running lifecycle check", {
         id: check.id,
         description: check.description,
         lane: check.lane,
-        example: `${check.command[0]} ${check.command[1].join(" ")}`,
+        example: `${selectedCommand[0]} ${selectedCommand[1].join(" ")}`,
+        mode: executeMode ? "execute" : "dry",
       });
 
       try {
         const { exitCode } = await execCommand(
-          check.command[0],
-          check.command[1],
+          selectedCommand[0],
+          selectedCommand[1],
           {
-            cwd: root,
+            cwd: runRoot,
             stdio: "inherit",
           },
         );
@@ -188,6 +291,7 @@ const CHECKS = [
           status: "passed",
           exitCode,
           durationMs: Date.now() - start,
+          sandbox: executeMode ? runRoot : root,
         });
         passed++;
       } catch (error) {
@@ -210,6 +314,7 @@ const CHECKS = [
             error?.shortMessage ||
             error?.message ||
             String(error),
+          sandbox: executeMode ? runRoot : root,
         });
         failed++;
       }
@@ -233,6 +338,7 @@ const CHECKS = [
           failed,
           durationMs: Date.now() - startedAt,
           results,
+          sandbox: executeMode ? runRoot : root,
         },
       });
       return;
@@ -252,6 +358,7 @@ const CHECKS = [
       failed,
       durationMs: Date.now() - startedAt,
       results,
+      sandbox: executeMode ? runRoot : root,
     });
   } catch (error) {
     logger.error("Lifecycle smoke errored", {

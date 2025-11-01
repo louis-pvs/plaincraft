@@ -9,9 +9,21 @@
 import path from "node:path";
 import fs from "node:fs/promises";
 import { z } from "zod";
-import { parseFlags, fail, succeed, repoRoot, now } from "../_lib/core.mjs";
+import {
+  parseFlags,
+  fail,
+  succeed,
+  repoRoot,
+  now,
+  atomicWrite,
+} from "../_lib/core.mjs";
 import { parseIdeaFile } from "../_lib/ideas.mjs";
 import { loadLifecycleConfig } from "../_lib/lifecycle.mjs";
+import {
+  loadProjectCache,
+  findProjectItemByFieldValue,
+  ensureProjectStatus,
+} from "../_lib/github.mjs";
 
 const FLAG_SCHEMA = z.object({
   id: z
@@ -58,21 +70,59 @@ Options:
 
     const ideaPath = await resolveIdeaPath(flags.file, flags.id, root, config);
     const ideaStatus = await readIdeaStatus(ideaPath, flags.id);
-    const projectStatus = resolveProjectStatus(flags.status, config);
+    const targetStatus = resolveProjectStatus(flags.status, config);
+
+    let projectCacheInfo = null;
+    let projectItem = null;
+    let projectLookupError = null;
+
+    try {
+      projectCacheInfo = await loadProjectCache({ cwd: root });
+      const statusField = projectCacheInfo.cache.project?.fields?.Status;
+      const idField = projectCacheInfo.cache.project?.fields?.ID;
+      if (statusField?.id && idField?.id) {
+        projectItem = await findProjectItemByFieldValue({
+          projectId: projectCacheInfo.cache.project.id,
+          fieldId: idField.id,
+          value: flags.id,
+          cwd: root,
+        });
+      }
+    } catch (error) {
+      projectLookupError = error?.message || String(error);
+    }
+
+    const statusFieldId =
+      projectCacheInfo?.cache?.project?.fields?.Status?.id || null;
+    const currentProjectStatus =
+      statusFieldId && projectItem?.fields
+        ? projectItem.fields.get(statusFieldId)?.value || null
+        : null;
 
     const plan = {
       id: flags.id,
       ideaPath,
       status: {
         idea: ideaStatus,
-        project: projectStatus,
-        action:
-          ideaStatus === projectStatus
+        project: currentProjectStatus || "Unknown",
+        target: targetStatus,
+        ideaAction:
+          ideaStatus === targetStatus
             ? "noop"
-            : `update idea frontmatter to ${projectStatus}`,
+            : `update idea status to ${targetStatus}`,
+        projectAction:
+          currentProjectStatus === targetStatus
+            ? "noop"
+            : `set project status to ${targetStatus}`,
+      },
+      notes: {
+        project:
+          projectLookupError ||
+          (projectItem
+            ? "Project item located."
+            : "Project item lookup pending."),
       },
       generatedAt: now(),
-      note: "TODO: Call GitHub Project API and rewrite idea frontmatter when --yes is provided.",
     };
 
     if (flags.dryRun || !flags.yes) {
@@ -85,13 +135,44 @@ Options:
       return;
     }
 
-    await fail({
+    const originalContent = await fs.readFile(ideaPath, "utf-8");
+    const updatedContent = applyStatusLine(originalContent, targetStatus);
+    const ideaChanged = updatedContent !== originalContent;
+
+    if (ideaChanged) {
+      await atomicWrite(ideaPath, updatedContent);
+    }
+
+    const projectResult = await ensureProjectStatus({
+      id: flags.id,
+      status: targetStatus,
+      cacheInfo: projectCacheInfo,
+      cwd: root,
+    });
+
+    plan.status.idea = targetStatus;
+    plan.status.project = projectResult.updated
+      ? targetStatus
+      : currentProjectStatus || targetStatus;
+    plan.status.ideaAction = ideaChanged
+      ? `updated idea status to ${targetStatus}`
+      : "noop";
+    plan.status.projectAction = projectResult.updated
+      ? `updated project status to ${targetStatus}`
+      : plan.status.projectAction;
+    plan.notes.project = projectResult.message;
+
+    await succeed({
       script: "reconcile-status",
-      exitCode: 10,
-      message:
-        "Reconciliation write path not implemented. Use --dry-run to inspect plan.",
-      error: plan,
       output: flags.output,
+      plan,
+      result: {
+        idea: {
+          updated: ideaChanged,
+          path: ideaPath,
+        },
+        project: projectResult,
+      },
     });
   } catch (error) {
     await fail({
@@ -146,4 +227,27 @@ function resolveProjectStatus(statusFlag, config) {
     );
   }
   return candidate;
+}
+
+function applyStatusLine(content, status) {
+  const statusLine = `Status: ${status}`;
+  const statusRegex = /^Status:\s*.*$/m;
+  if (statusRegex.test(content)) {
+    return content.replace(statusRegex, statusLine);
+  }
+
+  const lines = content.split("\n");
+  const laneIndex = lines.findIndex((line) => /^Lane:/i.test(line.trim()));
+  if (laneIndex !== -1) {
+    lines.splice(laneIndex + 1, 0, statusLine);
+    return lines.join("\n");
+  }
+
+  const titleIndex = lines.findIndex((line) => /^#\s+/.test(line));
+  if (titleIndex !== -1) {
+    lines.splice(titleIndex + 1, 0, statusLine);
+    return lines.join("\n");
+  }
+
+  return `${statusLine}\n\n${content}`;
 }

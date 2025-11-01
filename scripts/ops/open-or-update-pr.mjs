@@ -6,10 +6,38 @@
  * Prepare lifecycle-compliant pull requests for the Scripts-First workflow.
  */
 
+import path from "node:path";
+import { tmpdir } from "node:os";
+import { unlink } from "node:fs/promises";
 import { z } from "zod";
-import { parseFlags, fail, succeed, repoRoot, now } from "../_lib/core.mjs";
+import {
+  parseFlags,
+  fail,
+  succeed,
+  repoRoot,
+  now,
+  atomicWrite,
+} from "../_lib/core.mjs";
 import { getCurrentBranch } from "../_lib/git.mjs";
 import { loadLifecycleConfig } from "../_lib/lifecycle.mjs";
+import {
+  findIdeaFiles,
+  loadIdeaFile,
+  extractChecklistItems,
+} from "../_lib/ideas.mjs";
+import {
+  getRepoInfo,
+  findPullRequestByBranch,
+  createPR,
+  updatePR,
+  syncPullRequestLabels,
+  convertPrToDraft,
+  markPrReadyForReview,
+  getPR,
+  loadProjectCache,
+  findProjectItemByFieldValue,
+  ensureProjectStatus,
+} from "../_lib/github.mjs";
 
 const ID_REGEX = /^[A-Z]+-[A-Za-z0-9]+$/;
 
@@ -62,17 +90,80 @@ Options:
     validateBranchMatchesId(branchName, flags.id, config);
 
     const prTitle = resolveTitle(flags.title, branchName, flags.id, config);
+    const ideaDetails = await loadIdeaDetails(root, config, flags.id);
+    const prBody = buildPrBody({
+      id: flags.id,
+      branch: branchName,
+      metadata: ideaDetails?.metadata ?? null,
+      status: ideaDetails?.status ?? null,
+    });
+    const prLabels = ideaDetails?.labels ?? [];
+
+    let existingPr = null;
+    let prLookupError = null;
+    try {
+      existingPr = await findPullRequestByBranch(branchName, root);
+    } catch (error) {
+      prLookupError = error?.message || String(error);
+    }
+
+    let projectCacheInfo = null;
+    let projectItem = null;
+    let projectLookupError = null;
+    try {
+      projectCacheInfo = await loadProjectCache({ cwd: root });
+      const statusField = projectCacheInfo.cache.project?.fields?.Status;
+      const idField = projectCacheInfo.cache.project?.fields?.ID;
+      if (statusField?.id && idField?.id) {
+        projectItem = await findProjectItemByFieldValue({
+          projectId: projectCacheInfo.cache.project.id,
+          fieldId: idField.id,
+          value: flags.id,
+          cwd: root,
+        });
+      }
+    } catch (error) {
+      projectLookupError = error?.message || String(error);
+    }
+
+    const statusFieldId =
+      projectCacheInfo?.cache?.project?.fields?.Status?.id || null;
+    const currentProjectStatus =
+      statusFieldId && projectItem?.fields
+        ? projectItem.fields.get(statusFieldId)?.value || null
+        : null;
+    const projectStatusNote = projectLookupError
+      ? projectLookupError
+      : projectItem
+        ? "Project item fetched from cache."
+        : "Project item lookup pending.";
 
     const plan = {
       id: flags.id,
       branch: branchName,
       title: prTitle,
       draft: flags.draft,
-      projectStatus: {
-        from: "Branched",
-        to: "PR Open",
-        note: "Status transition pending GitHub Project API integration.",
+      labels: prLabels,
+      idea: ideaDetails
+        ? {
+            path: ideaDetails.path,
+            status: ideaDetails.status,
+            issue: ideaDetails.issue,
+          }
+        : null,
+      pr: {
+        exists: Boolean(existingPr),
+        number: existingPr?.number ?? null,
+        url: existingPr?.url ?? null,
+        action: existingPr ? "update" : "create",
+        lookupError: prLookupError,
       },
+      projectStatus: {
+        from: currentProjectStatus || ideaDetails?.status || "Branched",
+        to: "PR Open",
+        note: projectStatusNote,
+      },
+      prBodyPreview: buildBodyPreview(prBody),
       generatedAt: now(),
     };
 
@@ -86,17 +177,139 @@ Options:
       return;
     }
 
-    await fail({
-      script: "open-or-update-pr",
-      exitCode: 10,
-      message:
-        "PR creation/update not yet wired. Re-run with --dry-run to inspect the plan.",
-      error: {
+    const bodyFile = path.join(
+      tmpdir(),
+      `plaincraft-pr-body-${Date.now()}-${Math.random().toString(16).slice(2)}.md`,
+    );
+
+    try {
+      await atomicWrite(bodyFile, prBody);
+
+      const { owner, name: repo } = await getRepoInfo(root);
+
+      let prDetails = existingPr;
+      if (!prDetails) {
+        prDetails = await findPullRequestByBranch(branchName, root);
+      }
+
+      let prResult;
+      if (prDetails) {
+        const currentPr = await getPR(prDetails.number, root);
+        const updates = {};
+        if (currentPr.title !== prTitle) {
+          updates.title = prTitle;
+        }
+        if (currentPr.body !== prBody) {
+          updates.bodyFile = bodyFile;
+        }
+        if (Object.keys(updates).length > 0) {
+          await updatePR(prDetails.number, updates, root);
+        }
+
+        await syncPullRequestLabels(prDetails.number, prLabels, root, {
+          mode: "merge",
+        });
+
+        if (flags.draft && prDetails.isDraft === false) {
+          await convertPrToDraft({
+            owner,
+            repo,
+            pullNumber: prDetails.number,
+            cwd: root,
+          });
+        }
+
+        if (!flags.draft && prDetails.isDraft === true) {
+          await markPrReadyForReview({
+            owner,
+            repo,
+            pullNumber: prDetails.number,
+            cwd: root,
+          });
+        }
+
+        const refreshed = await getPR(prDetails.number, root);
+        prResult = {
+          number: prDetails.number,
+          url: refreshed?.url || prDetails.url || null,
+          action: Object.keys(updates).length > 0 ? "updated" : "unchanged",
+          draft: flags.draft,
+        };
+      } else {
+        const creation = await createPR(
+          {
+            title: prTitle,
+            bodyFile,
+            base: "main",
+            draft: flags.draft,
+            head: branchName,
+          },
+          root,
+        );
+
+        const prNumberFromUrl = extractPrNumber(creation.url);
+        let createdNumber = prNumberFromUrl;
+        let createdDetails = null;
+        if (!createdNumber) {
+          const lookup = await findPullRequestByBranch(branchName, root);
+          if (!lookup) {
+            throw new Error(
+              "PR created but unable to determine PR number from branch lookup.",
+            );
+          }
+          createdNumber = lookup.number;
+          createdDetails = await getPR(createdNumber, root);
+        } else {
+          createdDetails = await getPR(createdNumber, root);
+        }
+
+        await syncPullRequestLabels(createdNumber, prLabels, root, {
+          mode: "merge",
+        });
+
+        prResult = {
+          number: createdNumber,
+          url: createdDetails?.url || creation.url,
+          action: "created",
+          draft: flags.draft,
+        };
+      }
+
+      const projectResult = await ensureProjectStatus({
+        cwd: root,
+        cacheInfo: projectCacheInfo,
+        id: flags.id,
+        status: plan.projectStatus.to,
+      });
+
+      plan.projectStatus.note = projectResult.message;
+      plan.pr = {
+        ...plan.pr,
+        exists: true,
+        number: prResult.number,
+        url: prResult.url,
+        action: prResult.action,
+        lookupError: null,
+      };
+
+      await succeed({
+        script: "open-or-update-pr",
+        output: flags.output,
         plan,
-        nextStep: "TODO: Invoke GitHub CLI/API to create or update the PR.",
-      },
-      output: flags.output,
-    });
+        result: {
+          pr: prResult,
+          project: projectResult,
+          labels: prLabels,
+        },
+      });
+    } finally {
+      // Best-effort cleanup of the temp file; ignore errors.
+      try {
+        await unlink(bodyFile);
+      } catch {
+        // noop
+      }
+    }
   } catch (error) {
     await fail({
       script: "open-or-update-pr",
@@ -164,4 +377,127 @@ function deriveTitleFromBranch(branch, id) {
 function capitalizeWord(word) {
   if (!word) return "";
   return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+async function loadIdeaDetails(root, config, id) {
+  const ideasDir = path.join(root, config.ideas.directory);
+  const directPath = path.join(ideasDir, `${id}.md`);
+
+  try {
+    const direct = await loadIdeaFile(directPath);
+    return {
+      path: directPath,
+      metadata: direct.metadata,
+      content: direct.content,
+      status: parseIdeaStatus(direct.content),
+      labels: extractIdeaLabels(direct.metadata),
+      issue: direct.metadata.issueNumber ?? null,
+    };
+  } catch {
+    // Fall back to search below.
+  }
+
+  try {
+    const candidates = await findIdeaFiles(ideasDir, id);
+    for (const candidate of candidates) {
+      const resolved = path.join(ideasDir, candidate);
+      try {
+        const idea = await loadIdeaFile(resolved);
+        return {
+          path: resolved,
+          metadata: idea.metadata,
+          content: idea.content,
+          status: parseIdeaStatus(idea.content),
+          labels: extractIdeaLabels(idea.metadata),
+          issue: idea.metadata.issueNumber ?? null,
+        };
+      } catch {
+        // Continue trying additional candidates
+      }
+    }
+  } catch {
+    // Ignore lookup failures and return null below
+  }
+
+  return null;
+}
+
+function parseIdeaStatus(content) {
+  if (!content) return null;
+  const statusMatch = content.match(/^Status:\s*([^\n]+)$/m);
+  return statusMatch ? statusMatch[1].trim() : null;
+}
+
+function extractIdeaLabels(metadata) {
+  if (!metadata) return [];
+  const laneSection =
+    metadata.sectionsNormalized?.lane?.content || metadata.sections?.Lane || "";
+
+  const labelMatch = laneSection.match(/Labels?:\s*([^\n]+)/i);
+  if (!labelMatch) return [];
+
+  return labelMatch[1]
+    .replace(/\*\*/g, "")
+    .replace(/^[-*]\s*/, "")
+    .split(",")
+    .map((label) => label.trim())
+    .filter(Boolean);
+}
+
+function buildPrBody({ id, branch, metadata, status }) {
+  const lines = [];
+  const issueNumber = metadata?.issueNumber;
+
+  if (issueNumber) {
+    lines.push(`Closes #${issueNumber}`, "");
+  } else {
+    lines.push(`Linked ticket: ${id}`, "");
+  }
+
+  if (metadata?.purpose) {
+    lines.push("## Purpose", "", metadata.purpose.trim(), "");
+  }
+
+  if (metadata?.problem) {
+    lines.push("## Problem", "", metadata.problem.trim(), "");
+  }
+
+  if (metadata?.proposal) {
+    lines.push("## Proposal", "", metadata.proposal.trim(), "");
+  }
+
+  const checklistItems = extractChecklistItems(metadata) || [];
+  if (checklistItems.length > 0) {
+    lines.push("## Acceptance Checklist", "");
+    for (const item of checklistItems) {
+      lines.push(`- [ ] ${item}`);
+    }
+    lines.push("");
+  }
+
+  lines.push("---", "");
+  if (metadata?.title) {
+    lines.push(`**Idea**: ${metadata.title}`);
+  }
+  if (metadata?.filename) {
+    lines.push(`**Source**: \`/ideas/${metadata.filename}\``);
+  }
+  lines.push(`**Branch**: \`${branch}\``);
+  lines.push(`**Status**: ${status || "Unknown"}`);
+
+  return lines.join("\n").trimEnd();
+}
+
+function buildBodyPreview(body, maxLines = 12, maxChars = 1200) {
+  if (!body) return "";
+  const truncated = body.split("\n").slice(0, maxLines).join("\n");
+  return truncated.length > maxChars
+    ? `${truncated.slice(0, maxChars)}…`
+    : truncated;
+}
+
+function extractPrNumber(url) {
+  if (!url) return null;
+  const match = url.match(/\/(\d+)(?:$|\?)/);
+  return match ? parseInt(match[1], 10) : null;
 }

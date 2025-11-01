@@ -6,8 +6,17 @@
  * Emit lifecycle configuration snapshot for dashboards.
  */
 
+import path from "node:path";
+import fs from "node:fs/promises";
 import { z } from "zod";
-import { parseFlags, fail, succeed, repoRoot, now } from "../_lib/core.mjs";
+import {
+  parseFlags,
+  fail,
+  succeed,
+  repoRoot,
+  now,
+  atomicWrite,
+} from "../_lib/core.mjs";
 import { loadLifecycleConfig } from "../_lib/lifecycle.mjs";
 
 const FLAG_SCHEMA = z.object({
@@ -51,23 +60,56 @@ Options:
       branchPrefixes: config.branches.allowedPrefixes,
     };
 
+    const reportDir = path.join(root, "artifacts", "lifecycle");
+    const reportPath = path.join(reportDir, "status.json");
+    const summaryPath = process.env.GITHUB_STEP_SUMMARY || null;
+    const plan = {
+      script: "report",
+      payload,
+      outputPath: reportPath,
+      summaryPath,
+    };
+
     if (flags.dryRun || !flags.yes) {
       await succeed({
         script: "report",
         dryRun: true,
-        payload,
+        plan,
         output: flags.output,
       });
       return;
     }
 
-    await fail({
+    await fs.mkdir(reportDir, { recursive: true });
+    await atomicWrite(reportPath, `${JSON.stringify(payload, null, 2)}\n`);
+
+    let summaryWritten = false;
+    if (summaryPath) {
+      const summaryLines = [
+        `## Lifecycle Report (${payload.generatedAt})`,
+        "",
+        `- Project ID: ${payload.projectId}`,
+        `- Statuses: ${payload.statuses.join(", ")}`,
+        `- Lanes: ${payload.lanes.join(", ")}`,
+        `- Types: ${payload.types.join(", ")}`,
+        `- Priorities: ${payload.priorities.join(", ")}`,
+      ];
+      try {
+        await fs.appendFile(summaryPath, `${summaryLines.join("\n")}\n\n`);
+        summaryWritten = true;
+      } catch (error) {
+        plan.summaryError = error?.message || String(error);
+      }
+    }
+
+    await succeed({
       script: "report",
-      exitCode: 10,
-      message:
-        "Report publishing not implemented. Use --dry-run to inspect current payload.",
-      error: payload,
       output: flags.output,
+      plan,
+      result: {
+        reportPath,
+        summaryWritten,
+      },
     });
   } catch (error) {
     await fail({
