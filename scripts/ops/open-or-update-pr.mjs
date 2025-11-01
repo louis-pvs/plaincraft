@@ -466,6 +466,31 @@ function buildPrBody({ id, branch, metadata, status }) {
     lines.push("## Proposal", "", metadata.proposal.trim(), "");
   }
 
+  // Add changelog-friendly Changes section
+  if (metadata?.proposal) {
+    lines.push("## Changes", "");
+    lines.push(
+      "This PR implements the following changes based on the proposal above:",
+      "",
+    );
+    // Extract bullet points from proposal if available, otherwise use simplified summary
+    const proposalLines = metadata.proposal.trim().split("\n");
+    const bulletPoints = proposalLines.filter((line) =>
+      line.trim().match(/^[-*]\s+/),
+    );
+
+    if (bulletPoints.length > 0) {
+      // Use existing bullet points from proposal
+      bulletPoints.forEach((point) => lines.push(point));
+    } else {
+      // Generate a simple summary if no bullets found
+      lines.push(
+        `- Implemented solution as described in the proposal section above`,
+      );
+    }
+    lines.push("");
+  }
+
   const checklistItems = extractChecklistItems(metadata) || [];
   if (checklistItems.length > 0) {
     lines.push("## Acceptance Checklist", "");

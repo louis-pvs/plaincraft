@@ -156,6 +156,7 @@ async function main() {
       tempFiles: summaryFiles.map((filePath) => path.relative(root, filePath)),
       durationMs: Date.now() - start,
     });
+    return; // Exit early after dry-run
   }
 
   await atomicWrite(changelogPath, updatedChangelog);
