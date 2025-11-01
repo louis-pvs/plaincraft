@@ -5,9 +5,9 @@ import Mermaid from "../../../shared/vitepress/mermaid/Mermaid.vue";
 
 const theme: Theme = {
   ...DefaultTheme,
-  enhanceApp({ app }) {
-    DefaultTheme.enhanceApp?.({ app });
-    app.component("Mermaid", Mermaid);
+  enhanceApp(ctx) {
+    DefaultTheme.enhanceApp?.(ctx);
+    ctx.app.component("Mermaid", Mermaid);
   },
 };
 

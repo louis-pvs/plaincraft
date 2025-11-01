@@ -14,6 +14,9 @@ export function mermaidPlugin(md: MarkdownIt): void {
 
   md.renderer.rules.fence = (tokens, idx, options, env, slf) => {
     const token = tokens[idx];
+    if (!token) {
+      return "";
+    }
     const info = token.info.trim();
 
     if (MERMAID_FENCE.test(info)) {

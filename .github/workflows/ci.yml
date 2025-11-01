@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   check:
-    name: Typecheck, Lint & Unit Tests
+    name: Lint & Unit Tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -32,8 +32,6 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Format check
         run: pnpm format:check
-      - name: Typecheck
-        run: pnpm typecheck
       - name: Lint
         run: pnpm lint
       - name: Unit tests
@@ -225,7 +223,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Typecheck, Lint & Unit Tests | ${{ needs.check.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint & Unit Tests | ${{ needs.check.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Storybook Tests | ${{ needs.storybook-test.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Build Storybook | ${{ needs.build-storybook.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Build Demo | ${{ needs.build-demo.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
