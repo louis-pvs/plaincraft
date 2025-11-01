@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /**
  * test-project-graphql.mjs
+ * @since 2025-11-02
+ * @version 0.1.0
  * Quick test to verify Project GraphQL fix
  */
 

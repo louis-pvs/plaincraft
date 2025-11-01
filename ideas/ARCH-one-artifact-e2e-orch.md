@@ -5,7 +5,7 @@ Owner: @lane-d
 Lane: D
 Version: 1.0.0
 Created: 2025-11-01
-Status: Accepted
+Status: Draft
 TTL (days): 180
 Last verified: 2025-11-01
 ---

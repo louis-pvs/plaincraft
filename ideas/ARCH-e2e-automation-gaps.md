@@ -5,7 +5,7 @@ owner: "@lane-d"
 lane: C
 type: Arch
 priority: P2
-status: In Progress
+status: PR Open
 version: 1.0.0
 created: 2025-11-01
 last_verified: 2025-11-02

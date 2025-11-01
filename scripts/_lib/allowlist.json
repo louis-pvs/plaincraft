@@ -20,6 +20,8 @@
     "scripts/create-worktree-pr.mjs",
     "scripts/generate-pr-content.mjs",
     "scripts/ideas-to-issues.mjs",
-    "scripts/new-snippet.mjs"
+    "scripts/new-snippet.mjs",
+    "scripts/ops/test-project-graphql.mjs",
+    "scripts/ops/validate-pr-body.mjs"
   ]
 }
