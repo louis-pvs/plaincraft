@@ -4,6 +4,13 @@ All notable changes live here. Follow the [changelog guide](guides/CHANGELOG-GUI
 
 ## [0.22.11] - 2025-11-01
 
+### E2e Workflow Validation
+
+- Added E2E workflow validation test suite in tests/e2e-workflow-validation.spec.ts
+- Validates workflow steps from idea creation to deployment
+- Confirms all workflow scripts are functional and properly configured
+- Tests include verification of ideas:create, ops:create-branch, ops:open-or-update-pr, changelog:extract, ops:closeout, and changelog scripts
+
 ## [0.22.10] - 2025-11-01
 
 ## [0.22.9] - 2025-11-01

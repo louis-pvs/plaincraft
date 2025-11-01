@@ -517,11 +517,14 @@ export async function getPR(prNumber, cwd = process.cwd()) {
       "view",
       String(prNumber),
       "--json",
-      "number,title,body,state,labels,url",
+      "number,title,body,state,labels,url,mergedAt,mergedBy",
     ],
     { cwd },
   );
-  return JSON.parse(stdout);
+  const pr = JSON.parse(stdout);
+  // Add merged flag based on mergedAt presence
+  pr.merged = Boolean(pr.mergedAt);
+  return pr;
 }
 
 /**
