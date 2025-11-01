@@ -9,7 +9,10 @@ const container = ref<HTMLDivElement | null>(null);
 let mermaidApi:
   | {
       initialize?: (config: object) => void;
-      render: (id: string, code: string) => Promise<{ svg: string; bindFunctions?: (element: Element) => void }>;
+      render: (
+        id: string,
+        code: string,
+      ) => Promise<{ svg: string; bindFunctions?: (element: Element) => void }>;
     }
   | undefined;
 let initialized = false;
