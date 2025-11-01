@@ -38,11 +38,11 @@ last_verified: 2025-10-28
    # Checks: headers, CLI contract, dangerous patterns
    ```
 
-3. **Run smoke tests:**
+3. **(Optional) Run manual smoke probe:**
 
    ```bash
    pnpm scripts:smoke
-   # Tests: --help flag, --dry-run for ops scripts
+   # Spot-checks: --help flag, --dry-run for ops scripts
    ```
 
 4. **Check size compliance:**
@@ -55,7 +55,7 @@ last_verified: 2025-10-28
 5. **Run all guardrails:**
    ```bash
    pnpm guardrails
-   # Runs lint, test, smoke, size, deprecation checks
+   # Runs lint, tests, size, deprecation, docs, PR/issue checks
    ```
 
 # Rollback

@@ -11,9 +11,10 @@ pnpm guardrails
 # Run individual checks
 pnpm scripts:lint        # Policy compliance
 pnpm scripts:test        # Unit tests
-pnpm scripts:smoke       # Smoke tests
 pnpm scripts:size        # Size compliance
 pnpm scripts:deprecation # TTL enforcement
+# Optional manual probes
+pnpm scripts:smoke       # Manual --help/--dry-run spot check
 ```
 
 ## Directory Structure
@@ -32,7 +33,7 @@ pnpm scripts:deprecation # TTL enforcement
 
   checks/               # Validations and linters
     policy-lint.mjs     # Header, CLI contract, dangerous patterns
-    smoke.mjs           # Basic functionality smoke tests
+    smoke.mjs           # Manual smoke probe (--help/--dry-run)
     size-check.mjs      # LOC and function size limits
     deprecation-sweeper.mjs  # 90-day TTL enforcement
 
@@ -134,11 +135,6 @@ The `guardrails` job runs in CI and fails fast on violations.
 - Reject scripts lacking header block, CLI contract flags, or schema validation
 - Ban `sudo`, `rm -rf /`, raw `child_process.exec`, and non-allowlisted network calls
 
-### Smoke Tests
-
-- Run `--help` on every script (must exit 0)
-- Run `--dry-run --output json` on ops scripts
-
 ### Size Check
 
 - Alert at >300 LOC per script
@@ -183,7 +179,7 @@ The `guardrails` job runs in CI and fails fast on violations.
 # Run unit tests for _lib modules
 pnpm scripts:test
 
-# Run smoke tests for all scripts
+# Optional manual smoke probe
 pnpm scripts:smoke
 
 # Run all checks

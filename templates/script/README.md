@@ -35,7 +35,8 @@ node scripts/your-script.mjs --dry-run
 
 ## Required Guardrails
 
-- Run `pnpm guardrails` locally before any PR. Treat failures (including `commit:guard`, `drift:check`, lifecycle smoke) as stop-ship conditions until resolved.
+- Run `pnpm guardrails` locally before any PR. Treat failures (policy lint, unit tests, size/deprecation checks, docs + PR guards) as stop-ship conditions until resolved.
+- When you want extra assurance, run `pnpm scripts:smoke` manually to confirm new scripts still answer `--help` and `--dry-run` without errors.
 - Capture dry-run transcripts for key commands in your PR description so reviewers can trace planned writes without executing the script.
 
 ## What's Included

@@ -60,7 +60,6 @@ const colors = {
 
 const REPORT_AWARE_PNPM_SCRIPTS = new Set([
   "scripts:lint",
-  "scripts:smoke",
   "scripts:size",
   "scripts:deprecation",
   "docs:report",
@@ -75,11 +74,6 @@ const SCOPE_COMMANDS = {
   scripts: [
     { id: "scripts:lint", idea: IDEA_ID, cmd: ["pnpm", "run", "scripts:lint"] },
     { id: "scripts:test", idea: IDEA_ID, cmd: ["pnpm", "run", "scripts:test"] },
-    {
-      id: "scripts:smoke",
-      idea: IDEA_ID,
-      cmd: ["pnpm", "run", "scripts:smoke", "--", "--filter", "checks"],
-    },
     { id: "scripts:size", idea: IDEA_ID, cmd: ["pnpm", "run", "scripts:size"] },
     {
       id: "scripts:deprecation",

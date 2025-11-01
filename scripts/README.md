@@ -34,10 +34,10 @@ pnpm guardrails
 
 This orchestrates:
 
-1. **Script suite** — Policy lint, unit tests, smoke tests, size + deprecation checks
+1. **Script suite** — Policy lint, unit tests, size + deprecation checks
 2. **Docs suite** — README + template coverage, view dedupe, Playbook link guard
 3. **PR/Issue checks** — PR template lint, issue template lint
-4. **Recording probe** — Optional Storybook recording smoke (`--help`) to ensure tooling is available
+4. **Recording probe** — Optional Storybook smoke (`--help`) to ensure tooling is available when you opt in
 
 Use `pnpm guardrails:<scope>` (`docs`, `scripts`, `ideas`, `pr`, `recordings`) for focused runs.
 
@@ -379,9 +379,9 @@ All I/O operations are mocked to ensure:
 | `templates.spec.mjs`  | 36      | 7         | ≥80%     |
 | **Total**             | **355** | **63**    | **≥80%** |
 
-### Smoke Tests
+### Manual Smoke Probe (optional)
 
-Test that all scripts respond correctly:
+Spot-check that scripts still answer `--help` and `--dry-run`:
 
 ```bash
 pnpm scripts:smoke

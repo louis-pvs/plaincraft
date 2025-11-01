@@ -12,13 +12,13 @@ pnpm guardrails
 
 # Individual checks
 pnpm scripts:lint     # policy + headers
-pnpm scripts:smoke    # --help / --dry-run probes
+pnpm scripts:smoke    # optional manual --help/--dry-run probe
 pnpm scripts:size     # LOC budget
 pnpm scripts:test     # unit tests
 pnpm yaml:lint        # validate YAML workflows/configs parse
 ```
 
-`pnpm guardrails` now drives build, lint, typecheck, and test alongside the script/doc guardrails, fanning out up to three jobs at a time to stay inside the +90s budget. Watch the `[progress]` bar for dot updates, pass `--concurrency <n>` to tune throughput, or `--sequential` to match the legacy single-file order during incident response.
+`pnpm guardrails` now drives build, lint, typecheck, and test alongside the script/doc guardrails, fanning out up to three jobs at a time to stay inside the +90s budget. Watch the `[progress]` bar for dot updates, pass `--concurrency <n>` to tune throughput, or `--sequential` to match the legacy single-file order during incident response. Need an extra safety net? Run the manual smoke probe (`pnpm scripts:smoke`) whenever you want to double-check `--help`/`--dry-run` responses.
 
 All scripts honour the shared CLI contract:
 

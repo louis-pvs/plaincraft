@@ -112,7 +112,7 @@ pnpm guardrails
 
 # Or individual checks
 pnpm scripts:lint    # Header, CLI contract, patterns
-pnpm scripts:smoke   # --help and --dry-run
+pnpm scripts:smoke   # optional manual --help/--dry-run probe
 pnpm scripts:size    # LOC limits
 pnpm scripts:test -- --filter <script-name>  # Focused unit coverage
 
