@@ -32,6 +32,8 @@ The GitHub Project item falls back to `Branched` or `Ticketed` automatically bas
 
 ## Links
 
+- Template README: [`templates/script/README.md`](https://github.com/louis-pvs/plaincraft/blob/main/templates/script/README.md)
+- Template USAGE: [`templates/script/USAGE.md`](https://github.com/louis-pvs/plaincraft/blob/main/templates/script/USAGE.md)
 - Rollback Script: [`scripts/ops/remove-worktree.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/remove-worktree.mjs)
 - Branch Bootstrap: [`scripts/ops/create-worktree-pr.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/create-worktree-pr.mjs)
 - PR Refresh: [`scripts/ops/generate-pr-content.mjs`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/generate-pr-content.mjs)

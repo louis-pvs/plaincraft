@@ -1,7 +1,7 @@
 # ARCH-cli-logging-verbosity
 
 Lane: C (DevOps & Automation)
-Status: In-progress
+Status: Draft
 
 ## Lane
 

@@ -48,6 +48,9 @@ Replace `{command}` with the executed script (`pnpm ops:open-or-update-pr -- --i
 
 ## Links
 
+- Template README: [`templates/roadmap-project/README.md`](https://github.com/louis-pvs/plaincraft/blob/main/templates/roadmap-project/README.md)
+- Template USAGE: [`templates/roadmap-project/USAGE.md`](https://github.com/louis-pvs/plaincraft/blob/main/templates/roadmap-project/USAGE.md)
+- Storybook View: [`Governance / Roadmap Onboarding`](https://louis-pvs.github.io/plaincraft/storybook/?path=/docs/governance-roadmap-onboarding--docs)
 - Lifecycle Governance Report: [`pnpm ops:report`](https://github.com/louis-pvs/plaincraft/blob/main/scripts/ops/report.mjs)
 - Weekly Audit Workflow: [`.github/workflows/project-audit.yml`](https://github.com/louis-pvs/plaincraft/blob/main/.github/workflows/project-audit.yml)
 - Project Sync Workflow: [`.github/workflows/project.yml`](https://github.com/louis-pvs/plaincraft/blob/main/.github/workflows/project.yml)
