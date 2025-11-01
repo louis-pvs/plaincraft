@@ -52,7 +52,8 @@ export default defineConfig([
       "**/*.json",
       "**/DEPRECATED/**",
       "**/_archive/**",
-      "docs/.vitepress/**",
+      "playbook/.vitepress/cache/**",
+      "playbook/.vitepress/dist/**",
       "docs/.vitepress/cache/**",
       "docs/.vitepress/dist/**",
       "templates/**",
@@ -91,7 +92,9 @@ export default defineConfig([
     },
     settings: {
       "import/resolver": {
-        typescript: true,
+        typescript: {
+          project: `${TS_CONFIG_ROOT}/tsconfig.json`,
+        },
       },
     },
     rules: {

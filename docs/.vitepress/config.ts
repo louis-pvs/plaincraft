@@ -1,5 +1,7 @@
 /* eslint-disable import/no-default-export */
 import { defineConfig } from "vitepress";
+import { PATH_ALIASES } from "../../path-aliases";
+import { mermaidPlugin } from "./plugins/mermaid";
 
 export default defineConfig({
   title: "Plaincraft Docs",
@@ -8,6 +10,16 @@ export default defineConfig({
   srcDir: ".",
   cleanUrls: true,
   lastUpdated: true,
+  markdown: {
+    config: (md) => {
+      md.use(mermaidPlugin);
+    },
+  },
+  vite: {
+    resolve: {
+      alias: PATH_ALIASES,
+    },
+  },
   themeConfig: {
     nav: [
       { text: "Workflows", link: "/workflows/idea-lifecycle" },

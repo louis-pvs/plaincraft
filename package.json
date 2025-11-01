@@ -105,6 +105,7 @@
     "@storybook/test-runner": "^0.23.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+    "@types/markdown-it": "^14.1.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^8.8.1",
@@ -124,6 +125,8 @@
     "js-yaml": "^4.1.0",
     "jsdom": "^24.1.1",
     "lint-staged": "^15.2.10",
+    "markdown-it": "^14.1.0",
+    "mermaid": "^10.9.1",
     "msw": "^2.11.6",
     "pnpm": "^10.19.0",
     "postcss": "^8.4.47",
@@ -139,7 +142,8 @@
   },
   "dependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "vue": "^3.5.22"
   },
   "engines": {
     "node": ">=20.11.0",

@@ -1,4 +1,5 @@
 import type { StorybookConfig } from "@storybook/react-vite";
+import { pathAliasArray } from "../path-aliases";
 
 const config: StorybookConfig = {
   framework: "@storybook/react-vite",
@@ -24,21 +25,28 @@ const config: StorybookConfig = {
     }
 
     const alias = baseConfig.resolve?.alias ?? [];
+    const aliasEntries = [
+      ...pathAliasArray(),
+      { find: "storybook/blocks", replacement: blocksModulePath },
+      { find: "@storybook/blocks", replacement: blocksModulePath },
+    ];
 
     if (Array.isArray(alias)) {
-      alias.push(
-        { find: "storybook/blocks", replacement: blocksModulePath },
-        { find: "@storybook/blocks", replacement: blocksModulePath },
-      );
+      alias.push(...aliasEntries);
       baseConfig.resolve = { ...(baseConfig.resolve ?? {}), alias };
     } else {
+      const aliasObject = alias as Record<string, string>;
+      const mergedAliases = aliasEntries.reduce<Record<string, string>>(
+        (acc, { find, replacement }) => {
+          acc[find] = replacement;
+          return acc;
+        },
+        { ...aliasObject },
+      );
+
       baseConfig.resolve = {
         ...(baseConfig.resolve ?? {}),
-        alias: {
-          ...(alias as Record<string, string>),
-          "storybook/blocks": blocksModulePath,
-          "@storybook/blocks": blocksModulePath,
-        },
+        alias: mergedAliases,
       };
     }
 

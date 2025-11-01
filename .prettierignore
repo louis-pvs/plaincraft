@@ -8,6 +8,8 @@ node_modules
 .DS_Store
 storybook-static
 playbook-static
+playbook/.vitepress/dist
+playbook/.vitepress/cache
 docs/.vitepress/dist
 docs/.vitepress/cache
 _tmp

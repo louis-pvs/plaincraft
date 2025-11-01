@@ -10,14 +10,29 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@docs": ["docs"],
+      "@docs/*": ["docs/*"],
+      "@playbook": ["playbook"],
+      "@playbook/*": ["playbook/*"],
+      "@templates": ["templates"],
+      "@templates/*": ["templates/*"],
+      "@scripts": ["scripts"],
+      "@scripts/*": ["scripts/*"]
+    }
   },
   "include": [
     ".storybook/**/*",
     "demo",
     "snippets",
     "scripts",
+    "shared",
+    "docs/.vitepress/**/*.ts",
+    "playbook/.vitepress/**/*.ts",
     "env.d.ts",
-    "*.config.ts"
+    "*.config.ts",
+    "path-aliases.ts"
   ]
 }

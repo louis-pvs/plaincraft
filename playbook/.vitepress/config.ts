@@ -1,4 +1,6 @@
 import { defineConfig } from "vitepress";
+import { PATH_ALIASES } from "../../path-aliases";
+import { mermaidPlugin } from "./plugins/mermaid";
 
 // eslint-disable-next-line import/no-default-export
 export default defineConfig({
@@ -7,6 +9,16 @@ export default defineConfig({
     "Component patterns and best practices for Plaincraft UI snippets",
   base: "/playbook/",
   outDir: "../playbook-static",
+  vite: {
+    resolve: {
+      alias: PATH_ALIASES,
+    },
+  },
+  markdown: {
+    config: (md) => {
+      md.use(mermaidPlugin);
+    },
+  },
   themeConfig: {
     nav: [
       { text: "Home", link: "/" },

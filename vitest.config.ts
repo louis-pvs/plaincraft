@@ -1,8 +1,12 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
+import { PATH_ALIASES } from "./path-aliases";
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: PATH_ALIASES,
+  },
   test: {
     pool: "threads",
     poolOptions: {
@@ -12,7 +16,11 @@ export default defineConfig({
     },
     environment: "jsdom",
     globals: true,
-    include: ["snippets/**/*.spec.{ts,tsx}", "scripts/**/*.spec.mjs"],
+    include: [
+      "snippets/**/*.spec.{ts,tsx}",
+      "scripts/**/*.spec.mjs",
+      "tests/**/*.spec.{ts,tsx}",
+    ],
     exclude: [
       "**/node_modules/**",
       "**/dist/**",
