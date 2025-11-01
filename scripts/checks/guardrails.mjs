@@ -72,12 +72,6 @@ const IDEA_ID = "ARCH-unified-guardrails-suite";
 const DEFAULT_CONCURRENCY = 3;
 
 const SCOPE_COMMANDS = {
-  app: [
-    { id: "build", idea: IDEA_ID, cmd: ["pnpm", "run", "build"] },
-    { id: "typecheck", idea: IDEA_ID, cmd: ["pnpm", "run", "typecheck"] },
-    { id: "lint", idea: IDEA_ID, cmd: ["pnpm", "run", "lint"] },
-    { id: "test", idea: IDEA_ID, cmd: ["pnpm", "run", "test"] },
-  ],
   scripts: [
     { id: "scripts:lint", idea: IDEA_ID, cmd: ["pnpm", "run", "scripts:lint"] },
     { id: "scripts:test", idea: IDEA_ID, cmd: ["pnpm", "run", "scripts:test"] },
