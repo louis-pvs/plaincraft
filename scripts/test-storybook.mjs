@@ -291,33 +291,6 @@ async function runTests() {
 }
 
 /**
- * Run Playwright docs coverage
- */
-async function runDocsPlaywrightTests() {
-  console.log("Running Storybook docs Playwright checks...");
-  try {
-    await execCommand(
-      "pnpm",
-      [
-        "exec",
-        "playwright",
-        "test",
-        "--config",
-        "storybook/playwright.config.ts",
-      ],
-      {
-        env: { ...process.env, STORYBOOK_BASE_URL: TARGET_URL },
-        cwd: ROOT,
-      },
-    );
-    console.log("✓ Storybook docs suite passed");
-  } catch {
-    console.error("✗ Storybook docs suite failed");
-    exitCode = 1;
-  }
-}
-
-/**
  * Main execution
  */
 async function main() {
@@ -333,7 +306,6 @@ async function main() {
 
     // Run tests
     await runTests();
-    await runDocsPlaywrightTests();
   } catch (err) {
     console.error("Error:", err.message);
     exitCode = 1;

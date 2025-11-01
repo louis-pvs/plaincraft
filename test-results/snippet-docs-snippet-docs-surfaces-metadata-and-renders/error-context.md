@@ -1,0 +1,226 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+    - generic [ref=e5]:
+        - generic [ref=e6]:
+            - paragraph [ref=e8]: Template
+            - code [ref=e9]: /templates/snippet-inline-edit-label@v0.1
+        - generic [ref=e10]:
+            - paragraph [ref=e12]: Owner
+            - code [ref=e13]: "@lane-c"
+    - generic [ref=e14]:
+        - heading "Inline Edit Label" [level=1] [ref=e15]:
+            - link [ref=e16] [cursor=pointer]:
+                - /url: "#inline-edit-label"
+            - text: Inline Edit Label
+        - heading "When to use" [level=2] [ref=e17]:
+            - link [ref=e18] [cursor=pointer]:
+                - /url: "#when-to-use"
+            - text: When to use
+        - list [ref=e19]:
+            - listitem [ref=e20]: Ship inline renaming without rebuilding accessibility or optimistic save flows.
+            - listitem [ref=e21]: Reuse the proven Storybook narrative and Playbook rationale for consistency.
+            - listitem [ref=e22]: Keep UX changes fast by swapping views while the headless controller stays stable.
+        - heading "Scaffold" [level=2] [ref=e23]:
+            - link [ref=e24] [cursor=pointer]:
+                - /url: "#scaffold"
+            - text: Scaffold
+        - generic [ref=e26]:
+            - generic [ref=e31]:
+                - text: pnpm run new:snippet InlineEditLabel -- --dry-run
+                - text: "# scaffold_ref: /templates/snippet-inline-edit-label@v0.1"
+            - button "Copy" [ref=e33] [cursor=pointer]
+        - heading "Wire" [level=2] [ref=e34]:
+            - link [ref=e35] [cursor=pointer]:
+                - /url: "#wire"
+            - text: Wire
+        - list [ref=e36]:
+            - listitem [ref=e37]:
+                - text: Import
+                - code [ref=e38]: InlineEditLabel
+                - text: from
+                - code [ref=e39]: /snippets/InlineEditLabel/InlineEditLabel
+                - text: .
+            - listitem [ref=e40]:
+                - text: Provide
+                - code [ref=e41]: value
+                - text: ","
+                - code [ref=e42]: onSave
+                - text: ", and"
+                - code [ref=e43]: ariaLabel
+                - text: ; the controller handles focus + keys.
+            - listitem [ref=e44]:
+                - text: Switch to
+                - code [ref=e45]: InlineEditLabelHeadless
+                - text: when design needs a custom render function.
+            - listitem [ref=e46]:
+                - text: Pass a
+                - code [ref=e47]: labels
+                - text: object to surface tailored UI copy for
+                - code [ref=e48]: saving
+                - text: ","
+                - code [ref=e49]: success
+                - text: ","
+                - code [ref=e50]: error
+                - text: ", or"
+                - code [ref=e51]: discarded
+                - text: states. Legacy
+                - code [ref=e52]: "*Label"
+                - text: props still forward to the new contract if you need a staggered migration.
+            - listitem [ref=e53]:
+                - text: Use
+                - code [ref=e54]: emptyValuePlaceholder
+                - text: when the saved value can start empty to keep the button discoverable.
+        - heading "Test" [level=2] [ref=e55]:
+            - link [ref=e56] [cursor=pointer]:
+                - /url: "#test"
+            - text: Test
+        - generic [ref=e58]:
+            - generic [ref=e63]: pnpm test --filter InlineEditLabel
+            - button "Copy" [ref=e65] [cursor=pointer]
+        - heading "Rollback" [level=2] [ref=e66]:
+            - link [ref=e67] [cursor=pointer]:
+                - /url: "#rollback"
+            - text: Rollback
+        - generic [ref=e69]:
+            - generic [ref=e74]: git restore snippets/InlineEditLabel
+            - button "Copy" [ref=e76] [cursor=pointer]
+        - heading "Links" [level=2] [ref=e77]:
+            - link [ref=e78] [cursor=pointer]:
+                - /url: "#links"
+            - text: Links
+        - list [ref=e79]:
+            - listitem [ref=e80]: "USAGE: /templates/snippet-inline-edit-label/USAGE.md"
+            - listitem [ref=e81]: "Storybook: /storybook/?path=/docs/patterns-inline-edit--docs"
+            - listitem [ref=e82]: "Playbook: /playbook/patterns/inline-edit-label.html"
+        - paragraph [ref=e83]: "_Owner: @lane-c"
+    - heading "Interactive" [level=2] [ref=e84]:
+        - link [ref=e85] [cursor=pointer]:
+            - /url: "#interactive"
+        - text: Interactive
+    - generic [ref=e87]:
+        - generic [ref=e94]:
+            - generic [ref=e95]: Inline label
+            - button "Edit project headline" [ref=e96] [cursor=pointer]:
+                - generic [ref=e97]: Team charter
+                - generic [ref=e98]: Enter to edit
+            - generic [ref=e99]: Press Enter or click to edit. Max 32 characters.
+        - button "Show code" [ref=e101] [cursor=pointer]
+    - heading "Empty state" [level=2] [ref=e102]:
+        - link [ref=e103] [cursor=pointer]:
+            - /url: "#empty-state"
+        - text: Empty state
+    - generic [ref=e105]:
+        - generic [ref=e112]:
+            - generic [ref=e113]: Inline label
+            - button "Edit project headline" [ref=e114] [cursor=pointer]:
+                - generic [ref=e115]: Team charter
+                - generic [ref=e116]: Enter to edit
+            - generic [ref=e117]: Press Enter or click to edit. Max 32 characters.
+        - button "Show code" [ref=e119] [cursor=pointer]
+    - heading "Interaction test" [level=2] [ref=e120]:
+        - link [ref=e121] [cursor=pointer]:
+            - /url: "#interaction-test"
+        - text: Interaction test
+    - generic [ref=e123]:
+        - generic [ref=e130]:
+            - generic [ref=e131]: Inline label
+            - button "Edit project headline" [ref=e132] [cursor=pointer]:
+                - generic [ref=e133]: Team charter
+                - generic [ref=e134]: Enter to edit
+            - generic [ref=e135]: Press Enter or click to edit. Max 32 characters.
+        - button "Show code" [ref=e137] [cursor=pointer]
+    - heading "Error path" [level=2] [ref=e138]:
+        - link [ref=e139] [cursor=pointer]:
+            - /url: "#error-path"
+        - text: Error path
+    - generic [ref=e141]:
+        - generic [ref=e148]:
+            - generic [ref=e149]: Inline label
+            - button "Edit project headline" [ref=e150] [cursor=pointer]:
+                - generic [ref=e151]: Team charter
+                - generic [ref=e152]: Enter to edit
+            - generic [ref=e153]: Press Enter or click to edit. Max 32 characters.
+        - button "Show code" [ref=e155] [cursor=pointer]
+    - heading "Props" [level=2] [ref=e156]:
+        - link [ref=e157] [cursor=pointer]:
+            - /url: "#props"
+        - text: Props
+    - table [ref=e160]:
+        - rowgroup [ref=e161]:
+            - row "Name Description Default" [ref=e162]:
+                - cell "Name" [ref=e163]
+                - cell "Description" [ref=e164]
+                - cell "Default" [ref=e165]
+        - rowgroup [ref=e166]:
+            - row "value* string -" [ref=e167]:
+                - cell "value*" [ref=e168]
+                - cell "string" [ref=e169]:
+                    - generic [ref=e172]: string
+                - cell "-" [ref=e173]
+            - row "maxLength* number -" [ref=e174]:
+                - cell "maxLength*" [ref=e175]
+                - cell "number" [ref=e176]:
+                    - generic [ref=e179]: number
+                - cell "-" [ref=e180]
+            - row "ariaLabel Accessible label announced while the text is in read-only mode. string \"Edit label\"" [ref=e181]:
+                - cell "ariaLabel" [ref=e182]
+                - cell "Accessible label announced while the text is in read-only mode. string" [ref=e183]:
+                    - generic [ref=e184]: Accessible label announced while the text is in read-only mode.
+                    - generic [ref=e187]: string
+                - cell "\"Edit label\"" [ref=e188]:
+                    - generic [ref=e190]: '"Edit label"'
+            - 'row "onSave* Seam: inject the save handler from the parent. (nextValue: string) => Promise<void> | void -" [ref=e191]':
+                - cell "onSave*" [ref=e192]
+                - 'cell "Seam: inject the save handler from the parent. (nextValue: string) => Promise<void> | void" [ref=e193]':
+                    - generic [ref=e194]: "Seam: inject the save handler from the parent."
+                    - generic [ref=e195]: "(nextValue: string) => Promise<void> | void"
+                - cell "-" [ref=e196]
+            - 'row "savingLabel string Deprecated: Use `labels.saving` instead -" [ref=e197]':
+                - cell "savingLabel" [ref=e198]
+                - 'cell "string Deprecated: Use `labels.saving` instead" [ref=e199]':
+                    - generic [ref=e202]: string
+                    - table [ref=e203]:
+                        - rowgroup [ref=e204]:
+                            - 'row "Deprecated: Use `labels.saving` instead" [ref=e205]':
+                                - 'cell "Deprecated: Use `labels.saving` instead" [ref=e206]':
+                                    - strong [ref=e207]: Deprecated
+                                    - text: ": Use `labels.saving` instead"
+                - cell "-" [ref=e208]
+            - 'row "successLabel string Deprecated: Use `labels.success` instead -" [ref=e209]':
+                - cell "successLabel" [ref=e210]
+                - 'cell "string Deprecated: Use `labels.success` instead" [ref=e211]':
+                    - generic [ref=e214]: string
+                    - table [ref=e215]:
+                        - rowgroup [ref=e216]:
+                            - 'row "Deprecated: Use `labels.success` instead" [ref=e217]':
+                                - 'cell "Deprecated: Use `labels.success` instead" [ref=e218]':
+                                    - strong [ref=e219]: Deprecated
+                                    - text: ": Use `labels.success` instead"
+                - cell "-" [ref=e220]
+            - 'row "errorLabel string Deprecated: Use `labels.error` instead -" [ref=e221]':
+                - cell "errorLabel" [ref=e222]
+                - 'cell "string Deprecated: Use `labels.error` instead" [ref=e223]':
+                    - generic [ref=e226]: string
+                    - table [ref=e227]:
+                        - rowgroup [ref=e228]:
+                            - 'row "Deprecated: Use `labels.error` instead" [ref=e229]':
+                                - 'cell "Deprecated: Use `labels.error` instead" [ref=e230]':
+                                    - strong [ref=e231]: Deprecated
+                                    - text: ": Use `labels.error` instead"
+                - cell "-" [ref=e232]
+            - 'row "labels Optional label overrides for different states { saving?: string; success?: string; error?: string; discarded?: string; } -" [ref=e233]':
+                - cell "labels" [ref=e234]
+                - 'cell "Optional label overrides for different states { saving?: string; success?: string; error?: string; discarded?: string; }" [ref=e235]':
+                    - generic [ref=e236]: Optional label overrides for different states
+                    - generic [ref=e237]: "{ saving?: string; success?: string; error?: string; discarded?: string; }"
+                - cell "-" [ref=e238]
+            - row "emptyValuePlaceholder Placeholder shown when the current value is empty. string \"Add label\"" [ref=e239]:
+                - cell "emptyValuePlaceholder" [ref=e240]
+                - cell "Placeholder shown when the current value is empty. string" [ref=e241]:
+                    - generic [ref=e242]: Placeholder shown when the current value is empty.
+                    - generic [ref=e245]: string
+                - cell "\"Add label\"" [ref=e246]:
+                    - generic [ref=e248]: '"Add label"'
+```
