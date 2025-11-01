@@ -365,15 +365,26 @@ describe("getPR", () => {
       body: "PR description",
       state: "open",
       labels: [{ name: "feature" }],
+      mergedAt: null,
+      mergedBy: null,
     };
     execa.mockResolvedValue({ stdout: JSON.stringify(mockPR) });
 
     const result = await getPR(123);
 
-    expect(result).toEqual(mockPR);
+    expect(result).toEqual({
+      ...mockPR,
+      merged: false,
+    });
     expect(execa).toHaveBeenCalledWith(
       "gh",
-      ["pr", "view", "123", "--json", "number,title,body,state,labels,url"],
+      [
+        "pr",
+        "view",
+        "123",
+        "--json",
+        "number,title,body,state,labels,url,mergedAt,mergedBy",
+      ],
       expect.any(Object),
     );
   });
@@ -1040,7 +1051,13 @@ describe("syncPullRequestLabels", () => {
     expect(execa).toHaveBeenNthCalledWith(
       1,
       "gh",
-      ["pr", "view", "12", "--json", "number,title,body,state,labels,url"],
+      [
+        "pr",
+        "view",
+        "12",
+        "--json",
+        "number,title,body,state,labels,url,mergedAt,mergedBy",
+      ],
       { cwd: "/repo" },
     );
     expect(execa).toHaveBeenNthCalledWith(
