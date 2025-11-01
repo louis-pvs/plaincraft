@@ -34,6 +34,7 @@ Options:
   --log-level <level> Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>        Working directory (default: current)
   --threshold <n>     Similarity threshold percentage (default: 30)
+  --report            Emit machine-readable JSON summary
 
 Description:
   Detects near-duplicate content across guides using rolling hash similarity.
@@ -49,6 +50,7 @@ Exit codes:
 const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const SIMILARITY_THRESHOLD = parseInt(args.threshold) || 30;
+const reportMode = Boolean(args.report);
 
 logger.debug("Guide deduplication check started", {
   threshold: SIMILARITY_THRESHOLD,
@@ -125,18 +127,30 @@ try {
     duplicatesFound: duplicates.length,
     durationMs,
   };
+  if (reportMode) {
+    console.log(JSON.stringify({ "guide-dedupe": output }, null, 2));
+  }
 
   if (duplicates.length > 0) {
     output.duplicates = duplicates;
-    const outputStr =
-      (args.output || "text") === "json"
-        ? JSON.stringify(output) + "\n"
-        : formatTextOutput(output);
-    process.stdout.write(outputStr);
+    if (reportMode) {
+      console.log(JSON.stringify({ "guide-dedupe": output }, null, 2));
+    } else {
+      const outputStr =
+        (args.output || "text") === "json"
+          ? JSON.stringify(output) + "\n"
+          : formatTextOutput(output);
+      process.stdout.write(outputStr);
+    }
     process.exit(11);
   }
 
-  succeed(output, args.output || "text");
+  if (reportMode) {
+    console.log(JSON.stringify({ "guide-dedupe": output }, null, 2));
+    process.exitCode = 0;
+  } else {
+    succeed(output, args.output || "text");
+  }
 } catch (error) {
   logger.error("Guide deduplication failed", {
     error: error?.message || String(error),

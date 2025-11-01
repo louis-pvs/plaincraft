@@ -42,6 +42,7 @@ Options:
   --ignore <dirs>        Comma-separated directory names to skip (default: DEPRECATED)
   --include-deprecated   Include scripts in scripts/DEPRECATED (overrides --ignore)
   --filter <patterns>    Comma-separated substrings to include (relative path match)
+  --report               Emit machine-readable JSON summary
 
 Description:
   Validates all scripts against repository guardrails:
@@ -61,6 +62,7 @@ Exit codes:
 
 const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
+const reportMode = Boolean(args.report);
 
 logger.debug("Policy lint started", {
   example:
@@ -221,7 +223,10 @@ try {
     output.results = results;
   }
 
-  if (exitCode === 0) {
+  if (reportMode) {
+    console.log(JSON.stringify({ "policy-lint": output }, null, 2));
+    process.exitCode = exitCode;
+  } else if (exitCode === 0) {
     succeed(output, args.output);
   } else {
     process.stdout.write(formatOutput(output, args.output));

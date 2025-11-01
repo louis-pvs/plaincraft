@@ -213,8 +213,6 @@ try {
   const root = await repoRoot(args.cwd);
   logger.debug("Guide dedupe started", { threshold });
 
-  logger.debug("Guide dedupe started", { threshold });
-
   const results = await compareGuides(root);
   logger.debug("Guide comparisons complete", {
     totalComparisons: results.totalComparisons,

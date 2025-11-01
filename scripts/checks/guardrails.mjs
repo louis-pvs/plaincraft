@@ -14,7 +14,6 @@ import {
   Logger,
   repoRoot,
   fail,
-  succeed,
 } from "../_lib/core.mjs";
 
 const args = parseFlags(process.argv.slice(2));
@@ -35,6 +34,7 @@ Options:
   --cwd <path>           Working directory (default: current)
   --concurrency <n>      Run up to n guardrails in parallel (default: 3)
   --sequential           Force sequential execution (overrides concurrency)
+  --report               Emit structured JSON results for pipeline reporting
 
 Description:
   Runs the Plaincraft build/lint/test bundle plus guardrail suites (scripts, docs,
@@ -49,6 +49,24 @@ Exit codes:
 }
 
 const logger = new Logger(resolveLogLevel({ flags: args }));
+const reportMode = Boolean(args.report);
+const colors = {
+  info: (text) => `\u001b[34m${text}\u001b[0m`,
+  success: (text) => `\u001b[32m${text}\u001b[0m`,
+  warn: (text) => `\u001b[33m${text}\u001b[0m`,
+  error: (text) => `\u001b[31m${text}\u001b[0m`,
+  muted: (text) => `\u001b[90m${text}\u001b[0m`,
+};
+
+const REPORT_AWARE_PNPM_SCRIPTS = new Set([
+  "scripts:lint",
+  "scripts:smoke",
+  "scripts:size",
+  "scripts:deprecation",
+  "docs:report",
+  "docs:dedupe",
+  "commit:guard",
+]);
 
 const IDEA_ID = "ARCH-unified-guardrails-suite";
 const DEFAULT_CONCURRENCY = 3;
@@ -82,6 +100,7 @@ const SCOPE_COMMANDS = {
   ],
   docs: [
     { id: "docs:check", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:check"] },
+    { id: "docs:build", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:build"] },
   ],
   pr: [
     { id: "pr:template", idea: IDEA_ID, cmd: ["pnpm", "run", "pr:template"] },
@@ -140,7 +159,7 @@ const DEFAULT_SCOPE_ORDER = [
     });
 
     const taskQueue = buildTaskQueue(scopes);
-    const progress = createProgressReporter(taskQueue.length, logger);
+    const progress = createProgressReporter(taskQueue.length, !reportMode);
     progress.start();
 
     const results = [];
@@ -212,24 +231,77 @@ const DEFAULT_SCOPE_ORDER = [
     });
 
     if (failures === 0) {
-      succeed({ ...summary, message: "All guardrails passed" }, args.output);
+      if (reportMode) {
+        console.log(
+          JSON.stringify(
+            {
+              summary: {
+                ...summary,
+                failures,
+                skipped,
+              },
+            },
+            null,
+            2,
+          ),
+        );
+        process.exitCode = 0;
+      } else {
+        process.exitCode = 0;
+      }
     } else {
-      fail({
-        exitCode: 11,
-        message: "One or more guardrails failed",
-        output: args.output,
-        error: summary,
-        script: "guardrails",
-      });
+      if (reportMode) {
+        console.log(
+          JSON.stringify(
+            {
+              summary: {
+                ...summary,
+                failures,
+                skipped,
+              },
+            },
+            null,
+            2,
+          ),
+        );
+      }
+      if (reportMode) {
+        process.exitCode = 11;
+      } else {
+        fail({
+          exitCode: 11,
+          message: "One or more guardrails failed",
+          output: args.output,
+          error: summary,
+          script: "guardrails",
+        });
+      }
     }
   } catch (error) {
-    fail({
-      exitCode: 11,
-      script: "guardrails",
-      message: error.message,
-      output: args.output,
-      error: { stack: error.stack },
-    });
+    if (reportMode) {
+      console.log(
+        JSON.stringify(
+          {
+            summary: {
+              ok: false,
+              error: error.message,
+            },
+          },
+          null,
+          2,
+        ),
+      );
+      process.exitCode = 11;
+    }
+    if (!reportMode) {
+      fail({
+        exitCode: 11,
+        script: "guardrails",
+        message: error.message,
+        output: args.output,
+        error: { stack: error.stack },
+      });
+    }
   }
 })();
 
@@ -268,50 +340,41 @@ function summarizeOutput(stdout, stderr) {
   return lines.join("\n");
 }
 
-function createProgressReporter(totalTasks, logger) {
+function createProgressReporter(totalTasks, showProgress) {
   let completed = 0;
 
   return {
     start() {
+      if (!showProgress) return;
       if (totalTasks === 0) {
-        logger.debug("Progress idle", {
-          total: totalTasks,
-          example:
-            "Re-run guardrails with --verbose to stream per-task progress.",
-        });
+        console.log(colors.info("No guardrail commands queued"));
         return;
       }
-      logger.debug("Progress started", {
-        total: totalTasks,
-        completed,
-        bar: renderProgressBar(0, totalTasks),
-        example: "Progress bar only prints with --verbose for quieter CI logs.",
-      });
+      console.log(
+        colors.info(
+          `Starting guardrails (${completed}/${totalTasks}) ${renderProgressBar(0, totalTasks)}`,
+        ),
+      );
     },
     advance(task, result) {
-      if (totalTasks === 0) return;
+      if (!showProgress || totalTasks === 0) return;
       completed = Math.min(totalTasks, completed + 1);
-      logger.debug("Progress step", {
-        id: task.id,
-        scope: task.scope,
-        status: result.status,
-        completed,
-        total: totalTasks,
-        optional: Boolean(task.optional),
-        bar: renderProgressBar(completed, totalTasks),
-        example: `Next step re-run: ${[task.scope, task.id].join(" -> ")}`,
-      });
+      console.log(
+        colors.info(
+          `Progress ${completed}/${totalTasks} ${renderProgressBar(completed, totalTasks)}`,
+        ),
+      );
     },
     finish() {
-      if (totalTasks === 0) return;
+      if (!showProgress || totalTasks === 0) return;
       const label = completed >= totalTasks ? "complete" : "halted";
-      logger.debug("Progress finished", {
-        status: label,
-        completed,
-        total: totalTasks,
-        bar: renderProgressBar(completed, totalTasks),
-        example: "Expect status 'complete' when all guardrails finish.",
-      });
+      const statusText =
+        label === "complete"
+          ? colors.success("Guardrails complete")
+          : colors.warn("Guardrails halted");
+      console.log(
+        `${statusText} ${colors.info(renderProgressBar(completed, totalTasks))}`,
+      );
     },
   };
 }
@@ -347,10 +410,23 @@ function buildTaskQueue(scopes) {
   for (const scope of scopes) {
     const commands = SCOPE_COMMANDS[scope];
     if (!commands || commands.length === 0) {
-      logger.warn("Skipping unknown scope", {
-        scope,
-        example: "Use --scope app,scripts,docs,pr,issues,recordings",
-      });
+      if (reportMode) {
+        console.log(
+          JSON.stringify(
+            {
+              warning: `Unknown scope '${scope}'. Try --scope app,scripts,docs,pr,issues,recordings`,
+            },
+            null,
+            2,
+          ),
+        );
+      } else {
+        console.log(
+          colors.warn(
+            `△ Unknown scope '${scope}'. Try --scope app,scripts,docs,pr,issues,recordings`,
+          ),
+        );
+      }
       continue;
     }
 
@@ -368,9 +444,43 @@ function buildTaskQueue(scopes) {
   return tasks;
 }
 
+function applyReportFlag(cmd) {
+  if (!reportMode) return cmd;
+
+  const existing = cmd.join(" ");
+  if (existing.includes("--report")) return cmd;
+
+  if (cmd[0] === "pnpm" && cmd[1] === "run") {
+    const scriptName = cmd[2];
+    if (!REPORT_AWARE_PNPM_SCRIPTS.has(scriptName)) {
+      return cmd;
+    }
+    const result = [...cmd];
+    const dashIndex = result.indexOf("--");
+    if (dashIndex === -1) {
+      result.push("--", "--report");
+    } else {
+      result.splice(dashIndex + 1, 0, "--report");
+    }
+    return result;
+  }
+
+  if (
+    cmd[0] === "node" &&
+    cmd[1] &&
+    cmd[1].startsWith("scripts/") &&
+    cmd[1].includes("/checks/")
+  ) {
+    return [...cmd, "--report"];
+  }
+
+  return cmd;
+}
+
 async function runGuardrailTask(task, root) {
   const { scope, id, cmd, optional, idea } = task;
   const start = performance.now();
+  const commandWithReport = applyReportFlag(cmd);
 
   let status = "passed";
   let stdout = "";
@@ -378,11 +488,15 @@ async function runGuardrailTask(task, root) {
   let exitCode = 0;
 
   try {
-    const { all, exitCode: cmdExitCode } = await execa(cmd[0], cmd.slice(1), {
-      cwd: root,
-      all: true,
-      reject: false,
-    });
+    const { all, exitCode: cmdExitCode } = await execa(
+      commandWithReport[0],
+      commandWithReport.slice(1),
+      {
+        cwd: root,
+        all: true,
+        reject: false,
+      },
+    );
     stdout = all || "";
     exitCode = typeof cmdExitCode === "number" ? cmdExitCode : 0;
     status = exitCode === 0 ? "passed" : "failed";
@@ -406,7 +520,7 @@ async function runGuardrailTask(task, root) {
     scope,
     id,
     idea,
-    command: cmd.join(" "),
+    command: commandWithReport.join(" "),
     status,
     exitCode,
     durationMs,
@@ -416,37 +530,67 @@ async function runGuardrailTask(task, root) {
         : undefined,
   };
 
-  const commandLine = `${cmd[0]} ${cmd.slice(1).flat().join(" ")}`.trim();
-  const logPayload = {
-    id,
-    scope,
-    duration: `${durationMs}ms`,
-    exitCode,
-    optional: Boolean(optional),
-    command: commandLine,
-  };
-
+  const commandLine = `${commandWithReport[0]} ${commandWithReport
+    .slice(1)
+    .flat()
+    .join(" ")}`.trim();
   if (status === "skipped") {
-    logger.warn("Guardrail skipped (optional)", {
-      ...logPayload,
-      example: `Optional guardrail: ${commandLine}`,
-    });
+    if (!reportMode) {
+      console.log(
+        colors.warn(
+          `△ ${id} (optional) skipped ${colors.muted(`[${commandLine}]`)}`,
+        ),
+      );
+    }
   } else if (failed) {
-    logger.error("Guardrail failed", {
-      ...logPayload,
-      example: `Re-run with --verbose: ${commandLine}`,
-    });
+    if (!reportMode) {
+      console.log(
+        colors.error(`✗ ${id} failed ${colors.muted(`[${commandLine}]`)}`),
+      );
+    }
     logger.debug("Guardrail output", {
       id,
       scope,
       output: summarizeOutput(stdout, stderr),
       example: `Inspect logs above and re-run: ${commandLine} -- --verbose`,
     });
+    if (reportMode) {
+      console.log(
+        JSON.stringify(
+          {
+            guardrail: id,
+            status,
+            exitCode,
+            scope,
+            command: commandLine,
+            output: summarizeOutput(stdout, stderr),
+          },
+          null,
+          2,
+        ),
+      );
+    }
   } else {
-    logger.debug("Guardrail passed", {
-      ...logPayload,
-      example: `Typical success: ${commandLine}`,
-    });
+    if (!reportMode) {
+      console.log(
+        colors.success(`✓ ${id} passed ${colors.muted(`[${commandLine}]`)}`),
+      );
+    }
+    if (reportMode) {
+      console.log(
+        JSON.stringify(
+          {
+            guardrail: id,
+            status,
+            exitCode,
+            scope,
+            command: commandLine,
+          },
+          null,
+          2,
+        ),
+      );
+    }
   }
 
   return { result, failed };

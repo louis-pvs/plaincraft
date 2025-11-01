@@ -43,6 +43,9 @@
     "new:snippet": "node scripts/ops/new-snippet.mjs",
     "playbook:dev": "vitepress dev playbook",
     "playbook:preview": "vitepress preview playbook",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "pr:check": "node scripts/checks/pr-requirements.mjs --check-pr",
     "pr:create-issue": "node scripts/checks/pr-requirements.mjs",
     "pr:generate": "node scripts/ops/generate-pr-content.mjs",
@@ -87,7 +90,7 @@
     "guardrails:pr": "node scripts/checks/guardrails.mjs --scope pr",
     "guardrails:issues": "node scripts/checks/guardrails.mjs --scope issues",
     "guardrails:recordings": "node scripts/checks/guardrails.mjs --scope recordings",
-    "guardrails:ci": "node scripts/checks/guardrails.mjs --output json",
+    "guardrails:ci": "node scripts/checks/guardrails.mjs --output json --report",
     "guardrails:baseline": "node scripts/checks/guardrails-baseline.mjs",
     "scripts:lifecycle-smoke": "node scripts/checks/lifecycle-smoke.mjs",
     "scripts:guardrails": "pnpm guardrails"

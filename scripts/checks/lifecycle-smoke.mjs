@@ -34,6 +34,7 @@ Options:
   --output <format>     Output format: json|text (default: text)
   --log-level <level>   Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>          Working directory (default: current)
+  --report              Emit machine-readable JSON summary
 
 Description:
   Runs a focused set of lifecycle guardrails that are ready today:
@@ -50,6 +51,7 @@ const executeMode = Boolean(args.execute);
 const yesMode = args.yes === true || executeMode;
 const dryRun = args.dryRun !== false && !yesMode;
 const logger = new Logger(resolveLogLevel({ flags: args }));
+const reportMode = Boolean(args.report);
 const sandboxFlag = args.sandbox || args.sandboxRepo;
 const sandboxEnv = process.env.LIFECYCLE_SANDBOX_REPO;
 
@@ -223,34 +225,54 @@ const CHECKS = [
         example:
           "Run with --yes to execute checks like pnpm ideas:validate --filter ARCH-unified-guardrails-suite.",
       });
-      await succeed({
-        script: "lifecycle-smoke",
-        output: args.output,
-        dryRun: true,
-        generatedAt: now(),
-        plan: CHECKS.map(
-          ({ id, lane, description, command, executeCommand }) => {
-            const targetCommand =
-              executeMode && executeCommand ? executeCommand : command;
-            const targetRoot = executeMode
-              ? sandboxFlag || sandboxEnv || "<sandbox>"
-              : root;
 
-            return {
-              id,
-              lane,
-              description,
-              command: [
-                "cd",
-                targetRoot,
-                "&&",
-                targetCommand[0],
-                ...targetCommand[1],
-              ],
-            };
-          },
-        ),
-      });
+      const plan = CHECKS.map(
+        ({ id, lane, description, command, executeCommand }) => {
+          const targetCommand =
+            executeMode && executeCommand ? executeCommand : command;
+          const targetRoot = executeMode
+            ? sandboxFlag || sandboxEnv || "<sandbox>"
+            : root;
+
+          return {
+            id,
+            lane,
+            description,
+            command: [
+              "cd",
+              targetRoot,
+              "&&",
+              targetCommand[0],
+              ...targetCommand[1],
+            ],
+          };
+        },
+      );
+
+      if (reportMode) {
+        console.log(
+          JSON.stringify(
+            {
+              "lifecycle-smoke": {
+                dryRun: true,
+                generatedAt: now(),
+                plan,
+              },
+            },
+            null,
+            2,
+          ),
+        );
+        process.exitCode = 0;
+      } else {
+        await succeed({
+          script: "lifecycle-smoke",
+          output: args.output,
+          dryRun: true,
+          generatedAt: now(),
+          plan,
+        });
+      }
       return;
     }
 
@@ -327,20 +349,28 @@ const CHECKS = [
         durationMs: Date.now() - startedAt,
         example: "Re-run the failing check with --verbose for details.",
       });
-      await fail({
-        script: "lifecycle-smoke",
-        exitCode: 11,
-        output: args.output,
-        message: "Lifecycle smoke checks failed",
-        error: {
-          generatedAt: now(),
-          passed,
-          failed,
-          durationMs: Date.now() - startedAt,
-          results,
-          sandbox: executeMode ? runRoot : root,
-        },
-      });
+      const errorPayload = {
+        generatedAt: now(),
+        passed,
+        failed,
+        durationMs: Date.now() - startedAt,
+        results,
+        sandbox: executeMode ? runRoot : root,
+      };
+      if (reportMode) {
+        console.log(
+          JSON.stringify({ "lifecycle-smoke": errorPayload }, null, 2),
+        );
+        process.exitCode = 11;
+      } else {
+        await fail({
+          script: "lifecycle-smoke",
+          exitCode: 11,
+          output: args.output,
+          message: "Lifecycle smoke checks failed",
+          error: errorPayload,
+        });
+      }
       return;
     }
 
@@ -350,7 +380,7 @@ const CHECKS = [
       example: "Expected output: passed equals number of checks and failed=0.",
     });
 
-    await succeed({
+    const payload = {
       script: "lifecycle-smoke",
       output: args.output,
       generatedAt: now(),
@@ -359,19 +389,41 @@ const CHECKS = [
       durationMs: Date.now() - startedAt,
       results,
       sandbox: executeMode ? runRoot : root,
-    });
+    };
+
+    if (reportMode) {
+      console.log(JSON.stringify({ "lifecycle-smoke": payload }, null, 2));
+      process.exitCode = 0;
+    } else {
+      await succeed(payload);
+    }
   } catch (error) {
     logger.error("Lifecycle smoke errored", {
       error: error?.message || String(error),
       example:
         "Ensure pnpm guardrail scripts are installed before running lifecycle smoke.",
     });
-    await fail({
-      script: "lifecycle-smoke",
-      exitCode: 10,
-      output: args.output,
-      message: "Lifecycle smoke errored before completing checks",
-      error: error?.message || String(error),
-    });
+    if (reportMode) {
+      console.log(
+        JSON.stringify(
+          {
+            "lifecycle-smoke": {
+              error: error?.message || String(error),
+            },
+          },
+          null,
+          2,
+        ),
+      );
+      process.exitCode = 10;
+    } else {
+      await fail({
+        script: "lifecycle-smoke",
+        exitCode: 10,
+        output: args.output,
+        message: "Lifecycle smoke errored before completing checks",
+        error: error?.message || String(error),
+      });
+    }
   }
 })();

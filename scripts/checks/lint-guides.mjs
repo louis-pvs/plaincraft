@@ -33,6 +33,7 @@ Options:
   --log-level <level> Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>        Working directory (default: current)
   --strict            Treat warnings as errors
+  --report            Emit machine-readable JSON summary
 
 Description:
   Validates guides against governance rules:
@@ -67,6 +68,7 @@ const REQUIRED_FRONTMATTER = [
 
 const MAX_WORDS = 600;
 const MAX_GUIDES = 12;
+const reportMode = Boolean(args.report);
 
 logger.debug("Guide lint started", {
   example:
@@ -270,15 +272,29 @@ try {
     output.results = results;
   }
 
+  if (reportMode) {
+    console.log(JSON.stringify({ "lint-guides": output }, null, 2));
+  }
+
   if (exitCode === 0) {
-    succeed(output, args.output || "text");
+    if (reportMode) {
+      console.log(JSON.stringify({ "lint-guides": output }, null, 2));
+      process.exitCode = 0;
+    } else {
+      succeed(output, args.output || "text");
+    }
   } else {
-    const outputStr =
-      (args.output || "text") === "json"
-        ? JSON.stringify(output) + "\n"
-        : formatTextOutput(output);
-    process.stdout.write(outputStr);
-    process.exit(exitCode);
+    if (reportMode) {
+      console.log(JSON.stringify({ "lint-guides": output }, null, 2));
+      process.exit(exitCode);
+    } else {
+      const outputStr =
+        (args.output || "text") === "json"
+          ? JSON.stringify(output) + "\n"
+          : formatTextOutput(output);
+      process.stdout.write(outputStr);
+      process.exit(exitCode);
+    }
   }
 } catch (error) {
   logger.error("Guide lint failed", {

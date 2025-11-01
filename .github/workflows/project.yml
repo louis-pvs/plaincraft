@@ -232,7 +232,7 @@ jobs:
       - name: Run lifecycle smoke checks
         run: |
           set -euo pipefail
-          pnpm scripts:lifecycle-smoke --yes --output json | tee lifecycle-smoke-report.json
+          pnpm scripts:lifecycle-smoke --yes --output json --report | tee lifecycle-smoke-report.json
 
       - name: Upload lifecycle report
         uses: actions/upload-artifact@v4

@@ -35,6 +35,7 @@ Options:
   --cwd <path>        Working directory (default: current directory)
   --save              Save metrics to docs/metrics.json
   --quiet             Minimal output
+  --report            Emit machine-readable JSON summary
 
 Description:
   Generates health dashboard for documentation governance system:
@@ -57,6 +58,7 @@ Examples:
 const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const quiet = args.quiet === true;
+const reportMode = Boolean(args.report);
 
 logger.debug("Docs governance report started", {
   saveMetrics: Boolean(args.save),
@@ -304,27 +306,32 @@ try {
   }
 
   // Output
-  if (args.output === "json") {
-    console.log(JSON.stringify(reportData, null, 2));
+  if (reportMode) {
+    console.log(JSON.stringify({ "docs-report": reportData }, null, 2));
+    process.exitCode = 0;
   } else {
-    console.log(generateTextReport(reportData));
+    if (args.output === "json") {
+      console.log(JSON.stringify(reportData, null, 2));
+    } else {
+      console.log(generateTextReport(reportData));
+    }
+
+    logger.debug("Docs governance report generated", {
+      templates: reportData.templates,
+      guides: reportData.guides,
+      ratio: Number(reportData.ratio.toFixed(2)),
+      recommendations: reportData.recommendations.length,
+      example: "Healthy state: templates=9, guides=3, ratio=3.00.",
+    });
+
+    succeed({
+      runId,
+      script: "docs-report",
+      version: "0.1.0",
+      ...reportData,
+      durationMs: Date.now() - start,
+    });
   }
-
-  logger.debug("Docs governance report generated", {
-    templates: reportData.templates,
-    guides: reportData.guides,
-    ratio: Number(reportData.ratio.toFixed(2)),
-    recommendations: reportData.recommendations.length,
-    example: "Healthy state: templates=9, guides=3, ratio=3.00.",
-  });
-
-  succeed({
-    runId,
-    script: "docs-report",
-    version: "0.1.0",
-    ...reportData,
-    durationMs: Date.now() - start,
-  });
 } catch (error) {
   logger.error("Docs report failed", {
     error: error?.message || String(error),

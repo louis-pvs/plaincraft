@@ -34,6 +34,7 @@ Options:
   --log-level <level> Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>        Working directory (default: current)
   --strict            Treat warnings as errors (enforced after 30 days)
+  --report            Emit machine-readable JSON summary
 
 Description:
   Validates script size compliance:
@@ -51,6 +52,7 @@ const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const MAX_SCRIPT_LINES = 300;
 const MAX_FUNCTION_LINES = 60;
+const reportMode = Boolean(args.report);
 
 logger.debug("Size compliance check started", {
   maxScriptLines: MAX_SCRIPT_LINES,
@@ -112,14 +114,20 @@ try {
   const durationMs = Date.now() - start;
 
   if (totalViolations === 0) {
-    succeed({
+    const payload = {
       runId,
       script: "size-check",
       status: "passed",
       totalScripts: scriptFiles.length,
       violations: 0,
       durationMs,
-    });
+    };
+    if (reportMode) {
+      console.log(JSON.stringify({ "size-check": payload }, null, 2));
+      process.exitCode = 0;
+      return;
+    }
+    succeed({ ...payload, output: args.output });
   } else {
     const output = {
       runId,
@@ -133,6 +141,12 @@ try {
         ? "Size violations found (strict mode)"
         : "Size violations found (warning only, will be enforced after 30 days)",
     };
+
+    if (reportMode) {
+      console.log(JSON.stringify({ "size-check": output }, null, 2));
+      process.exitCode = args.strict ? 11 : 0;
+      return;
+    }
 
     formatOutput(output, args.output);
 

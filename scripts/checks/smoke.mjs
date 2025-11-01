@@ -34,6 +34,7 @@ Options:
   --cwd <path>        Working directory (default: current)
   --timeout <ms>      Timeout per script in milliseconds (default: 5000)
   --filter <patterns> Comma-separated substrings to include (relative path match)
+  --report            Emit machine-readable JSON summary
 
 Description:
   Runs basic smoke tests on all scripts:
@@ -51,6 +52,7 @@ Exit codes:
 const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const timeout = parseInt(args.timeout) || 5000;
+const reportMode = Boolean(args.report);
 
 logger.debug("Smoke tests started", { timeoutMs: timeout });
 logger.debug("Smoke test expectation", {
@@ -132,7 +134,10 @@ try {
     output.results = results.filter((r) => r.tests.some((t) => !t.passed));
   }
 
-  if (failed === 0) {
+  if (reportMode) {
+    console.log(JSON.stringify({ smoke: output }, null, 2));
+    process.exitCode = failed === 0 ? 0 : 11;
+  } else if (failed === 0) {
     succeed(output, args.output);
   } else {
     process.stdout.write(formatOutput(output, args.output));

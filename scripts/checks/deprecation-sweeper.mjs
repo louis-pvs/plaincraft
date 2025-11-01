@@ -32,6 +32,7 @@ Options:
   --output <format>   Output format: json|text (default: text)
   --log-level <level> Log level: trace|debug|info|warn|error (default: info)
   --cwd <path>        Working directory (default: current)
+  --report            Emit machine-readable JSON summary
 
 Description:
   Enforces 90-day TTL for deprecated scripts:
@@ -49,6 +50,7 @@ Exit codes:
 const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const MAX_DEPRECATED_DAYS = 90;
+const reportMode = Boolean(args.report);
 
 logger.debug("Deprecation sweep started", {
   maxDays: MAX_DEPRECATED_DAYS,
@@ -175,12 +177,17 @@ try {
     durationMs,
   };
 
-  formatOutput(output, args.output);
-
-  if (expiredScripts.length > 0) {
-    process.exit(11);
+  if (reportMode) {
+    console.log(JSON.stringify({ "deprecation-sweeper": output }, null, 2));
+    process.exitCode = expiredScripts.length > 0 ? 11 : 0;
   } else {
-    process.exit(0);
+    formatOutput(output, args.output);
+
+    if (expiredScripts.length > 0) {
+      process.exit(11);
+    } else {
+      process.exit(0);
+    }
   }
 } catch (error) {
   logger.error("Deprecation sweep failed", {

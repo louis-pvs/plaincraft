@@ -54,11 +54,13 @@ Options:
   --output <format>    json|text (default: text)
   --log-level <level>  trace|debug|info|warn|error
   --cwd <path>         Working directory
+  --report             Emit machine-readable JSON summary
 `);
     process.exit(0);
   }
 
   const logger = new Logger(resolveLogLevel({ flags: rawFlags }));
+  const reportMode = Boolean(rawFlags.report);
   const flags = FLAG_SCHEMA.parse(rawFlags);
 
   try {
@@ -78,14 +80,21 @@ Options:
     const commits = await collectCommits(range, flags.max, root);
 
     if (commits.length === 0) {
-      await succeed({
+      const payload = {
         script: "commit-guard",
         output: flags.output,
         generatedAt: now(),
         checkedRange: range,
         commits: 0,
         violations: [],
-      });
+      };
+      if (reportMode) {
+        console.log(JSON.stringify({ "commit-guard": payload }, null, 2));
+        process.exitCode = 0;
+      }
+      if (!reportMode) {
+        await succeed(payload);
+      }
       return;
     }
 
@@ -94,21 +103,40 @@ Options:
       .filter(Boolean);
 
     if (violations.length > 0) {
-      await fail({
-        script: "commit-guard",
-        output: flags.output,
-        exitCode: 11,
-        message: "Commit guard detected invalid headers",
-        error: {
-          generatedAt: now(),
-          range,
-          violations,
-          pattern: commitRegex.toString(),
-          branchPattern,
-          example:
-            "Use commit headers like '[ARCH-sample] Add lifecycle guardrail'.",
-        },
-      });
+      if (reportMode) {
+        console.log(
+          JSON.stringify(
+            {
+              "commit-guard": {
+                generatedAt: now(),
+                range,
+                violations,
+                pattern: commitRegex.toString(),
+                branchPattern,
+              },
+            },
+            null,
+            2,
+          ),
+        );
+        process.exitCode = 11;
+      } else {
+        await fail({
+          script: "commit-guard",
+          output: flags.output,
+          exitCode: 11,
+          message: "Commit guard detected invalid headers",
+          error: {
+            generatedAt: now(),
+            range,
+            violations,
+            pattern: commitRegex.toString(),
+            branchPattern,
+            example:
+              "Use commit headers like '[ARCH-sample] Add lifecycle guardrail'.",
+          },
+        });
+      }
       return;
     }
 
@@ -118,7 +146,7 @@ Options:
       example: "[ARCH-sample] Add lifecycle guardrail",
     });
 
-    await succeed({
+    const payload = {
       script: "commit-guard",
       output: flags.output,
       generatedAt: now(),
@@ -126,20 +154,41 @@ Options:
       commits: commits.length,
       autoRangeSource: source ?? null,
       violations: [],
-    });
+    };
+    if (reportMode) {
+      console.log(JSON.stringify({ "commit-guard": payload }, null, 2));
+      process.exitCode = 0;
+    } else {
+      await succeed(payload);
+    }
   } catch (error) {
     logger.error("Commit guard failed", {
       error: error?.message || String(error),
       example: "[ARCH-sample] Add lifecycle guardrail",
     });
-    await fail({
-      script: "commit-guard",
-      output: rawFlags.output,
-      message: "Commit guard failed",
-      error: error?.message || String(error),
-      example:
-        "Use commit headers like '[ARCH-sample] Add lifecycle guardrail'.",
-    });
+    if (reportMode) {
+      console.log(
+        JSON.stringify(
+          {
+            "commit-guard": {
+              error: error?.message || String(error),
+            },
+          },
+          null,
+          2,
+        ),
+      );
+      process.exitCode = 11;
+    } else {
+      await fail({
+        script: "commit-guard",
+        output: rawFlags.output,
+        message: "Commit guard failed",
+        error: error?.message || String(error),
+        example:
+          "Use commit headers like '[ARCH-sample] Add lifecycle guardrail'.",
+      });
+    }
   }
 })();
 

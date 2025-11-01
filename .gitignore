@@ -4,5 +4,6 @@ dist
 .DS_Store
 storybook-static
 playbook-static
+docs/.vitepress/dist
 _tmp
-_*.*
+_*.* 
