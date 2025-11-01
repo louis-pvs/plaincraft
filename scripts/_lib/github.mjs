@@ -11,6 +11,80 @@ import { execa } from "execa";
 import { repoRoot } from "./core.mjs";
 
 /**
+ * Execute gh CLI command with non-interactive flags to prevent hangs
+ * @param {string[]} args - Command arguments
+ * @param {object} options - Execution options
+ * @param {string} [options.cwd] - Working directory
+ * @param {boolean} [options.json] - Add --json flag (default: false)
+ * @returns {Promise<object>} Result from execa
+ */
+export async function ghCommand(args, options = {}) {
+  const { cwd = process.cwd(), json = false } = options;
+  const finalArgs = [...args];
+
+  // Add --json flag if requested and not already present
+  if (json && !finalArgs.includes("--json")) {
+    finalArgs.push("--json");
+  }
+
+  return execa("gh", finalArgs, { cwd });
+}
+
+/**
+ * Verify gh CLI has required token scopes
+ * @param {string[]} requiredScopes - List of required scopes (e.g., ['read:project', 'project'])
+ * @param {string} [cwd] - Working directory
+ * @returns {Promise<{valid: boolean, missing: string[], message: string}>}
+ */
+export async function verifyGhTokenScopes(requiredScopes, cwd = process.cwd()) {
+  try {
+    const { stdout } = await execa("gh", ["auth", "status", "--show-token"], {
+      cwd,
+    });
+
+    // Parse scopes from auth status output
+    // Format: "Token scopes: repo, read:org, project"
+    const scopeMatch = stdout.match(/Token scopes:\s*([^\n]+)/i);
+    if (!scopeMatch) {
+      return {
+        valid: false,
+        missing: requiredScopes,
+        message: "Could not parse token scopes from gh auth status",
+      };
+    }
+
+    const currentScopes = scopeMatch[1]
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const missing = requiredScopes.filter(
+      (req) => !currentScopes.includes(req),
+    );
+
+    if (missing.length > 0) {
+      return {
+        valid: false,
+        missing,
+        message: `Missing required scopes: ${missing.join(", ")}. Run: gh auth refresh -s ${missing.join(" -s ")}`,
+      };
+    }
+
+    return {
+      valid: true,
+      missing: [],
+      message: "All required token scopes present",
+    };
+  } catch (error) {
+    return {
+      valid: false,
+      missing: requiredScopes,
+      message: error?.message || "Failed to verify token scopes",
+    };
+  }
+}
+
+/**
  * Check if gh CLI is authenticated
  * @returns {Promise<boolean>} True if authenticated
  */

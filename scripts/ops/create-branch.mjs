@@ -10,6 +10,7 @@ import { z } from "zod";
 import { parseFlags, fail, succeed, repoRoot, now } from "../_lib/core.mjs";
 import { execCommand, branchExists, getCurrentBranch } from "../_lib/git.mjs";
 import { loadLifecycleConfig } from "../_lib/lifecycle.mjs";
+import { verifyGhTokenScopes, ensureProjectStatus } from "../_lib/github.mjs";
 
 const ID_REGEX = /^[A-Z]+-[A-Za-z0-9]+$/;
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -100,17 +101,48 @@ Options:
     await execCommand("git", ["pull", "--ff-only"], { cwd: root });
     await execCommand("git", ["switch", "-c", branchName], { cwd: root });
 
-    await fail({
+    // Update project status
+    const scopeCheck = await verifyGhTokenScopes(
+      ["read:project", "project"],
+      root,
+    );
+    let projectStatus = {
+      updated: false,
+      message: "Skipped - token scopes not verified",
+    };
+
+    if (scopeCheck.valid) {
+      projectStatus = await ensureProjectStatus({
+        id: flags.id,
+        status: "Branched",
+        cwd: root,
+      });
+
+      if (projectStatus.updated) {
+        console.log(
+          `[INFO] Project status updated: ${projectStatus.previous || "none"} → Branched`,
+        );
+      } else {
+        console.log(
+          `[WARN] Project status not updated: ${projectStatus.message}`,
+        );
+      }
+    } else {
+      console.log(`[WARN] ${scopeCheck.message}`);
+    }
+
+    await succeed({
       script: "create-branch",
       output: flags.output,
-      exitCode: 10,
-      message:
-        "Project status update not yet implemented. Branch created locally.",
-      error: {
+      message: `Branch created: ${branchName}`,
+      data: {
         branch: branchName,
         base: flags.base,
-        nextStep:
-          "TODO: Update GitHub Project status to Branched and attach branch metadata.",
+        created: now(),
+        projectStatus: {
+          updated: projectStatus.updated,
+          message: projectStatus.message,
+        },
       },
     });
   } catch (error) {
