@@ -16,9 +16,10 @@
  * - Exception handling for thrown errors
  *
  * Implementation:
- * - MAX_RETRIES = 3
- * - Exponential backoff: 1s, 2s, 3s
+ * - MAX_RETRIES = 2 (optimized for CI budget)
+ * - Retry delay: 500ms (total max 1.5s overhead per command)
  * - Only retries pnpm commands with specific error patterns
+ * - Performance budget: stays within CI ±90s tripwire policy
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -55,8 +56,8 @@ describe("guardrails retry logic", () => {
         exitCode: 0,
       });
 
-    // Simulate the retry logic
-    const MAX_RETRIES = 3;
+    // Simulate the retry logic (optimized for CI budget)
+    const MAX_RETRIES = 2;
     const RETRY_DELAY_MS = 10; // Faster for tests
     let attempt = 0;
     let status = "passed";
@@ -98,7 +99,7 @@ describe("guardrails retry logic", () => {
       exitCode: 1,
     });
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 2;
     const RETRY_DELAY_MS = 10;
     let attempt = 0;
     let status = "passed";
@@ -129,8 +130,8 @@ describe("guardrails retry logic", () => {
 
     expect(status).toBe("failed");
     expect(exitCode).toBe(1);
-    expect(execaMock).toHaveBeenCalledTimes(4); // Initial + 3 retries
-    expect(attempt).toBe(3);
+    expect(execaMock).toHaveBeenCalledTimes(3); // Initial + 2 retries
+    expect(attempt).toBe(2);
   });
 
   it("should not retry pnpm command on non-retryable errors", async () => {
@@ -139,7 +140,7 @@ describe("guardrails retry logic", () => {
       exitCode: 11,
     });
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 2;
     let attempt = 0;
     let status = "passed";
     let stdout = "";
@@ -182,7 +183,7 @@ describe("guardrails retry logic", () => {
       exitCode: 1,
     });
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 2;
     let attempt = 0;
     let exitCode = 0;
 
@@ -220,7 +221,7 @@ describe("guardrails retry logic", () => {
         exitCode: 0,
       });
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 2;
     const RETRY_DELAY_MS = 10;
     let attempt = 0;
     let status = "passed";
@@ -264,7 +265,7 @@ describe("guardrails retry logic", () => {
       exitCode: 0,
     });
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 2;
     let attempt = 0;
     let status = "passed";
     let exitCode = 0;
@@ -311,7 +312,7 @@ describe("guardrails retry logic", () => {
         exitCode: 0,
       });
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 2;
     const RETRY_DELAY_MS = 10;
     let attempt = 0;
     let status = "passed";

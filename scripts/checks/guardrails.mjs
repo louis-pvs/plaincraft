@@ -7,7 +7,8 @@
  *
  * Features:
  * - Automatic retry logic for transient pnpm errors (ENOTEMPTY, EBUSY, EEXIST)
- * - Exponential backoff (1s, 2s, 3s) for up to 3 retries
+ * - Budget-optimized: 500ms delays, max 2 retries (1.5s max overhead per command)
+ * - Stays within CI ±90s performance tripwire policy
  * - Parallel execution with configurable concurrency
  * - JSON and text output formats
  * - Per-scope filtering and fail-fast mode
@@ -484,8 +485,10 @@ async function runGuardrailTask(task, root) {
   let exitCode = 0;
 
   // Retry logic for transient pnpm errors (ENOTEMPTY, lock contention)
-  const MAX_RETRIES = 3;
-  const RETRY_DELAY_MS = 1000;
+  // Performance budget: max 6s overhead per command (worst case)
+  // CI policy: ±90s tripwire - optimized for minimal impact
+  const MAX_RETRIES = 2; // Reduced from 3 to stay within budget
+  const RETRY_DELAY_MS = 500; // Reduced from 1000ms - total max 1.5s delay
   let attempt = 0;
 
   while (attempt <= MAX_RETRIES) {
