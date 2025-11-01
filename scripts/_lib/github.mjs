@@ -203,24 +203,44 @@ export async function findProjectItemByFieldValue(options) {
                   __typename
                   ... on ProjectV2ItemFieldTextValue { 
                     text 
-                    field { id name }
+                    field { 
+                      ... on ProjectV2Field { id name }
+                      ... on ProjectV2SingleSelectField { id name }
+                      ... on ProjectV2IterationField { id name }
+                    }
                   }
                   ... on ProjectV2ItemFieldNumberValue { 
                     number 
-                    field { id name }
+                    field { 
+                      ... on ProjectV2Field { id name }
+                      ... on ProjectV2SingleSelectField { id name }
+                      ... on ProjectV2IterationField { id name }
+                    }
                   }
                   ... on ProjectV2ItemFieldSingleSelectValue { 
                     name 
                     optionId 
-                    field { id name }
+                    field { 
+                      ... on ProjectV2Field { id name }
+                      ... on ProjectV2SingleSelectField { id name }
+                      ... on ProjectV2IterationField { id name }
+                    }
                   }
                   ... on ProjectV2ItemFieldDateValue { 
                     date 
-                    field { id name }
+                    field { 
+                      ... on ProjectV2Field { id name }
+                      ... on ProjectV2SingleSelectField { id name }
+                      ... on ProjectV2IterationField { id name }
+                    }
                   }
                   ... on ProjectV2ItemFieldIterationValue { 
                     title 
-                    field { id name }
+                    field { 
+                      ... on ProjectV2Field { id name }
+                      ... on ProjectV2SingleSelectField { id name }
+                      ... on ProjectV2IterationField { id name }
+                    }
                   }
                 }
               }

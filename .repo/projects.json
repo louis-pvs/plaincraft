@@ -1,114 +1,136 @@
 {
-  "cachedAt": "2025-10-31T07:20:00.000Z",
+  "cachedAt": "2025-11-01T13:35:11.193Z",
   "version": 3,
   "project": {
-    "id": "PVT_kwHOAGt2e84AAAAB",
+    "id": "PVT_kwHOAHTeus4BG_AC",
     "number": 1,
-    "name": "Plaincraft Roadmap",
-    "url": "https://github.com/orgs/louis-pvs/projects/1",
+    "name": "Plaincraft Lifecycle",
+    "url": "https://github.com/users/louis-pvs/projects/1",
     "fields": {
       "ID": {
-        "id": "PVTSSF_lifecycle_id",
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xhY",
         "type": "TEXT",
-        "description": "Ticket identifier (ARCH-, U-, C-, B-, PB-)",
+        "description": "Ticket identifier",
         "required": true
       },
       "Type": {
-        "id": "PVTSSF_lifecycle_type",
+        "id": "PVTSSF_lAHOAHTeus4BG_ACzg33xiI",
         "type": "SINGLE_SELECT",
         "options": [
-          { "id": "TYPE_UNIT", "name": "Unit" },
-          { "id": "TYPE_COMPOSITION", "name": "Composition" },
-          { "id": "TYPE_BUG", "name": "Bug" },
-          { "id": "TYPE_ARCH", "name": "Architecture" },
-          { "id": "TYPE_PLAYBOOK", "name": "Playbook" }
+          {
+            "id": "4464d63e",
+            "name": "Architecture"
+          },
+          {
+            "id": "f6c63ee7",
+            "name": "Component"
+          },
+          {
+            "id": "f42877cc",
+            "name": "Bug"
+          },
+          {
+            "id": "af8dc8c5",
+            "name": "Policy"
+          },
+          {
+            "id": "f4309723",
+            "name": "Update"
+          },
+          {
+            "id": "2023f891",
+            "name": "Chore"
+          }
         ],
         "required": true
       },
       "Lane": {
-        "id": "PVTSSF_lifecycle_lane",
+        "id": "PVTSSF_lAHOAHTeus4BG_ACzg33xig",
         "type": "SINGLE_SELECT",
         "options": [
-          { "id": "LANE_A", "name": "A" },
-          { "id": "LANE_B", "name": "B" },
-          { "id": "LANE_C", "name": "C" },
-          { "id": "LANE_D", "name": "D" }
+          {
+            "id": "818a3b7e",
+            "name": "A"
+          },
+          {
+            "id": "b08d27d8",
+            "name": "B"
+          },
+          {
+            "id": "913fa367",
+            "name": "C"
+          },
+          {
+            "id": "1b63675b",
+            "name": "D"
+          },
+          {
+            "id": "f7a73603",
+            "name": "E"
+          },
+          {
+            "id": "97d554d4",
+            "name": "X"
+          }
         ],
         "required": true
       },
       "Status": {
-        "id": "PVTSSF_lifecycle_status",
+        "id": "PVTSSF_lAHOAHTeus4BG_ACzg33xak",
         "type": "SINGLE_SELECT",
         "options": [
-          { "id": "STATUS_DRAFT", "name": "Draft", "category": "TODO" },
-          { "id": "STATUS_TICKETED", "name": "Ticketed", "category": "TODO" },
           {
-            "id": "STATUS_BRANCHED",
-            "name": "Branched",
+            "id": "f75ad846",
+            "name": "Todo",
+            "category": "TODO"
+          },
+          {
+            "id": "47fc9ee4",
+            "name": "In Progress",
             "category": "IN_PROGRESS"
           },
           {
-            "id": "STATUS_PR_OPEN",
-            "name": "PR Open",
-            "category": "IN_PROGRESS"
-          },
-          {
-            "id": "STATUS_IN_REVIEW",
-            "name": "In Review",
-            "category": "IN_PROGRESS"
-          },
-          { "id": "STATUS_MERGED", "name": "Merged", "category": "DONE" },
-          { "id": "STATUS_ARCHIVED", "name": "Archived", "category": "DONE" }
+            "id": "98236657",
+            "name": "Done",
+            "category": "DONE"
+          }
         ],
         "required": true
       },
       "Owner": {
-        "id": "PVTSSF_lifecycle_owner",
-        "type": "USER",
-        "required": true
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xiw",
+        "type": "TEXT",
+        "required": false
       },
       "Priority": {
-        "id": "PVTSSF_lifecycle_priority",
+        "id": "PVTSSF_lAHOAHTeus4BG_ACzg33xjE",
         "type": "SINGLE_SELECT",
         "options": [
-          { "id": "PRIORITY_P1", "name": "P1" },
-          { "id": "PRIORITY_P2", "name": "P2" },
-          { "id": "PRIORITY_P3", "name": "P3" },
-          { "id": "PRIORITY_P4", "name": "P4" }
+          {
+            "id": "dce8e9a3",
+            "name": "P0"
+          },
+          {
+            "id": "86093db0",
+            "name": "P1"
+          },
+          {
+            "id": "a0cf3f25",
+            "name": "P2"
+          },
+          {
+            "id": "efdee8e5",
+            "name": "P3"
+          }
         ],
-        "required": true
+        "required": false
       },
       "Release": {
-        "id": "PVTSSF_lifecycle_release",
+        "id": "PVTF_lAHOAHTeus4BG_ACzg33xjY",
         "type": "TEXT",
         "required": false
       }
-    },
-    "views": {
-      "ticketed": {
-        "id": "PVTVIEW_ticketed",
-        "filter": "Status:Ticketed",
-        "wipLimit": 8
-      },
-      "branched": {
-        "id": "PVTVIEW_branched",
-        "filter": "Status:Branched",
-        "wipLimit": 8
-      },
-      "review": {
-        "id": "PVTVIEW_review",
-        "filter": "Status:`PR Open`,`In Review`",
-        "wipLimit": 8
-      }
-    },
-    "automation": {
-      "workflows": ["project-sync.yml", "project-audit.yml"],
-      "scripts": [
-        "scripts/ops/idea-intake.mjs",
-        "scripts/ops/reconcile-status.mjs",
-        "scripts/ops/report.mjs"
-      ]
     }
   },
-  "notes": "Lifecycle v3 schema cache. Update via pnpm ops:report --yes --refresh when field IDs change."
+  "notes": "User-level project for testing E2E automation"
 }

@@ -12,6 +12,8 @@ mkdir -p scripts/config
 cp scripts/config/lifecycle.json scripts/config/lifecycle.local.json
 ```
 
+<!-- scaffold_ref: /templates/script@v0.1 -->
+
 ## Wire
 
 - `scripts/_lib/lifecycle.mjs` loads `lifecycle.json`.

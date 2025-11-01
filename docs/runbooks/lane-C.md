@@ -24,5 +24,6 @@ last_verified: 2025-11-01
 
 - Post metrics deltas; block non-compliant PRs.
 - Log exceptions with expiry.
+- Verify project board status updates throughout workflow.
 
-**Success:** equal/faster CI, stable artifacts, compliance >95%.
+**Success:** equal/faster CI, stable artifacts, compliance >95%, automated project tracking.

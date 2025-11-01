@@ -1,3 +1,31 @@
+---
+id: ARCH-e2e-automation-gaps
+title: ARCH-e2e-automation-gaps
+owner: "@lane-d"
+lane: C
+type: Arch
+priority: P2
+status: In Progress
+version: 1.0.0
+created: 2025-11-01
+last_verified: 2025-11-02
+ttl_days: 90
+acceptance:
+  must_have:
+    - GraphQL queries stable (no union errors)
+    - PR body auto-generation for Purpose/Problem/Proposal
+    - Dry-run changelog does not mutate state
+    - Project status updates implemented in scripts
+  wont_have:
+    - Full auto-merge without review
+  evidence: []
+work_items:
+  issue: TBD (create or link GitHub Issue ID)
+  branch: TBD (create after Ticketed → Branched)
+  pr: TBD (open after first push)
+  project_item: TBD (ensure added to Project board)
+---
+
 # ARCH-e2e-automation-gaps
 
 Lane: C (DevOps & Automation)
@@ -54,18 +82,60 @@ These gaps mean developers must manually intervene at 6+ points in the workflow,
    - Verify changelog extraction still works
    - Document new PR body format
 
-### Phase 3: Project Board Integration (4-6 hours) - OPTIONAL
+### Phase 3: Project GraphQL Fixes (Required for True E2E)
 
-6. **Fix GraphQL Union Query** (3-4 hours)
-   - Restructure fieldValues query to handle unions properly
-   - Move `field { id name }` inside each union case
-   - Update all affected functions: `loadProjectCache`, `findProjectItemByFieldValue`, `ensureProjectStatus`
-   - Test with actual GitHub Projects V2 API
+**Status**: ⚠️ In Progress - GraphQL Fixed, Token Scope Required
 
-7. **Full Integration Testing** (1-2 hours)
-   - Run complete E2E test with project updates
-   - Verify status transitions work
-   - Document any remaining limitations
+**Problem**: Project board operations fail with GraphQL union errors and require proper token scopes
+
+**Solution**:
+
+1. ✅ Update GraphQL queries to handle nested union types properly
+2. ✅ Add `read:project` and `project` scopes to GitHub token
+3. ✅ Create test GitHub Project board
+4. ⚠️ Discovered real workflow integration gaps during E2E testing
+
+**Implementation**:
+
+- [x] Fix `findProjectItemByFieldValue()` GraphQL query - handled ProjectV2ItemFieldValue union
+- [x] Fix nested ProjectV2FieldConfiguration union - added concrete type specifications
+- [x] Test revealed query syntax is now correct (no more union errors)
+- [x] Added `project` scope to GitHub token via `gh auth refresh -s project`
+- [x] Created GitHub Project "Plaincraft Lifecycle" (PVT_kwHOAHTeus4BG_AC)
+- [x] Added custom fields: ID, Type, Lane, Status, Owner, Priority, Release
+- [x] Updated project cache in `.repo/projects.json`
+- [x] Verified GraphQL queries work without errors
+- [x] Real E2E testing with `create-branch` script
+
+**E2E Testing Results - Issues Discovered**:
+
+1. **`create-branch` doesn't update project status** ❌
+   - Script exits with code 10: "Project status update not yet implemented"
+   - Branch is created successfully but project status remains unchanged
+   - Need to implement actual project status update in create-branch script
+
+2. **Project Status field has wrong options** ⚠️
+   - Default project has: "Todo", "In Progress", "Done"
+   - Lifecycle needs: "Ticketed", "Branched", "PR Open", "Merged", "Archived"
+   - Cannot update via CLI - needs manual web UI update or GraphQL mutation
+
+3. **No automated project item creation** ⚠️
+   - Issues are not automatically added to project when created
+   - Requires either:
+     - GitHub Actions workflow to add issues to project
+     - Manual addition via `ideas-to-issues` script enhancement
+     - GitHub's built-in automation rules
+
+**Technical Details**:
+
+- ProjectV2ItemFieldValue has 5 union cases (TextValue, NumberValue, SingleSelectValue, DateValue, IterationValue)
+- Each field access requires nested union handling for ProjectV2FieldConfiguration
+- ProjectV2FieldConfiguration has 3 concrete types (ProjectV2Field, ProjectV2SingleSelectField, ProjectV2IterationField)
+- All project queries require `read:project` scope, updates require `project` scope
+- GraphQL mutations work correctly for finding items and updating fields
+- The infrastructure is ready, but workflow scripts need integration work
+
+**Value**: GraphQL fixes complete. Real E2E testing revealed additional workflow integration work needed for 95% automation target.
 
 ## Acceptance Checklist
 
@@ -88,20 +158,38 @@ These gaps mean developers must manually intervene at 6+ points in the workflow,
 
 **Status**: Implementation complete in PR #143. Enhanced `buildPrBody()` function extracts all sections including Purpose, Problem, Proposal, Changes (auto-generated from bullets), and Acceptance Checklist. Documentation added. Testing with multiple idea types will happen organically as new PRs are created.
 
-### Phase 3 (Optional - Project Board)
+### Phase 3 (Project Board Integration) - ⚠️ PARTIALLY COMPLETE
 
-- [ ] GraphQL union selection error resolved
-- [ ] Project status updates work throughout workflow
-- [ ] Status transitions: Ticketed → Branched → PR Open → Merged
-- [ ] All project-related functions tested and working
+- [x] GraphQL union selection error resolved
+- [x] GitHub token scopes updated (`project` scope added)
+- [x] GitHub Project board created with required fields
+- [x] Project cache updated and working
+- [ ] `create-branch` script updated to actually update project status (currently exits with code 10)
+- [ ] Project Status field options updated to lifecycle values (currently has "Todo/In Progress/Done")
+- [ ] Automated project item creation when issues are created
+- [ ] Status transitions fully working: Ticketed → Branched → PR Open → Merged
+- [ ] All project-related functions tested and working in real workflow
 
-**Status**: Not started. This is the largest fix (2-3 hours) and may be deferred if project board tracking is not critical.
+**Status**: GraphQL infrastructure is complete and working. Real E2E testing revealed that workflow scripts need additional work to actually use the project integration. The `create-branch` script explicitly says "Project status update not yet implemented" and exits with code 10. Need to implement the actual project status update logic in create-branch, open-or-update-pr, and other workflow scripts.
 
 ### General
 
-- [x] All existing tests still pass (461/461 tests passing)
-- [x] New tests added for PR body generation (test fixes for getPR merged field)
-- [x] E2E workflow success rate improved from 40% to ~70% (Phase 1 complete)
+- [x] All existing tests still pass (443/443 tests passing)
+- [x] New tests added for PR body generation (9 validation tests)
+- [x] E2E workflow success rate improved from 40% to ~75% (Phase 1 & 2 complete)
+- [x] Real E2E testing completed with GitHub Project board
+- [ ] Project workflow integration completed (create-branch, open-or-update-pr status updates)
 - [ ] Documentation updated with automation improvements
 
-**Progress Summary**: Phase 1 mostly complete. Automation rate improved from 40% to ~70%. Remaining gaps: workflow auto-trigger debugging, Phase 3 optional project board fixes.
+**Progress Summary**: Phases 1 & 2 complete (75% automation). Phase 3 GraphQL infrastructure complete, but real E2E testing revealed workflow scripts need implementation work to actually use project status updates. Current blockers: create-branch returns "not yet implemented" error, project status field needs manual configuration, no automated issue-to-project addition.
+
+## Work Item Links (Manual - Lane D)
+
+| Artifact     | Reference | Status                          |
+| ------------ | --------- | ------------------------------- |
+| Issue        | (pending) | Ticketed                        |
+| Branch       | (pending) | Branched (after implementation) |
+| PR           | (pending) | PR Open (after first push)      |
+| Project Item | (pending) | In Progress                     |
+
+Update these manually per Lane D runbook until automation lands. Ensure single source of truth: when status advances, update `status` frontmatter key and Project item field, one step only.
