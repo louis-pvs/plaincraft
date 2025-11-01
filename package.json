@@ -35,6 +35,7 @@
     "ops:reconcile-status": "node scripts/ops/reconcile-status.mjs",
     "ops:closeout": "node scripts/ops/closeout.mjs",
     "ops:report": "node scripts/ops/report.mjs",
+    "ops:validate-pr-body": "node scripts/ops/validate-pr-body.mjs",
     "commit:guard": "node scripts/checks/commit-guard.mjs",
     "drift:check": "node scripts/checks/drift.mjs",
     "lint:staged": "lint-staged",

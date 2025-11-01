@@ -201,12 +201,27 @@ export async function findProjectItemByFieldValue(options) {
               fieldValues(first: 50) {
                 nodes {
                   __typename
-                  field { id name }
-                  ... on ProjectV2ItemFieldTextValue { text }
-                  ... on ProjectV2ItemFieldNumberValue { number }
-                  ... on ProjectV2ItemFieldSingleSelectValue { name optionId }
-                  ... on ProjectV2ItemFieldDateValue { date }
-                  ... on ProjectV2ItemFieldIterationValue { title }
+                  ... on ProjectV2ItemFieldTextValue { 
+                    text 
+                    field { id name }
+                  }
+                  ... on ProjectV2ItemFieldNumberValue { 
+                    number 
+                    field { id name }
+                  }
+                  ... on ProjectV2ItemFieldSingleSelectValue { 
+                    name 
+                    optionId 
+                    field { id name }
+                  }
+                  ... on ProjectV2ItemFieldDateValue { 
+                    date 
+                    field { id name }
+                  }
+                  ... on ProjectV2ItemFieldIterationValue { 
+                    title 
+                    field { id name }
+                  }
                 }
               }
             }
