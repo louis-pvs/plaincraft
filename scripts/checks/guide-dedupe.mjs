@@ -211,12 +211,12 @@ function generateTextReport(data, threshold) {
 
 try {
   const root = await repoRoot(args.cwd);
-  logger.info("Guide dedupe started", { threshold });
+  logger.debug("Guide dedupe started", { threshold });
 
-  logger.info("Guide dedupe started", { threshold });
+  logger.debug("Guide dedupe started", { threshold });
 
   const results = await compareGuides(root);
-  logger.info("Guide comparisons complete", {
+  logger.debug("Guide comparisons complete", {
     totalComparisons: results.totalComparisons,
     highSimilarityPairs: results.highSimilarityPairs,
   });

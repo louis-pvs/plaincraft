@@ -62,7 +62,7 @@ Exit codes:
 const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 
-logger.info("Policy lint started", {
+logger.debug("Policy lint started", {
   example:
     "Every script header should include @since YYYY-MM-DD and @version x.y.z",
 });
@@ -111,7 +111,7 @@ try {
     });
   }
 
-  logger.info("Scripts queued for validation", {
+  logger.debug("Scripts queued for validation", {
     count: scriptFiles.length,
     strict: Boolean(args.strict),
     example: "Example script: scripts/ops/create-worktree-pr.mjs",

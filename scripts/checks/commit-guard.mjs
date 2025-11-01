@@ -68,7 +68,7 @@ Options:
     const commitRegex = config.commits.regex;
 
     const { range, source } = await resolveRange(flags, root);
-    logger.info("Validating commit headers", {
+    logger.debug("Validating commit headers", {
       range,
       source: source ?? "manual",
       max: flags.max ?? 50,
@@ -112,7 +112,7 @@ Options:
       return;
     }
 
-    logger.info("Commit headers valid", {
+    logger.debug("Commit headers valid", {
       range,
       commits: commits.length,
       example: "[ARCH-sample] Add lifecycle guardrail",

@@ -52,7 +52,7 @@ const runId = generateRunId();
 const MAX_SCRIPT_LINES = 300;
 const MAX_FUNCTION_LINES = 60;
 
-logger.info("Size compliance check started", {
+logger.debug("Size compliance check started", {
   maxScriptLines: MAX_SCRIPT_LINES,
   maxFunctionLines: MAX_FUNCTION_LINES,
   example: "Keep scripts under 300 lines with functions under 60 lines.",
@@ -63,7 +63,7 @@ try {
   const scriptsDir = path.join(root, "scripts");
 
   const scriptFiles = await findScriptFiles(scriptsDir);
-  logger.info("Scanning scripts", {
+  logger.debug("Scanning scripts", {
     count: scriptFiles.length,
     example: "Example script: scripts/ops/example.mjs",
   });

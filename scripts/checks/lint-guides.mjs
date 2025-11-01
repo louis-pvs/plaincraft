@@ -68,7 +68,7 @@ const REQUIRED_FRONTMATTER = [
 const MAX_WORDS = 600;
 const MAX_GUIDES = 12;
 
-logger.info("Guide lint started", {
+logger.debug("Guide lint started", {
   example:
     "Frontmatter should include owner: @lane-c and scaffold_ref: /templates/example@v0.1",
 });
@@ -83,7 +83,7 @@ try {
     (f) => f.endsWith(".md") && f.startsWith("guide-") && f !== "README.md",
   );
 
-  logger.info("Guides discovered", {
+  logger.debug("Guides discovered", {
     count: guideFiles.length,
     example: "Guides are markdown files like guides/guide-ideas.md",
   });

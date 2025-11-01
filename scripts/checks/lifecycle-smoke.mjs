@@ -211,14 +211,14 @@ const CHECKS = [
     const root = await repoRoot(args.cwd);
     const runRoot = await resolveSandboxRoot(root);
     if (executeMode) {
-      logger.info("Lifecycle smoke execute mode", {
+      logger.debug("Lifecycle smoke execute mode", {
         sandbox: runRoot,
         checks: CHECKS.length,
       });
     }
 
     if (dryRun) {
-      logger.info("Lifecycle smoke dry-run plan generated", {
+      logger.debug("Lifecycle smoke dry-run plan generated", {
         checks: CHECKS.length,
         example:
           "Run with --yes to execute checks like pnpm ideas:validate --filter ARCH-unified-guardrails-suite.",
@@ -266,7 +266,7 @@ const CHECKS = [
           ? check.executeCommand
           : check.command;
 
-      logger.info("Running lifecycle check", {
+      logger.debug("Running lifecycle check", {
         id: check.id,
         description: check.description,
         lane: check.lane,
@@ -344,7 +344,7 @@ const CHECKS = [
       return;
     }
 
-    logger.info("Lifecycle smoke passed", {
+    logger.debug("Lifecycle smoke passed", {
       passed,
       durationMs: Date.now() - startedAt,
       example: "Expected output: passed equals number of checks and failed=0.",

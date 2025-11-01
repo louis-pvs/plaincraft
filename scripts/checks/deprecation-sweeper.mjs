@@ -50,7 +50,7 @@ const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const MAX_DEPRECATED_DAYS = 90;
 
-logger.info("Deprecation sweep started", {
+logger.debug("Deprecation sweep started", {
   maxDays: MAX_DEPRECATED_DAYS,
   example: "@deprecated since=2025-10-01 replace=scripts/new-script.mjs",
 });
@@ -65,7 +65,7 @@ try {
   const expiredScripts = [];
   const warningScripts = [];
 
-  logger.info("Scanning scripts for @deprecated", {
+  logger.debug("Scanning scripts for @deprecated", {
     total: allScripts.length,
     example: "Use '@deprecated since=YYYY-MM-DD replace=path/to/new-script'.",
   });

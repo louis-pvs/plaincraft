@@ -50,7 +50,7 @@ const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const SIMILARITY_THRESHOLD = parseInt(args.threshold) || 30;
 
-logger.info("Guide deduplication check started", {
+logger.debug("Guide deduplication check started", {
   threshold: SIMILARITY_THRESHOLD,
   example:
     "Aim for unique content per guide; consolidate duplicates into docs/overview.md.",
@@ -66,7 +66,7 @@ try {
     (f) => f.endsWith(".md") && f.startsWith("guide-"),
   );
 
-  logger.info("Loaded guides", {
+  logger.debug("Loaded guides", {
     count: guideFiles.length,
     example: "Example guide: guides/guide-ideas.md",
   });

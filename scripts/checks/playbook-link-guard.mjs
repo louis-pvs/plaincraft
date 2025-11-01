@@ -138,7 +138,7 @@ async function main() {
     });
   }
 
-  logger.info("Playbook pattern links validated", {
+  logger.debug("Playbook pattern links validated", {
     patterns: results.length,
     errors: errors.length,
     example:

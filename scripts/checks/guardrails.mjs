@@ -131,7 +131,7 @@ const DEFAULT_SCOPE_ORDER = [
     const effectiveConcurrency =
       failFast || sequentialMode ? 1 : resolvedConcurrency;
 
-    logger.info("Guardrails initialised", {
+    logger.debug("Guardrails initialised", {
       scopes: scopes.join(", "),
       failFast,
       sequential: sequentialMode,
@@ -203,7 +203,7 @@ const DEFAULT_SCOPE_ORDER = [
     const skipped = results.filter(
       (entry) => entry.status === "skipped",
     ).length;
-    logger.info("Guardrails summary", {
+    logger.debug("Guardrails summary", {
       ok: failures === 0,
       total: results.length,
       failures,
@@ -354,7 +354,7 @@ function buildTaskQueue(scopes) {
       continue;
     }
 
-    logger.info("Queued guardrail scope", {
+    logger.debug("Queued guardrail scope", {
       scope,
       commands: commands.length,
       example: `Typical command: pnpm run guardrails:${scope}`,
@@ -443,7 +443,7 @@ async function runGuardrailTask(task, root) {
       example: `Inspect logs above and re-run: ${commandLine} -- --verbose`,
     });
   } else {
-    logger.info("Guardrail passed", {
+    logger.debug("Guardrail passed", {
       ...logPayload,
       example: `Typical success: ${commandLine}`,
     });

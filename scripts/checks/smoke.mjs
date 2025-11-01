@@ -52,8 +52,8 @@ const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const timeout = parseInt(args.timeout) || 5000;
 
-logger.info("Smoke tests started", { timeoutMs: timeout });
-logger.info("Smoke test expectation", {
+logger.debug("Smoke tests started", { timeoutMs: timeout });
+logger.debug("Smoke test expectation", {
   example:
     "Each script should exit 0 for '--help' and support '--dry-run --output json'.",
 });
@@ -75,7 +75,7 @@ try {
     });
   }
 
-  logger.info("Executable scripts detected", {
+  logger.debug("Executable scripts detected", {
     count: scriptFiles.length,
     example: "Example script: scripts/ops/create-worktree-pr.mjs",
   });

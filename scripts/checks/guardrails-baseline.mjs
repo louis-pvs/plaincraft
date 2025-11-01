@@ -87,7 +87,7 @@ const dryRun = args.dryRun !== false && args.yes !== true;
 
     await ensureGhAvailable(logger);
 
-    logger.info("Collecting workflow metrics", {
+    logger.debug("Collecting workflow metrics", {
       repo,
       workflow,
       jobName,

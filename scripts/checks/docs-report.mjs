@@ -58,7 +58,7 @@ const logger = new Logger(resolveLogLevel({ flags: args }));
 const runId = generateRunId();
 const quiet = args.quiet === true;
 
-logger.info("Docs governance report started", {
+logger.debug("Docs governance report started", {
   saveMetrics: Boolean(args.save),
   quietMode: quiet,
   output: args.output || "text",
@@ -296,7 +296,7 @@ try {
   if (args.save) {
     const metricsPath = path.join(root, "docs", "metrics.json");
     await writeFile(metricsPath, JSON.stringify(reportData, null, 2));
-    logger.info("Docs governance metrics saved", {
+    logger.debug("Docs governance metrics saved", {
       path: metricsPath,
       example:
         "docs/metrics.json should capture templates, guides, and recommendations.",
@@ -310,7 +310,7 @@ try {
     console.log(generateTextReport(reportData));
   }
 
-  logger.info("Docs governance report generated", {
+  logger.debug("Docs governance report generated", {
     templates: reportData.templates,
     guides: reportData.guides,
     ratio: Number(reportData.ratio.toFixed(2)),
