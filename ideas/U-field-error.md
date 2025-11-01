@@ -1,36 +1,56 @@
 # U-field-error
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-billing-method`
+- **Contracts**:
+  - Surface asynchronous validation errors with delayed messaging to avoid flicker.
+  - Provide retry clearing logic so successful validations remove stale errors.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for form guidance, Lane C (DevOps & Automation) for validation hooks.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, field, validation
 
-## Purpose
+## Contracts
 
-Create an input field unit with consistent async validation and inline error patterns so forms stay predictable and accessible.
+- Normalize async validation flows with consistent pending/error/success states.
+- Ensure retries clear stale errors and update messaging predictably.
 
-## Problem
+## Props + Shape
 
-Forms implement async validation differently, resulting in flickering errors, missing screen-reader feedback, and retry flows that require manual patching. This slows lane adoption and hurts UX.
+- `value: string`
+- `label: string`
+- `description?: string`
+- `validate(value: string): Promise<{ ok: boolean; message?: string }>`
+- `onChange(next: string): void`
+- `status: "idle" | "validating" | "error" | "success"`
 
-## Proposal
+## Behaviors
 
-1. Define props for validator promises, pending states, and error messaging slots.
-2. Implement delayed error surfacing with screen-reader text, retry clearing, and focus management.
-3. Provide Storybook exercises, tests, and documentation for adoption.
-
-## Acceptance Checklist
-
-- [ ] Error message delayed appropriately and includes SR-friendly content.
-- [ ] Retry path clears previous errors once validation succeeds.
+- Debounces validation calls, displaying spinner while pending.
+- On validation failure, shows inline error and announces message; success clears.
+- Offers `retry()` method to re-run validation after external fix.
 
 ## Status
 
-- 2025-11-07 - Draft captured for async field error unit.
+- 2025-11-07 - Draft logged for field error unit.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Links error text to input via `aria-describedby`.
+- Announces validation state changes via live region.
+
+## Acceptance Checklist
+
+- [ ] Async validation tests cover delayed error + retry flows.
+- [ ] Error messaging templates documented and localized.
+- [ ] Storybook stories demonstrate success, failure, and retry; GIF captured.
+- [ ] Guardrail ensures validation promises handle race conditions (latest result wins).
+- [ ] a11y smoke verifies announcements and focus persistence.
+
+## Status Log
+
+- 2025-11-07 - Draft staged for backlog sizing.

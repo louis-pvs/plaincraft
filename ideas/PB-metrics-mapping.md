@@ -23,6 +23,13 @@ Teams struggle to articulate which metrics a pattern influences, leading to weak
 2. Provide case studies showing before/after metric impact.
 3. Offer templates for noting metric hypotheses in ideas/issues.
 
+## Process
+
+1. Gather data points from Lane D reporting and Lane C telemetry dashboards.
+2. Draft mapping tables linking patterns → metrics and embed instrumentation guidance.
+3. Review with analytics stakeholders, update based on feedback, and run docs guardrails.
+4. Publish and circulate snippet for inclusion in future idea metric sections.
+
 ## Acceptance Checklist
 
 - [ ] Examples included for drop-off, TTFX, and support load.

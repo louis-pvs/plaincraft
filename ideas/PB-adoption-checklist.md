@@ -23,6 +23,13 @@ Without a shared adoption checklist, teams skip telemetry, forget fallback plann
 2. Capture kill criteria guidance and owner/date capture requirements.
 3. Provide copy-ready checklist for issues/PRs plus Playbook status integration.
 
+## Process
+
+1. Compile adoption requirements with Lane C guardrail owners and Lane D pilots.
+2. Author the Playbook page including copy-ready checklist snippets.
+3. Validate via `pnpm docs:check` and embed links into template READMEs.
+4. Announce adoption in the weekly governance update with expectations for new rollouts.
+
 ## Acceptance Checklist
 
 - [ ] Rollout steps listed with references to required scripts/tests.

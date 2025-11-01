@@ -23,6 +23,13 @@ Teams author `play()` stories inconsistently, causing flaky tests, nondeterminis
 2. Document deterministic event helpers, global delay usage, and flake killers.
 3. Provide do/don’t tables with code samples and link to supporting scripts.
 
+## Process
+
+1. Gather patterns from Lane A component owners and Lane C automation maintainers.
+2. Draft the Playbook content with code samples and do/don’t tables.
+3. Cross-link relevant Storybook docs and guardrail scripts; run docs lint.
+4. Socialize with contributors through a release note + backlog training snippet.
+
 ## Acceptance Checklist
 
 - [ ] Code samples included showing deterministic `play()` usage.

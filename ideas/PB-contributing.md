@@ -23,6 +23,13 @@ New contributors struggle to find authoritative guidance on where files live, ho
 2. Document commit/PR conventions, including guardrails (`pnpm guardrails`, `commit:guard`) and required checklists.
 3. Provide reviewer matrix detailing who owns what plus escalation paths.
 
+## Process
+
+1. Draft lane → glob mapping with Lane C automation and Lane D program ops.
+2. Capture commit/PR guidance referencing templates and guardrail commands.
+3. Build reviewer matrix, validate with leadership, and embed escalation docs.
+4. Run docs guardrails and publish in Playbook; announce in contributor channel.
+
 ## Acceptance Checklist
 
 - [ ] “Who owns what” table included with lane + reviewer mapping.

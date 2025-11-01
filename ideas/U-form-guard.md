@@ -1,37 +1,55 @@
 # U-form-guard
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-onboarding-light`
+- **Contracts**:
+  - Block navigation when forms are dirty and surface inline banner + beforeunload confirmation.
+  - Release guard once save succeeds, ensuring status is reflected across router + window hooks.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for rollout documentation, Lane C (DevOps & Automation) for lifecycle guardrails.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, form, accessibility
 
-## Purpose
+## Contracts
 
-Introduce a form guard unit that blocks navigation on unsaved changes, synchronizes inline banners, and supports accessible announcements.
+- Provide a unified guard for SPA + beforeunload flows so teams stop rolling bespoke solutions.
+- Ensure banners, dialogs, and listeners stay synchronized as dirty state changes.
 
-## Problem
+## Props + Shape
 
-Unsaved changes logic appears in multiple flows with inconsistent blocking behavior, leading to accidental data loss and conflicting banner patterns. Without a governed unit, teams rely on ad hoc implementations.
+- `isDirty: boolean`
+- `onConfirmNavigate(): void`
+- `onStay(): void`
+- `banner?: React.ReactNode`
+- `beforeUnloadMessage?: string`
 
-## Proposal
+## Behaviors
 
-1. Define props for dirty detection, confirmation copy, callbacks, and banner slotting.
-2. Wire `beforeunload` integration, router interception, and inline banner updates with consistent UX.
-3. Ensure accessible alerts, Storybook coverage, and tests for both block and release paths.
-
-## Acceptance Checklist
-
-- [ ] Navigation blocked whenever form remains dirty.
-- [ ] Guard releases once a save completes successfully.
-- [ ] Inline banner announces state via `role="alert"` and remains accessible.
+- Registers/unregisters `beforeunload` listener when `isDirty` toggles.
+- Presents inline banner with "Leave" vs "Stay" actions; selecting leave triggers `onConfirmNavigate`.
+- Exposes imperative API for routers to ask guard permission programmatically.
 
 ## Status
 
-- 2025-11-07 - Draft opened to unify form guard behavior.
+- 2025-11-07 - Draft opened for form guard unit.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Inline banner uses `role="alert"` and focus management so messages are read immediately.
+- Buttons include descriptive labels for confirm vs stay actions.
+
+## Acceptance Checklist
+
+- [ ] beforeunload + SPA routing guard scenarios covered by tests.
+- [ ] Banner copy/CTA standardized and documented in Storybook.
+- [ ] a11y audit confirms announcements and focus order.
+- [ ] Recorded GIF shows dirty state, guard modal, and release after save.
+- [ ] Guardrail ensures `isDirty` toggling updates listeners exactly once.
+
+## Status Log
+
+- 2025-11-07 - Draft queued for refinement.

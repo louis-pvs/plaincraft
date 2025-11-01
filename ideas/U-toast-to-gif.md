@@ -1,37 +1,56 @@
 # U-toast-to-gif
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-notifications`
+- **Contracts**:
+  - Provide deterministic toast timing that respects global recording delay knobs.
+  - Expose tags/metadata to mark stories for GIF capture.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for recording standards, Lane C (DevOps & Automation) for script integration.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, recording, toast
 
-## Purpose
+## Contracts
 
-Provide a deterministic toast interaction harness tailored for GIF capture so documentation and demos remain consistent.
+- Ensure toast timing and callbacks stay deterministic for recording scripts.
+- Provide tagging/metadata utilities so narrative assets can locate canonical stories.
 
-## Problem
+## Props + Shape
 
-Story recordings frequently require manual timing tweaks to align toasts, resulting in jittery GIFs and drift across docs. Without a standardized anchor, Playbook assets degrade rapidly.
+- `message: string`
+- `delayMs: number`
+- `durationMs: number`
+- `onShow?: () => void`
+- `onHide?: () => void`
+- `recordingId: string`
 
-## Proposal
+## Behaviors
 
-1. Define props for message, delay, duration, and control hooks tied to recording scripts.
-2. Implement deterministic timing respecting global recording delay knobs and ensure consistent layout.
-3. Tag Storybook stories with `tags:["record"]` and capture official assets for Lane B's recording standard.
-
-## Acceptance Checklist
-
-- [ ] Interaction timing remains deterministic across runs.
-- [ ] Global recording delay knob honored during playback.
-- [ ] Storybook story tagged with `tags:["record"]` for automation.
+- Waits for `delayMs` before showing toast, then hides after `durationMs`.
+- Emits callbacks on show/hide so recording scripts stay in sync.
+- Accepts global overrides via context to coordinate mass captures.
 
 ## Status
 
-- 2025-11-07 - Draft logged to support repeatable toast recordings.
+- 2025-11-07 - Draft created for toast recording anchor unit.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Announces toast message via polite live region, including countdown metadata when recording.
+- Provides manual close button with clear label.
+
+## Acceptance Checklist
+
+- [ ] Timing verified with unit tests to ensure deterministic show/hide windows.
+- [ ] Integrates with recording script exposing `tags:["record"]` metadata.
+- [ ] Storybook story demonstrates standard vs extended delay; GIF captured.
+- [ ] a11y audit covers toast announcement and focus handling.
+- [ ] Lane D playbook references integration instructions.
+
+## Status Log
+
+- 2025-11-07 - Draft submitted for lane sync.

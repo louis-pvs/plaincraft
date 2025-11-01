@@ -23,6 +23,13 @@ Teams interpret key terms differently, causing confusion in status updates, road
 2. Document ID scheme patterns (U-/C-/ARCH-/PB-) and where they apply.
 3. Include pronunciation/usage notes and embed searchable anchors in the Playbook.
 
+## Process
+
+1. Aggregate existing definitions from templates, Storybook docs, and ADRs.
+2. Draft glossary entries with links back to source material and ID scheme guidance.
+3. Run docs guardrails, ensure anchors render in the Playbook sidebar, and add search metadata.
+4. Share the glossary with Lane D training leads for onboarding use.
+
 ## Acceptance Checklist
 
 - [ ] Glossary entries cover Unit, Composition, Recording, Playbook, and ID scheme.

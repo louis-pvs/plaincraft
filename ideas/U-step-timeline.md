@@ -1,36 +1,55 @@
 # U-step-timeline
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-comment-edit`
+- **Contracts**:
+  - Keep the current step in view with automatic scrolling/focus cues.
+  - Paginate historical steps without losing semantic order or accessibility.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for walkthrough demos, Lane C (DevOps & Automation) for scroll guardrails.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, timeline, accessibility
 
-## Purpose
+## Contracts
 
-Create a timeline unit that guarantees the current step stays visible and supports pagination for earlier steps without sacrificing accessibility.
+- Keep the active step visible with built-in focus and scrolling rules.
+- Provide pagination helpers so long histories stay accessible without custom builds.
 
-## Problem
+## Props + Shape
 
-Existing timelines often clip the active step off-screen, lack pagination for long histories, and provide little assistance for screen readers. Reimplementing these patterns wastes time and causes inconsistent UX.
+- `steps: Array<{ id: string; title: string; description: string; completed: boolean }>`
+- `currentId: string`
+- `onSelect?(id: string): void`
+- `pageSize?: number`
+- `onLoadMore?(): void`
 
-## Proposal
+## Behaviors
 
-1. Define props for steps, current index, pagination settings, and callbacks.
-2. Implement auto-scroll / focus management so the active step remains in view with keyboard/pointer input.
-3. Provide pagination for prior steps plus Storybook coverage and a recorded demo for narrative guidance.
-
-## Acceptance Checklist
-
-- [ ] Current step scrolls into view when state changes.
-- [ ] Pagination allows browsing prior steps without losing position.
+- Automatically scrolls to and highlights the current step when `currentId` changes.
+- Provides "See more" pagination for prior steps with accessible summary.
+- Allows keyboard navigation across steps with arrow keys/Enter.
 
 ## Status
 
-- 2025-11-07 - Draft established to govern step timeline unit.
+- 2025-11-07 - Draft logged for step timeline unit.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Uses `aria-current="step"` and `role="list"` semantics.
+- Announces pagination actions via polite live region.
+
+## Acceptance Checklist
+
+- [ ] Auto-scroll + focus behavior covered with integration tests.
+- [ ] Pagination documented and accessible for keyboard + screen reader users.
+- [ ] Storybook demos illustrate long timeline, pagination, and current-step highlight; GIF recorded.
+- [ ] Guardrail ensures `aria-current` always assigned to exactly one step.
+- [ ] Telemetry hook available for step change analytics.
+
+## Status Log
+
+- 2025-11-07 - Draft added for foundation review.

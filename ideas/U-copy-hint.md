@@ -1,38 +1,55 @@
 # U-copy-hint
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-billing-method`
+- **Contracts**:
+  - Provide a resilient clipboard helper that degrades gracefully without the Async Clipboard API.
+  - Surface countdown hinting and live-region messaging so users know copy completion status.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for Storybook narrative + GIF, Lane C (DevOps & Automation) for clipboard guardrails.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, clipboard, accessibility
 
-## Purpose
+## Contracts
 
-Ship a reusable copy-to-clipboard unit that surfaces countdown hints, resilient fallbacks, and a deterministic recording path for documentation.
+- Offer a consistent clipboard abstraction with first-class fallback when permissions or API support fail.
+- Communicate countdown hinting and status updates through accessible messaging for UI + SR users.
 
-## Problem
+## Props + Shape
 
-Copy interactions are inconsistent across the product: some lack keyboard triggers, others miss fallbacks when the Clipboard API fails, and announcements rarely reach assistive tech. This fragmentation blocks Playbook demos and tests.
+- `value: string` — text to copy.
+- `countdownMs: number` — duration of the visible hint timer.
+- `onCopy?: (result: { success: boolean }) => void` — telemetry callback after copy attempt.
+- `label: string` — accessible label for the button/control.
+- `fallbackText?: string` — optional text for textarea fallback.
 
-## Proposal
+## Behaviors
 
-1. Define props for target value, countdown duration, and callbacks for success/error.
-2. Implement keyboard + pointer triggers with countdown hinting, auto-dismiss, and fallback textarea copy when the Clipboard API is unavailable.
-3. Provide Storybook stories with live region messaging, plus `play()` and recordable flow for Lane B assets.
-
-## Acceptance Checklist
-
-- [ ] Clipboard fallback path handles unsupported browsers gracefully.
-- [ ] Keyboard-only path (Enter/Space) copies and announces success.
-- [ ] Live region updates surface countdown + success/failure messaging.
-- [ ] Storybook record story captured for Playbook usage.
+- Keyboard activation (Enter/Space) copies the value and starts the countdown hint.
+- When the Clipboard API rejects, fall back to a hidden textarea selection and notify via live region.
+- Resets countdown and hint content on blur or after the countdown completes.
 
 ## Status
 
-- 2025-11-07 - Draft logged to standardize copy hint unit coverage.
+- 2025-11-07 - Logged in `Draft` by Lane A to scope clipboard hint unit.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Announces success/failure and remaining countdown via `aria-live` updates.
+- Maintains focus on the trigger control after copy completes.
+
+## Acceptance Checklist
+
+- [ ] Async clipboard and fallback textarea flows validated with automated tests.
+- [ ] Countdown hint renders consistently and clears after completion.
+- [ ] Live-region messaging documented and verified with screen reader smoke.
+- [ ] Storybook `play()` story exercises keyboard + pointer paths; recorded asset published.
+- [ ] Error state gracefully surfaces when clipboard permissions are denied.
+
+## Status Log
+
+- 2025-11-07 - Draft captured for backlog intake.

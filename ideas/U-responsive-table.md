@@ -1,37 +1,55 @@
 # U-responsive-table
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-search-refine`
+- **Contracts**:
+  - Preserve table semantics while collapsing to cards under configurable breakpoints.
+  - Provide utilities for mapping headers to card labels so context is never lost.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for responsive demos, Lane C (DevOps & Automation) for visual regression coverage.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, table, responsive
 
-## Purpose
+## Contracts
 
-Provide a responsive table unit that collapses gracefully into card layouts while preserving semantic headers and accessibility.
+- Maintain semantic table structure above breakpoint and card mappings below breakpoint.
+- Supply helpers for header → label mapping so downstream teams avoid duplicating logic.
 
-## Problem
+## Props + Shape
 
-Current tables collapse inconsistently across breakpoints, often losing header context or forcing manual duplication of markup. This undermines mobile UX and accessibility.
+- `columns: Array<{ id: string; header: string; render(row): React.ReactNode }>`
+- `rows: Array<{ id: string; [key: string]: unknown }>`
+- `breakpoint: number` — width in px triggering card mode.
+- `getCardSections(row): Array<{ label: string; value: React.ReactNode }>`
+- `emptyState?: React.ReactNode`
 
-## Proposal
+## Behaviors
 
-1. Define props for columns, rows, responsive breakpoint, and render overrides.
-2. Implement breakpoint-based collapse that keeps header metadata accessible in card layouts.
-3. Build Storybook scenarios with resizing tests and record a demo for Playbook handoffs.
-
-## Acceptance Checklist
-
-- [ ] Table preserves header relationships in both table and card modes.
-- [ ] Card view labels remain audible/visible after collapse.
-- [ ] Resize test validates layout switches at configured breakpoints.
+- Renders semantic `<table>` above breakpoint with thead/tbody structure.
+- Below breakpoint, swaps to cards with header/value pairs generated via `getCardSections`.
+- Emits resize events for analytics once per layout change.
 
 ## Status
 
-- 2025-11-07 - Draft recorded to steward responsive table unit.
+- 2025-11-07 - Draft added to govern responsive table unit.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Table mode preserves `<th scope="col">`; card mode uses `aria-labelledby` to map headers.
+- Announces layout changes via live region when breakpoint crosses.
+
+## Acceptance Checklist
+
+- [ ] Layout swap covered with integration test simulating resize events.
+- [ ] Empty state visible in both table and card modes.
+- [ ] Storybook demos include desktop, tablet, and mobile breakpoints; GIF recorded.
+- [ ] a11y audit confirms header relationships retained.
+- [ ] Guardrail ensures header labels provided whenever card mode active.
+
+## Status Log
+
+- 2025-11-07 - Draft enqueued for refinement.

@@ -1,37 +1,57 @@
 # U-range-picker
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-quick-range-analytics`
+- **Contracts**:
+  - Emit ISO date pairs for presets and manual selections with timezone safety.
+  - Guard invalid ranges and communicate errors without trapping users.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for docs + demos, Lane C (DevOps & Automation) for date validation tooling.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, date-range, accessibility
 
-## Purpose
+## Contracts
 
-Provide a date range picker unit with quick presets, ISO-safe outputs, and robust accessibility to back analytics and scheduling flows.
+- Emit canonical ISO ranges for presets/manual selections while respecting timezone settings.
+- Provide validation + messaging ensuring users can correct invalid inputs quickly.
 
-## Problem
+## Props + Shape
 
-Date range widgets across the app produce inconsistent formats, lack quick preset support, and struggle with manual edits versus preset snaps. This causes analytics bugs and confusing UX.
+- `value: { start: string; end: string }`
+- `presets: Array<{ id: string; label: string; range: { start: string; end: string } }>`
+- `timezone: string`
+- `onChange(range: { start: string; end: string }): void`
+- `onPresetSelect(id: string): void`
+- `minDate?: string`
+- `maxDate?: string`
 
-## Proposal
+## Behaviors
 
-1. Define props covering value, presets, time zone handling, and callbacks.
-2. Implement preset shortcuts emitting ISO ranges, manual entry validation, and guardrails for invalid spans.
-3. Deliver keyboard/a11y coverage, Storybook `play()` demos, and a recordable flow for Playbook usage.
-
-## Acceptance Checklist
-
-- [ ] Quick presets emit correct ISO date ranges.
-- [ ] Manual edits guard against invalid spans with feedback.
-- [ ] Accessibility coverage verified (labels, focus order, SR announcements).
+- Selecting a preset fires `onChange` with canonical ISO strings and highlights selection.
+- Manual edits validate ranges, snapping end >= start; errors surface inline.
+- Supports keyboard navigation across calendar grids and input fields.
 
 ## Status
 
-- 2025-11-07 - Draft opened to standardize range picker unit.
+- 2025-11-07 - Draft created for range picker unit.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Calendar grid exposes `aria-selected`, `aria-disabled`, and instructions for keyboard use.
+- Announces preset selections and manual errors via polite live region.
+
+## Acceptance Checklist
+
+- [ ] Preset coverage verified with tests ensuring emitted ranges are correct.
+- [ ] Manual editing guards documented and accessible.
+- [ ] Storybook stories showcase presets, manual overrides, and error handling; GIF recorded.
+- [ ] Integration sample with analytics export added to template README.
+- [ ] Guardrail watcher ensures timezone changes do not break emission contract.
+
+## Status Log
+
+- 2025-11-07 - Draft logged for upcoming sprint sizing.

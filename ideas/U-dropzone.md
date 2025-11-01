@@ -1,37 +1,57 @@
 # U-dropzone
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-upload-and-confirm`
+- **Contracts**:
+  - Provide unified drag/drop + file input flow with validation and preview hooks.
+  - Reject disallowed files with actionable messaging and analytics telemetry.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for documentation demos, Lane C (DevOps & Automation) for upload guardrails.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, upload, accessibility
 
-## Purpose
+## Contracts
 
-Deliver a drag-and-drop upload unit with previews and type/size guards that stays accessible and predictable across product flows.
+- Unify file validation and preview generation across drag/drop and input selection.
+- Ensure rejection messaging and instrumentation integrate with downstream reporting.
 
-## Problem
+## Props + Shape
 
-Upload entry points today lack consistent validation, keyboard access, and preview scaffolding. Designers and developers duplicate logic, risking regressions and poor a11y support.
+- `accept: string[]` — allowed MIME types/extensions.
+- `maxSizeMb: number`
+- `multiple?: boolean`
+- `files: Array<{ id: string; name: string; size: number; previewUrl?: string }>`
+- `onDrop(files: FileList): void`
+- `onRemove(id: string): void`
+- `onRetry?(id: string): void`
 
-## Proposal
+## Behaviors
 
-1. Define props for accepted mime types, size limits, multiple selection, and callbacks.
-2. Implement drag/drop + keyboard file selection with clear feedback, validation, and inline previews.
-3. Provide Storybook coverage with `play()` exercising validation paths plus recorded demo for Playbook narratives.
-
-## Acceptance Checklist
-
-- [ ] Oversized or disallowed files are rejected with clear messaging.
-- [ ] Images display previews with remove/retry actions.
-- [ ] Keyboard-accessible file input mirrors drag-and-drop behavior.
+- Dragging highlights dropzone and announces instructions to screen readers.
+- Drop/choose flows share the same validation pipeline for size/type rules.
+- Generates preview slots and exposes hooks for retry/remove actions.
 
 ## Status
 
-- 2025-11-07 - Draft recorded to scope dropzone unit.
+- 2025-11-07 - Draft noted for dropzone unit backlog.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Input element remains focusable with descriptive instructions.
+- Rejection reasons announced via live region and visually inline.
+
+## Acceptance Checklist
+
+- [ ] Validation tests cover oversize, disallowed mime, and success paths.
+- [ ] Preview gallery documented with Storybook examples; remove/retry flows captured.
+- [ ] Keyboard path mirrors drag/drop behavior.
+- [ ] Recorded GIF shows accepted vs rejected file flows.
+- [ ] Error telemetry hook wired so Lane D reporting can track rejects.
+
+## Status Log
+
+- 2025-11-07 - Draft submitted for lane review.

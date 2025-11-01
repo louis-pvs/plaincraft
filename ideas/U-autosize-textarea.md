@@ -1,38 +1,57 @@
 # U-autosize-textarea
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-onboarding-light`
+- **Contracts**:
+  - Autosize grows/shrinks within defined min/max rows while respecting content height.
+  - Soft/hard length limits surface warnings and block input without layout jank.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for docs, Lane C (DevOps & Automation) for validation hooks.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, textarea, accessibility
 
-## Purpose
+## Contracts
 
-Deliver an autosizing textarea that respects soft/hard limits, surfaces character feedback, and remains accessible across form compositions.
+- Manage textarea sizing within configured bounds without triggering reflow regressions.
+- Communicate soft/hard limit states clearly while preventing input overflow.
 
-## Problem
+## Props + Shape
 
-Current textareas either grow unpredictably or clip content, leaving users without feedback on limits. Teams reimplement length counters and blocking logic inconsistently, harming accessibility and QA repeatability.
+- `value: string`
+- `minRows: number`
+- `maxRows: number`
+- `softLimit: number`
+- `hardLimit: number`
+- `onChange(next: string): void`
+- `onLimitHit?(type: "soft" | "hard"): void`
 
-## Proposal
+## Behaviors
 
-1. Define props for min/max rows, soft/hard character limits, value, and change/validate callbacks.
-2. Implement autosizing logic with resize observers, counter feedback with warning threshold, and guard rails for hard-limit enforcement.
-3. Ensure accessible announcements and Storybook coverage including `play()` stories for deterministic demos.
-
-## Acceptance Checklist
-
-- [ ] Component grows with content while respecting configured limits.
-- [ ] Counter warns when soft limit approached.
-- [ ] Hard limit blocks additional input and communicates reason.
-- [ ] Accessibility behaviors verified (labels, descriptions, announcements).
+- Expands fluidly until `maxRows` then introduces vertical scroll.
+- Emits warning callbacks when `softLimit` reached and blocks keystrokes beyond `hardLimit`.
+- Re-measures height on container resize to avoid stale scrollbars.
 
 ## Status
 
-- 2025-11-07 - Draft captured to track autosizing textarea unit.
+- 2025-11-07 - Draft captured to standardize autosizing textarea.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Announces soft/hard limit messaging via `aria-live` region with contextual copy.
+- Associates counter status with textarea via `aria-describedby`.
+
+## Acceptance Checklist
+
+- [ ] Autosize verified with unit tests covering growth/shrink scenarios.
+- [ ] Soft/hard limit messaging documented and accessible.
+- [ ] Storybook demos show min/max rows, warning, and blocking behavior; GIF captured.
+- [ ] Guardrail test prevents regressions in length enforcement.
+- [ ] Fallback styles degrade gracefully when JavaScript disabled.
+
+## Status Log
+
+- 2025-11-07 - Draft logged for backlog triage.

@@ -1,37 +1,56 @@
 # U-snackbar-undo
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-onboarding-light`
+- **Contracts**:
+  - Snackbar exposes deterministic timeout + progress bar with undo affordance.
+  - Focus order stays predictable before/during/after snackbar lifetime.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for recorded demos, Lane C (DevOps & Automation) for interaction guardrails.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, snackbar, accessibility
 
-## Purpose
+## Contracts
 
-Create a reusable snackbar unit that supports undo actions, progress timing, and predictable focus management for rollback flows.
+- Provide consistent undo-capable snackbars that share timing + focus rules across apps.
+- Surface countdown state visually and programmatically for automation + docs.
 
-## Problem
+## Props + Shape
 
-Rollback messaging varies across products: timers drift, undo actions vanish after focus loss, and assistive tech rarely hears updates. Without a standardized unit, compositions cannot guarantee reliable recovery.
+- `message: string`
+- `timeoutMs: number`
+- `onUndo(): void`
+- `onTimeout(): void`
+- `progress?: boolean` — toggles progress indicator.
+- `actionLabel?: string` — custom label for undo button.
 
-## Proposal
+## Behaviors
 
-1. Define props for message, timeout, undo callback, and optional progress display.
-2. Implement timer-driven dismissal, undo activation, and focus trapping that respects surrounding UI expectations.
-3. Validate with tests, deterministic Storybook stories, and record a demo showing undo + timeout behaviors.
-
-## Acceptance Checklist
-
-- [ ] Snackbar auto-dismisses on timeout with progress indicator.
-- [ ] Undo callback executes and confirms completion.
-- [ ] Focus order remains sane before, during, and after snackbar lifecycle.
+- Starts countdown on show; invoking undo cancels timeout and emits callback.
+- Keyboard focus returns to originating element after snackbar dismissal.
+- Supports stacking guard to ensure one snackbar visible at a time.
 
 ## Status
 
-- 2025-11-07 - Draft filed to standardize snackbar undo flows.
+- 2025-11-07 - Draft recorded for undo snackbar unit.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Announces message and timeout updates via polite live region.
+- Undo action rendered as button with clear label and focus outline.
+
+## Acceptance Checklist
+
+- [ ] Timeout dismissal + undo callback covered by unit/integration tests.
+- [ ] Progress indicator visually and programmatically reflects remaining time.
+- [ ] Focus order validated with keyboard-only walkthrough in Storybook `play()`.
+- [ ] Recorded GIF demonstrates timeout and undo paths.
+- [ ] Guardrail scenario ensures only one snackbar instance mounts at a time.
+
+## Status Log
+
+- 2025-11-07 - Draft captured for sprint planning.

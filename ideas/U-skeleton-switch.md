@@ -1,36 +1,55 @@
 # U-skeleton-switch
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-notifications`
+- **Contracts**:
+  - Toggle between skeleton and loaded content without leaking hidden markup to assistive tech.
+  - Expose accessible switch state so loading vs ready is clear to all users.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for docs/story demos, Lane C (DevOps & Automation) for governance checks.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, skeleton, accessibility
 
-## Purpose
+## Contracts
 
-Introduce a loader-to-content toggle unit that pairs skeleton placeholders with an accessible switch to standardize loading states.
+- Provide shared skeleton infrastructure that hides loading markup from assistive tech.
+- Synchronize switch state and events across loading/loaded views for reuse.
 
-## Problem
+## Props + Shape
 
-Apps show inconsistent skeleton markup and toggle behaviors, leading to redundant implementations and accessibility gaps (e.g., screen readers reading hidden skeletons).
+- `loading: boolean`
+- `label: string`
+- `skeleton: React.ReactNode`
+- `children: React.ReactNode`
+- `onToggle?(next: boolean): void`
 
-## Proposal
+## Behaviors
 
-1. Model props for loading state, switch labels, and slots for skeleton/content.
-2. Implement skeleton visibility with `aria-hidden` plus accessible switch patterns reflecting state.
-3. Cover with tests, Storybook interactions, and recording for Lane B adoption guides.
-
-## Acceptance Checklist
-
-- [ ] Skeleton region toggles `aria-hidden` accurately.
-- [ ] Switch reflects state via `aria-checked`.
+- Renders skeleton content when `loading === true`, adding `aria-hidden="true"` to hide from SRs.
+- Switch control updates `aria-checked` and invokes `onToggle` when present.
+- Smoothly transitions between states to avoid layout jumpiness.
 
 ## Status
 
-- 2025-11-07 - Draft documented to govern skeleton switch unit.
+- 2025-11-07 - Draft captured for skeleton switch unit.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Associates switch with description clarifying what loads when toggled.
+- Ensures skeleton markup is hidden from focus order and SR output.
+
+## Acceptance Checklist
+
+- [ ] Skeleton visibility toggled with proper `aria-hidden` attributes.
+- [ ] Switch state reflected via `aria-checked` and text updates.
+- [ ] Storybook stories capture loading vs ready flows; GIF recorded for docs.
+- [ ] Guardrail ensures skeleton markup never leaks when loaded content visible.
+- [ ] Unit tests cover accessibility attributes and toggle events.
+
+## Status Log
+
+- 2025-11-07 - Draft logged for lane planning.

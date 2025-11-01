@@ -23,6 +23,13 @@ Teams conflate compositions with ad-hoc flows, omitting metric hypotheses and fa
 2. Provide a checklist for metric hypothesis, fallback states, and Storybook/Playbook assets.
 3. Offer guidance on linking compositions to roadmap cards and status reports.
 
+## Process
+
+1. Partner with Lane A to catalogue required units and dependency relationships.
+2. Draft the checklist + template block, then validate against existing compositions (`C-profile-form-composed`, etc.).
+3. Publish the Playbook entry, add links to Storybook examples, and run guardrail lint.
+4. Notify Lane D backlog pilots to adopt the definition during intake reviews.
+
 ## Acceptance Checklist
 
 - [ ] “Metric hypothesis” checklist captured with example questions.

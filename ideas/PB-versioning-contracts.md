@@ -23,6 +23,13 @@ Without a shared versioning contract, teams guess how to mark breaking changes, 
 2. Capture change classification (patch/minor/major) with required mitigation steps.
 3. Outline migration doc expectations and notification cadence across lanes.
 
+## Process
+
+1. Align with Lane C automation on stability signals and version metadata storage.
+2. Draft the Playbook guidance with classification tables and migration templates.
+3. Validate with recent changes (retrofit one example) and gather lane sign-offs.
+4. Publish and include comms plan template for Lane D to use in status updates.
+
 ## Acceptance Checklist
 
 - [ ] Semantic hints documented for Units/Compositions.

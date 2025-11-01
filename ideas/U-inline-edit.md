@@ -1,39 +1,55 @@
 # U-inline-edit
 
-Lane: A (Foundations & Tooling)
-Status: Draft
+- **Lane**: A (Foundations & Tooling)
+- **Linked Composition**: `C-comment-edit`
+- **Contracts**:
+  - Inline label edits always use optimistic state with guaranteed rollback on failure.
+  - Deterministic recording hook (`tags:["record"]`) exposes the primary edit flow for docs.
 
 ## Lane
 
+Lane: A (Foundations & Tooling)
+
 - **Primary Lane:** A (Foundations & Tooling)
-- **Partners:** Lane B (Narrative & Enablement) for Storybook docs + GIF demos, Lane C (DevOps & Automation) for guardrail coverage.
+- **Partners:** Lane B (Narrative & Enablement), Lane C (DevOps & Automation)
 - **Labels:** unit, inline-edit, accessibility
 
-## Purpose
+## Contracts
 
-Deliver an inline-edit label component that keeps optimistic saves trustworthy, accessible, and recorder-friendly for narrative assets.
+- Guarantee Enter/Esc/blur flows map to optimistic save/cancel logic without manual branching.
+- Expose deterministic recording metadata so documentation stays in sync with the component.
 
-## Problem
+## Props + Shape
 
-Teams currently hand-roll inline edit patterns, causing inconsistent enter/escape semantics, unverified optimistic flows, and missing Storybook recordings. Without a governed unit, documentation and demos drift and accessibility coverage is uneven.
+- `value: string` — current label text sourced from the backing model.
+- `status: "idle" | "saving" | "error"` — drives optimistic UI and messaging.
+- `onCommit(next: string): Promise<void>` — resolves once save succeeds; reject to trigger rollback.
+- `onCancel(): void` — restores the last persisted value and exits edit mode.
+- `label: string` — accessible label announced when focus enters edit mode.
 
-## Proposal
+## Behaviors
 
-1. Model props and contract (value, status, callbacks) with clear optimistic state transitions.
-2. Implement keyboard + pointer behaviors, optimistic commit with rollback, and deterministic Storybook stories with `play()` coverage.
-3. Capture a record-ready interaction (`tags:["record"]`) and wire guardrail tests (behavior + a11y) before adoption.
-
-## Acceptance Checklist
-
-- [ ] Props table documents value, status, callbacks, and optimistic constraints.
-- [ ] Enter/Escape flows commit or cancel edits predictably.
-- [ ] Blur-to-save path mirrors Enter behavior with rollback on failure.
-- [ ] Accessibility coverage: focus states, announcements, and SR text verified.
-- [ ] Storybook `play()` plus one recorded story published for demos.
+- Enter commits edits and transitions to `saving`; Esc cancels and restores the original value.
+- Blur commits using the same optimistic path as Enter, including rollback on rejection.
+- Exposes `data-record-id` so the recording harness can capture deterministic GIFs.
 
 ## Status
 
-- 2025-11-07 - Draft created to capture inline edit unit scope and acceptance.
+- 2025-11-07 - Logged in `Draft` to scope the inline edit unit and acceptance.
 
-<!-- prettier-ignore -->
-_Owner: @lane-a
+## Accessibility
+
+- Announces save/rollback outcomes via `aria-live="polite"` region.
+- Preserves focus on the editable element after optimistic commits complete.
+
+## Acceptance Checklist
+
+- [ ] Props, behaviors, and accessibility contract documented in Storybook (`docs` tab) and template README.
+- [ ] Automated tests cover Enter, Esc, and blur flows with optimistic rollback.
+- [ ] Deterministic `play()` story plus recorded GIF published for Lane B.
+- [ ] a11y audit verifies announcements and focus order.
+- [ ] Guardrail scenario added so future changes keep Enter/Esc semantics intact.
+
+## Status Log
+
+- 2025-11-07 - Draft captured by Lane A foundations.

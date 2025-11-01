@@ -23,6 +23,13 @@ Accessibility expectations live in scattered docs and PR comments, making it dif
 2. List axe rules and manual checks required before sign-off, with links to guardrail tooling.
 3. Provide examples (do/don’t) and references to Storybook docs for deeper dives.
 
+## Process
+
+1. Partner with Lane A to inventory core component accessibility expectations.
+2. Draft the policy page, embedding do/don’t tables and linking to guardrail scripts.
+3. Run accessibility lint (axe smoke in Storybook) to verify examples meet standards.
+4. Publish and route through Lane D compliance review for rollout messaging.
+
 ## Acceptance Checklist
 
 - [ ] Keyboard path requirements documented per component type.

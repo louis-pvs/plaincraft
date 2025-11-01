@@ -23,6 +23,13 @@ Teams capture media with ad-hoc delays, inconsistent tagging, and no shared size
 2. Provide size/time caps, naming conventions, and tagging rules that automation (Lane C) can enforce.
 3. Publish Playbook page with linked Storybook examples plus status-note template for Lane D adoption.
 
+## Process
+
+1. Update `/templates/script/README.md` and recording scripts with the canonical delay knob and tagging guidance.
+2. Capture sample recordings (GIF + video) following the checklist; document expected file structure and metadata.
+3. Publish the Playbook page with links to Storybook demos and circulate adoption notes via Lane D status update.
+4. Hand off to Lane C to wire guardrails that enforce the new standards.
+
 ## Acceptance Checklist
 
 - [ ] Global delay knob documented with recommended defaults.
