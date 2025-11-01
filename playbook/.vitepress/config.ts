@@ -7,7 +7,7 @@ export default defineConfig({
   title: "Plaincraft Playbook",
   description:
     "Component patterns and best practices for Plaincraft UI snippets",
-  base: "/playbook/",
+  base: "/plaincraft/playbook/",
   outDir: "../playbook-static",
   vite: {
     resolve: {

@@ -10,6 +10,10 @@ const config: StorybookConfig = {
   ],
   addons: ["@storybook/addon-a11y", "@storybook/addon-docs"],
   async viteFinal(baseConfig) {
+    // Set base path for GitHub Pages deployment
+    if (baseConfig.base === undefined) {
+      baseConfig.base = "/plaincraft/storybook/";
+    }
     const { createRequire } = await import("node:module");
     const { access } = await import("node:fs/promises");
     const resolveModule = createRequire(import.meta.url);
