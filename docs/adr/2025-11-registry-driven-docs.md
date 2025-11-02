@@ -1,6 +1,6 @@
 ---
 id: adr-2025-11-pilot-registry-driven-docs
-owner: @lane-d
+owner: "@lane-d"
 status: Accepted
 version: 1.0.0
 created: 2025-11-02
@@ -42,8 +42,8 @@ Faster intake, fewer stale docs, CI enforcement on projections.
 - p95 total avg (baseline): 547.0 s
 - p95 build avg (baseline): 321.4 s
 - Tripwire delta: +90 s over baseline p95 total
-- First pilot PR: [TBD-PR-URL]
-- Gate status: Pending initial run
+- First pilot PR: https://github.com/louis-pvs/plaincraft/pull/149
+- Gate status: **PASSED** (local run verified by Lane C)
 - Waivers: None (\`waivers: []\` in registry entries)
 
 ### Decision Log
