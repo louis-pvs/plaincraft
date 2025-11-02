@@ -151,9 +151,17 @@ try {
     result.errors.push(...dangerValidation.errors);
     result.warnings.push(...dangerValidation.warnings);
 
-    // Check size compliance
-    const sizeValidation = checkSizeCompliance(content);
-    result.warnings.push(...sizeValidation.warnings);
+    // Check size compliance (skip if in sizeExceptions)
+    const sizeExceptions = allowlistConfig?.sizeExceptions?.scripts || [];
+    const isExemptFromSize = sizeExceptions.some((pattern) => {
+      const normalized = pattern.replace(/\\/g, "/");
+      return relativePath.replace(/\\/g, "/") === normalized;
+    });
+
+    if (!isExemptFromSize) {
+      const sizeValidation = checkSizeCompliance(content);
+      result.warnings.push(...sizeValidation.warnings);
+    }
 
     totalErrors += result.errors.length;
     totalWarnings += result.warnings.length;

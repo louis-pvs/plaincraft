@@ -23,9 +23,10 @@ export async function loadAllowlist() {
     return {
       domains: data.domains || [],
       policyIgnore: data.policyIgnore || [],
+      sizeExceptions: data.sizeExceptions || null,
     };
   } catch {
-    return { domains: [], policyIgnore: [] };
+    return { domains: [], policyIgnore: [], sizeExceptions: null };
   }
 }
 

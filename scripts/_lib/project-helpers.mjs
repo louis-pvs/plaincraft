@@ -1,6 +1,7 @@
 /**
  * project-helpers.mjs
  * @since 2025-11-02
+ * @version 0.1.0
  * Additional project integration helpers
  */
 
