@@ -5,22 +5,23 @@ on:
 
 jobs:
   cascade:
+    name: Cascade Registry Baton
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       issues: write
       pull-requests: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: pnpm/action-setup@v4
         with:
           version: 9.0.0
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version-file: ".nvmrc"
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 

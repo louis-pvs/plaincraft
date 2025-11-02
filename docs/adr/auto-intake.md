@@ -29,7 +29,7 @@ Adopt registry-driven docs with automation:
 
 ## Intake Hand-off (Zero-Talk)
 
-- ADR ID: ARCH-registry-driven-docs
+- ADR ID: adr-2025-11-auto-intake-and-cascade
 - Delta type: Docs
 - Pilot unit/pattern: U-registry-docs-pilot
 - Owners: A:@lane-a B:@lane-b C:@lane-c D:@lane-d

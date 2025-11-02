@@ -33,6 +33,66 @@ schema:
   last_verified: date
 
 items:
+  - id: adr-2025-10-idea-lifecycle
+    title: Idea Lifecycle, Sources of Truth, and Enforcement Split
+    type: arch
+    lane: D
+    current_owner: "@lane-d"
+    next_owner: "@lane-d"
+    next_lane: "D"
+    project_item: ""
+    status: "Accepted"
+    surfaces:
+      storybook: ""
+      playbook: "playbook/workflows/idea-lifecycle.md"
+      readme: ""
+    evidence:
+      A:
+        storybook_run: ""
+        readme_diff: ""
+        pr_url: ""
+      B:
+        playbook_page: ""
+        asset_note: ""
+      C:
+        gate_comment: ""
+        metrics_note: ""
+      D:
+        decision_log: "https://github.com/louis-pvs/plaincraft/blob/main/docs/adr/2025-10-idea-lifecycle.md"
+        registry_commit: ""
+    ttl_days: 365
+    last_verified: "2025-11-02"
+
+  - id: adr-2025-11-pilot-registry-driven-docs
+    title: Registry-Driven Docs Pilot
+    type: arch
+    lane: D
+    current_owner: "@lane-a"
+    next_owner: "@lane-b"
+    next_lane: "B"
+    project_item: ""
+    status: "Accepted"
+    surfaces:
+      storybook: "storybook/docs/Patterns/inline-edit.mdx"
+      playbook: "playbook/pages/inline-edit.md"
+      readme: "src/components/inline-edit/README.md"
+    evidence:
+      A:
+        storybook_run: ""
+        readme_diff: ""
+        pr_url: ""
+      B:
+        playbook_page: ""
+        asset_note: ""
+      C:
+        gate_comment: ""
+        metrics_note: ""
+      D:
+        decision_log: "https://github.com/louis-pvs/plaincraft/blob/main/docs/adr/2025-11-registry-driven-docs.md"
+        registry_commit: ""
+    ttl_days: 180
+    last_verified: "2025-11-02"
+
   - id: adr-2025-11-auto-intake-and-cascade
     title: Auto Intake & Registry-Driven Cascade
     type: arch
@@ -64,14 +124,14 @@ items:
     last_verified: "2025-11-02"
 
   - id: ARCH-registry-driven-docs
-    title: Registry-driven docs pilot
+    title: Registry-driven docs pilot (legacy ID)
     type: arch
     lane: D
     current_owner: "@lane-a"
     next_owner: "@lane-b"
     next_lane: "B"
     project_item: "https://github.com/orgs/<org>/projects/<id>/views/<view>"
-    status: "Ticketed"
+    status: "Archived"
     surfaces:
       storybook: "storybook/docs/Patterns/registry-docs.mdx"
       playbook: "playbook/pages/patterns/registry-docs.md"
