@@ -64,6 +64,48 @@ jobs:
         run: |
           set -o pipefail
           pnpm guardrails --output json --report | tee guardrails-report.json
+      - name: Report size exceptions
+        if: always()
+        run: |
+          echo "## ⚠️ Technical Debt - LOC Violations" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          EXCEPTION_COUNT=$(node -e "const fs = require('fs'); const data = JSON.parse(fs.readFileSync('scripts/_lib/allowlist.json', 'utf-8')); console.log(data.sizeExceptions?.scripts?.length || 0);")
+          TARGET_DATE=$(node -e "const fs = require('fs'); const data = JSON.parse(fs.readFileSync('scripts/_lib/allowlist.json', 'utf-8')); console.log(data.sizeExceptions?.targetDate || 'Not set');")
+          TRACKED_IN=$(node -e "const fs = require('fs'); const data = JSON.parse(fs.readFileSync('scripts/_lib/allowlist.json', 'utf-8')); console.log(data.sizeExceptions?.trackedIn || 'Not tracked');")
+
+          echo "**Status**: ${EXCEPTION_COUNT} scripts exceeding LOC limits (300 LOC per script, 60 LOC per function)" >> $GITHUB_STEP_SUMMARY
+          echo "**Target Fix Date**: ${TARGET_DATE}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tracked In**: ${TRACKED_IN}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary>View excepted scripts (${EXCEPTION_COUNT} total)</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          node -e "
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('scripts/_lib/allowlist.json', 'utf-8'));
+            const scripts = data.sizeExceptions?.scripts || [];
+            scripts.forEach(script => console.log('- \`' + script + '\`'));
+          " >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Calculate days until target
+          DAYS_REMAINING=$(node -e "
+            const target = new Date('${TARGET_DATE}');
+            const now = new Date();
+            const diff = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+            console.log(diff);
+          ")
+
+          if [ "$DAYS_REMAINING" -lt 0 ]; then
+            echo "⚠️ **WARNING**: Target date has passed! Refactoring is overdue by $((-DAYS_REMAINING)) days." >> $GITHUB_STEP_SUMMARY
+          elif [ "$DAYS_REMAINING" -lt 14 ]; then
+            echo "⚠️ **WARNING**: Only ${DAYS_REMAINING} days remaining until target date." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ ${DAYS_REMAINING} days remaining until target refactoring date." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
       - name: Upload guardrail report
         if: always()
         uses: actions/upload-artifact@v4
