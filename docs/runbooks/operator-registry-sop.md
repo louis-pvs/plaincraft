@@ -1,13 +1,17 @@
 ---
 id: runbook-operator-registry-sop
-owner: @lane-d
+owner: "@lane-d"
 version: 1.0.0
 created: 2025-11-02
 ttl_days: 60
 last_verified: 2025-11-02
+prev: /runbooks/observer
+next: /runbooks/artifact-manual-lifecycle
 ---
 
 # Operator SOP — Registry-Driven Docs
+
+**Related:** [Lane A](/runbooks/lane-A) · [Lane B](/runbooks/lane-B) · [Lane C](/runbooks/lane-C) · [Lane D](/runbooks/lane-D) · [Observer](/runbooks/observer) · [Artifact Lifecycle](/runbooks/artifact-manual-lifecycle)
 
 You keep the registry true, grant waivers with dates, and ensure projections don't lie. Judgment only; no YAML gymnastics during reviews.
 
@@ -62,3 +66,7 @@ Stop rule: pilot missing → block refactor PR.
 - Edit generated projections by hand.
 - Approve PR that changes contracts without Doc Impact.
 - Let a page sit Stale past expiry.
+
+---
+
+**Navigation:** [← Observer](/runbooks/observer) · [Next: Artifact Lifecycle →](/runbooks/artifact-manual-lifecycle)

@@ -1,3 +1,15 @@
+---
+id: ref-pr-body-generation
+owner: "@lane-c"
+lane: C
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 90
+last_verified: 2025-11-02
+prev: /reference/coverage-map
+next: /scripts-reference
+---
+
 # PR Body Generation Enhancement
 
 ## Overview

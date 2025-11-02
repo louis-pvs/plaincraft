@@ -7,9 +7,12 @@ created: 2025-11-02
 ttl_days: 60
 last_verified: 2025-11-02
 scaffold_ref: /templates/runbook-lifecycle@1.0.0
+prev: /runbooks/operator-registry-sop
 ---
 
 # Artifact Lifecycle Manual Runbook
+
+**Related:** [Lane A](/runbooks/lane-A) · [Lane B](/runbooks/lane-B) · [Lane C](/runbooks/lane-C) · [Lane D](/runbooks/lane-D) · [Observer](/runbooks/observer) · [Operator SOP](/runbooks/operator-registry-sop)
 
 ## Scope
 
@@ -223,3 +226,7 @@ node scripts/ops/reconcile-status.mjs --id ARCH-123 --yes
 | Date       | Change                                   | Author  |
 | ---------- | ---------------------------------------- | ------- |
 | 2025-11-02 | Initial unified manual lifecycle runbook | @lane-d |
+
+---
+
+**Navigation:** [← Operator SOP](/runbooks/operator-registry-sop)

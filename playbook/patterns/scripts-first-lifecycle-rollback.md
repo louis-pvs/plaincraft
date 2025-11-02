@@ -1,3 +1,15 @@
+---
+id: pattern-scripts-first-lifecycle-rollback
+owner: "@lane-b"
+lane: B
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 180
+last_verified: 2025-11-02
+prev: /patterns/scripts-first-lifecycle-rollout
+next: /patterns/script-automation-guardrails
+---
+
 # Scripts-First Lifecycle Rollback
 
 - **Audience:** Lane C implementers and Lane D release captains responding to failed rollouts

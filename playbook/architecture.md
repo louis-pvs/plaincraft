@@ -1,3 +1,15 @@
+---
+id: playbook-architecture
+owner: "@lane-b"
+lane: B
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 180
+last_verified: 2025-11-02
+prev: /
+next: /patterns/
+---
+
 # Architecture
 
 Plaincraft follows a **headless component architecture** that separates business logic from presentation. This design enables maximum flexibility while maintaining type safety and testability.

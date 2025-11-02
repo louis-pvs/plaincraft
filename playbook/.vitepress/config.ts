@@ -41,6 +41,38 @@ export default defineConfig({
         items: [
           { text: "Overview", link: "/patterns/" },
           { text: "Inline Edit Label", link: "/patterns/inline-edit-label" },
+          {
+            text: "Ideas Source of Truth",
+            link: "/patterns/ideas-source-of-truth",
+          },
+          {
+            text: "Scripts-First Lifecycle Overview",
+            link: "/patterns/scripts-first-lifecycle-overview",
+          },
+          {
+            text: "Scripts-First Lifecycle Rollout",
+            link: "/patterns/scripts-first-lifecycle-rollout",
+          },
+          {
+            text: "Scripts-First Lifecycle Rollback",
+            link: "/patterns/scripts-first-lifecycle-rollback",
+          },
+          {
+            text: "Script Automation Guardrails",
+            link: "/patterns/script-automation-guardrails",
+          },
+          {
+            text: "Release Changelog Automation",
+            link: "/patterns/release-changelog-automation",
+          },
+          {
+            text: "Roadmap Project Onboarding",
+            link: "/patterns/roadmap-project-onboarding",
+          },
+          {
+            text: "Backlog Pilot Scripts-First",
+            link: "/patterns/backlog-pilot-scripts-first",
+          },
         ],
       },
     ],

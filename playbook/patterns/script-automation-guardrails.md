@@ -1,3 +1,15 @@
+---
+id: pattern-script-automation-guardrails
+owner: "@lane-b"
+lane: B
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 180
+last_verified: 2025-11-02
+prev: /patterns/scripts-first-lifecycle-rollback
+next: /patterns/release-changelog-automation
+---
+
 # Script Automation Guardrails
 
 - **Audience:** Lane C automation engineers pairing with Lane B storytellers

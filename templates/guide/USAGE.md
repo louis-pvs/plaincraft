@@ -25,19 +25,16 @@ pnpm guides:lint                  # legacy guardrail (rarely needed now)
 
 ### 3. Fill Frontmatter
 
+````yaml
+### 3. Fill Frontmatter
+
 ```yaml
 ---
-id: guide-your-topic           # Match filename
-owner: @your-github-handle     # Your handle
-lane: D                        # Usually D for meta/docs
-artifact_id: ARCH-your-ticket  # Reference ticket
-scaffold_ref: /templates/your-template@v0.1  # Template path + version
-version: 0.1.0                 # Start at 0.1.0
-created: 2025-10-28            # Today's date
-ttl_days: 90                   # Standard 90 days
-last_verified: 2025-10-28      # Today's date
----
-```
+id: guide-{slug}
+owner: "@your-github-handle"     # Your handle (quoted)
+lane: A|B|C|D
+artifact_id: {ARCH|U|C|B}-*  # ticket ID
+````
 
 ### 4. Write "When to use" Section
 

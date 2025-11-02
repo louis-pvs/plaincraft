@@ -1,6 +1,6 @@
 ---
 id: workflow-idea-lifecycle
-owner: @lane-d
+owner: "@lane-d"
 lane: D
 version: 1.0.0
 created: 2025-11-02

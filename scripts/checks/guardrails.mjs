@@ -97,7 +97,7 @@ const SCOPE_COMMANDS = {
   ],
   docs: [
     { id: "docs:check", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:check"] },
-    { id: "docs:build", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:build"] },
+    { id: "docs:lint", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:lint"] },
   ],
   pr: [
     { id: "pr:template", idea: IDEA_ID, cmd: ["pnpm", "run", "pr:template"] },

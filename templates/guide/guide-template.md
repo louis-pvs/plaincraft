@@ -1,7 +1,7 @@
 ---
-id: guide-template
-owner: @your-handle
-lane: D
+id: guide-your-slug
+owner: "@your-handle"
+lane: A
 artifact_id: ARCH-template-ticket
 scaffold_ref: /templates/template-name@v0.1
 version: 0.1.0

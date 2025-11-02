@@ -1,3 +1,15 @@
+---
+id: pattern-scripts-first-lifecycle-overview
+owner: "@lane-b"
+lane: B
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 180
+last_verified: 2025-11-02
+prev: /patterns/
+next: /patterns/scripts-first-lifecycle-rollout
+---
+
 # Scripts-First Lifecycle Overview
 
 - **Audience:** Lane D program leads and Lane B storytellers coordinating rollouts

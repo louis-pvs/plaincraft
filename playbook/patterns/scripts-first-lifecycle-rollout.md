@@ -1,3 +1,15 @@
+---
+id: pattern-scripts-first-lifecycle-rollout
+owner: "@lane-b"
+lane: B
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 180
+last_verified: 2025-11-02
+prev: /patterns/scripts-first-lifecycle-overview
+next: /patterns/scripts-first-lifecycle-rollback
+---
+
 # Scripts-First Lifecycle Rollout
 
 - **Audience:** Lane C engineers bootstrapping work from validated ideas

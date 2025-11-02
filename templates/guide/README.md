@@ -28,15 +28,15 @@ Do **not** create new guides. Instead:
 
 ```yaml
 ---
-id: guide-<slug>              # Unique identifier
-owner: @handle                # Exactly one owner
-lane: A|B|C|D                 # Roadmap lane
-artifact_id: U-*|C-*|ARCH-*   # Linked ticket
-scaffold_ref: /templates/<name>@vX.Y  # Template reference
-version: X.Y.Z                # Guide version
-created: YYYY-MM-DD           # Creation date
-ttl_days: 90                  # Time to live
-last_verified: YYYY-MM-DD     # Last verification date
+id: guide-<slug> # Unique identifier
+owner: "@handle" # Exactly one owner (quoted if starts with @)
+lane: A|B|C|D # Roadmap lane
+artifact_id: U-*|C-*|ARCH-* # Linked ticket
+scaffold_ref: /templates/<name>@vX.Y # Template reference
+version: X.Y.Z # Guide version
+created: YYYY-MM-DD # Creation date
+ttl_days: 90 # Time to live
+last_verified: YYYY-MM-DD # Last verification date
 ---
 ```
 

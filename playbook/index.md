@@ -1,3 +1,14 @@
+---
+id: playbook-home
+owner: "@lane-b"
+lane: B
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 180
+last_verified: 2025-11-02
+next: /architecture
+---
+
 # Plaincraft Playbook
 
 Welcome to the Plaincraft Playbook — a living collection of component patterns, architecture decisions, and best practices for building accessible, maintainable UI components.

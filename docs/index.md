@@ -27,11 +27,13 @@ features:
 - [Workflow Enforcement Policy](/policy/workflow-enforcement)
 - [Project Schema Reference](/reference/project-schema)
 - Runbooks:
-  - [Lane A](/runbooks/lane-A)
-  - [Lane B](/runbooks/lane-B)
-  - [Lane C](/runbooks/lane-C)
-  - [Lane D](/runbooks/lane-D)
-  - [Observer](/runbooks/observer)
+  - [Lane A (Developer UI)](/runbooks/lane-A)
+  - [Lane B (Playbook)](/runbooks/lane-B)
+  - [Lane C (DevOps & Enforcement)](/runbooks/lane-C)
+  - [Lane D (Ideas & Product Ops)](/runbooks/lane-D)
+  - [Observer (Situational Checks)](/runbooks/observer)
+  - [Operator Registry SOP](/runbooks/operator-registry-sop)
+  - [Artifact Manual Lifecycle](/runbooks/artifact-manual-lifecycle)
 - [ADR 2025-10 Idea Lifecycle](/adr/2025-10-idea-lifecycle)
 
 ### External Destinations

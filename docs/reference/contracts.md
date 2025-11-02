@@ -1,3 +1,15 @@
+---
+id: ref-contracts
+owner: "@lane-d"
+lane: D
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 90
+last_verified: 2025-11-02
+prev: /reference/project-schema
+next: /reference/coverage-map
+---
+
 # Contracts Manifest
 
 > Canonical source for public workflow and governance contracts referenced in `ARCH-one-artifact-e2e-orch.md`.
@@ -22,20 +34,34 @@ Provide a single auditable list of active contracts (identity, lifecycle, schema
 
 ## Change Log
 
-| Date       | Contract       | Change                 | Reason       | Approved By |
-| ---------- | -------------- | ---------------------- | ------------ | ----------- |
-| 2025-11-01 | identity       | Initial manifest entry | ADR accepted | Lane D      |
-| 2025-11-01 | lifecycle      | Initial manifest entry | ADR accepted | Lane D      |
-| 2025-11-01 | project-schema | Initial manifest entry | ADR accepted | Lane D      |
-| 2025-11-01 | frontmatter    | Initial manifest entry | ADR accepted | Lane D      |
-| 2025-11-01 | template       | Initial manifest entry | ADR accepted | Lane D      |
-| 2025-11-01 | governance     | Initial manifest entry | ADR accepted | Lane D      |
-| 2025-11-01 | freshness      | Initial manifest entry | ADR accepted | Lane D      |
+| Date       | Contract       | Change                                        | Reason                  | Approved By |
+| ---------- | -------------- | --------------------------------------------- | ----------------------- | ----------- |
+| 2025-11-02 | frontmatter    | Standardized owner format to quoted "@handle" | VitePress compatibility | Lane D      |
+| 2025-11-01 | identity       | Initial manifest entry                        | ADR accepted            | Lane D      |
+| 2025-11-01 | lifecycle      | Initial manifest entry                        | ADR accepted            | Lane D      |
+| 2025-11-01 | project-schema | Initial manifest entry                        | ADR accepted            | Lane D      |
+| 2025-11-01 | frontmatter    | Initial manifest entry                        | ADR accepted            | Lane D      |
+| 2025-11-01 | template       | Initial manifest entry                        | ADR accepted            | Lane D      |
+| 2025-11-01 | governance     | Initial manifest entry                        | ADR accepted            | Lane D      |
+| 2025-11-01 | freshness      | Initial manifest entry                        | ADR accepted            | Lane D      |
 
 ## Guardrails
 
 - Each contract must list: ID, owner, source doc, review interval, status.
 - Contracts without an owner or overdue review become `Stale` and should block merges touching related areas after grace period.
+
+## Frontmatter Standard
+
+**Owner Field Format:** The `owner` field in YAML frontmatter must be quoted when the value starts with `@`:
+
+```yaml
+owner: "@lane-d"    # ✅ Correct - quoted
+owner: @lane-d      # ❌ Wrong - YAML parse error
+owner: lane-d       # ⚠️  Allowed but not standard
+```
+
+This is required for VitePress/YAML compatibility, as `@` is a reserved character in YAML.
+
 - Automation may generate a coverage report linking contracts to tests and docs.
 
 ## Next Steps

@@ -1,3 +1,15 @@
+---
+id: pattern-release-changelog-automation
+owner: "@lane-b"
+lane: B
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 180
+last_verified: 2025-11-02
+prev: /patterns/script-automation-guardrails
+next: /patterns/roadmap-project-onboarding
+---
+
 # Release Changelog Automation
 
 - **Audience:** Lane D release leads who own Playbook status notes

@@ -1,3 +1,15 @@
+---
+id: ref-coverage-map
+owner: "@lane-d"
+lane: D
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 90
+last_verified: 2025-11-02
+prev: /reference/contracts
+next: /reference/pr-body-generation
+---
+
 # Coverage Map
 
 > Links each adopted contract to implementation artifacts (scripts, templates, docs, tests) for drift detection.

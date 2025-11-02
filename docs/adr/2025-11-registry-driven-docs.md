@@ -1,6 +1,6 @@
 ---
 id: adr-2025-11-registry-driven-docs
-owner: @lane-d
+owner: "@lane-d"
 status: Accepted
 version: 1.1.0
 created: 2025-11-02

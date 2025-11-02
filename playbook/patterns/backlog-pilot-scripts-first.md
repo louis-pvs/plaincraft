@@ -1,3 +1,14 @@
+---
+id: pattern-backlog-pilot-scripts-first
+owner: "@lane-d"
+lane: D
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 180
+last_verified: 2025-11-02
+prev: /patterns/roadmap-project-onboarding
+---
+
 # Backlog Pilot Scripts-First Ops
 
 - **Audience:** Lane D backlog pilots stewarding the Plaincraft Roadmap

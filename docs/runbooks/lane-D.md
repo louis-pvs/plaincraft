@@ -1,14 +1,18 @@
 ---
 id: runbook-lane-d
-owner: @lane-d
+owner: "@lane-d"
 lane: D
 version: 1.0.0
 created: 2025-11-02
 ttl_days: 60
 last_verified: 2025-11-02
+prev: /runbooks/lane-C
+next: /runbooks/observer
 ---
 
 # Lane D Runbook (Ideas & Product Ops)
+
+**Related:** [Lane A](/runbooks/lane-A) · [Lane B](/runbooks/lane-B) · [Lane C](/runbooks/lane-C) · [Observer](/runbooks/observer) · [Operator SOP](/runbooks/operator-registry-sop) · [Artifact Lifecycle](/runbooks/artifact-manual-lifecycle)
 
 ## Before
 
@@ -26,3 +30,7 @@ last_verified: 2025-11-02
 - Archive on closeout.
 
 **Success:** single source of truth preserved; zero duplicate truth.
+
+---
+
+**Navigation:** [← Lane C](/runbooks/lane-C) · [Next: Observer →](/runbooks/observer)

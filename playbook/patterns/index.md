@@ -1,3 +1,15 @@
+---
+id: patterns-index
+owner: "@lane-b"
+lane: B
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 90
+last_verified: 2025-11-02
+prev: /architecture
+next: /patterns/inline-edit-label
+---
+
 # Component Patterns
 
 This section contains detailed documentation for each Plaincraft component pattern. Each pattern includes API documentation, architecture overview, usage examples, and adoption guides.

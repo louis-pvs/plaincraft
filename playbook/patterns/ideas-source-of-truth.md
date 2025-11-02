@@ -1,3 +1,15 @@
+---
+id: pattern-ideas-source-of-truth
+owner: "@lane-b"
+lane: B
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 180
+last_verified: 2025-11-02
+prev: /patterns/
+next: /patterns/scripts-first-lifecycle-overview
+---
+
 # Ideas Source of Truth
 
 - **Audience:** Lane D backlog owners coordinating with Lane B storytellers
