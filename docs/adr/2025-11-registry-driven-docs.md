@@ -35,3 +35,19 @@ Faster intake, fewer stale docs, CI enforcement on projections.
 - Docs affected: PATTERN-inline-edit, RUNBOOK-lane-D, WORKFLOW-adr-intake
 - Registry updates: WORKFLOW-adr-intake already added; add PATTERN-inline-edit & RUNBOOK-lane-D; mark dependents Stale
 - Review date: 2026-05-01
+
+## Pilot Tracking
+
+- Baseline metrics file: `artifacts/baseline-ci.json`
+- p95 total avg (baseline): 547.0 s
+- p95 build avg (baseline): 321.4 s
+- Tripwire delta: +90 s over baseline p95 total
+- First pilot PR: [TBD-PR-URL]
+- Gate status: Pending initial run
+- Waivers: None (\`waivers: []\` in registry entries)
+
+### Decision Log
+
+| Timestamp (UTC) | Outcome | p95 Delta vs Baseline | Notes           | Approved By |
+| --------------- | ------- | --------------------- | --------------- | ----------- |
+| [TBD]           | Pending | N/A                   | Pilot executing | Lane D      |
