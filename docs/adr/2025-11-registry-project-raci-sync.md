@@ -65,7 +65,7 @@ Use the registry as the authority for role fields and sync them into a Project R
 
 ## Intake Hand-off (Zero-Talk)
 
-- ADR ID: ARCH-registry-project-raci-sync
+- ADR ID: adr-2025-11-registry-project-raci-sync
 - Delta type: Contracts
 - Pilot unit/pattern: U-registry-docs-pilot
 - Owners: A:@lane-a B:@lane-b C:@lane-c D:@lane-d
