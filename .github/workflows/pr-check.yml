@@ -43,35 +43,64 @@ jobs:
             exit 1
           fi
 
-      - name: Check commits
+      - name: Validate commit headers (full pattern)
         id: commits
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          # Verify all commits have tag prefix [U-*], [C-*], [B-*], [ARCH-*], [PB-*], or [D-*]
-          commits=$(gh pr view ${{ github.event.pull_request.number }} --json commits -q '.commits[].messageHeadline')
+          # Use commit-guard for full regex validation per policy
+          pnpm commit:guard --range origin/main..HEAD --report | tee commit-guard-report.json
 
-          missing_tags=0
-          invalid_commits=""
-          while IFS= read -r commit; do
-            # Check for any of the valid tag patterns at the start of the message
-            # Must start with [ then one of the prefixes, then -, then anything, then ]
-            if ! echo "$commit" | grep -qE '^\[(U-|C-|B-|ARCH-|PB-|D-)'; then
-              echo "❌ Missing valid tag: $commit"
-              invalid_commits="${invalid_commits}- ${commit}"$'\n'
-              missing_tags=$((missing_tags + 1))
-            fi
-          done <<< "$commits"
-
-          if [ $missing_tags -gt 0 ]; then
-            echo "::error title=Invalid Commit Tags::${missing_tags} commit(s) missing valid tag prefix: [U-*], [C-*], [B-*], [ARCH-*], [PB-*], or [D-*]"
-            # Output invalid commits on separate lines
-            echo "Invalid commits:"
-            echo "$invalid_commits"
+          if [ $? -ne 0 ]; then
+            echo "::error title=Commit Header Validation Failed::One or more commits do not match the required pattern."
+            echo "See commit-guard-report.json for details."
             exit 1
           fi
 
-          echo "✅ All commits have valid tag prefix"
+          echo "✅ All commit headers valid"
+
+      - name: Validate branch format
+        id: branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Policy requirement #3: Branch format type/ID-slug
+          pnpm branch:guard --report | tee branch-guard-report.json
+
+          if [ $? -ne 0 ]; then
+            echo "::error title=Branch Format Failed::Branch does not match required format type/ID-slug."
+            exit 1
+          fi
+
+          echo "✅ Branch format valid"
+
+      - name: Validate PR title format
+        id: pr-title
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Policy requirement #4: PR title must be [ID] Title matching branch ID
+          pnpm pr:title-guard --report | tee pr-title-guard-report.json
+
+          if [ $? -ne 0 ]; then
+            echo "::error title=PR Title Failed::PR title does not match required format [ID] Title."
+            exit 1
+          fi
+
+          echo "✅ PR title valid"
+
+      - name: Check for duplicate branches/PRs
+        id: duplicates
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Policy requirement #5: Only one branch/PR per ID
+          pnpm duplicate:guard --report | tee duplicate-guard-report.json
+
+          if [ $? -ne 0 ]; then
+            echo "::error title=Duplicate Branch/PR::Multiple open branches or PRs detected for same ID."
+            exit 1
+          fi
+
+          echo "✅ No duplicates found"
 
       - name: Summary
         if: always()
@@ -91,9 +120,35 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ steps.commits.outcome }}" == "success" ]; then
-            echo "✅ **Commit Tags**: Passed" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Commit Headers**: Passed" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ **Commit Tags**: Failed" >> $GITHUB_STEP_SUMMARY
-            echo "- All commits must have valid tag prefix" >> $GITHUB_STEP_SUMMARY
-            echo "- Valid tags: \`[U-*]\`, \`[C-*]\`, \`[B-*]\`, \`[ARCH-*]\`, \`[PB-*]\`, \`[D-*]\`" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Commit Headers**: Failed" >> $GITHUB_STEP_SUMMARY
+            echo "- All commits must match pattern from policy" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.branch.outcome }}" == "success" ]; then
+            echo "✅ **Branch Format**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Branch Format**: Failed" >> $GITHUB_STEP_SUMMARY
+            echo "- Branch must follow type/ID-slug format" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.pr-title.outcome }}" == "success" ]; then
+            echo "✅ **PR Title**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **PR Title**: Failed" >> $GITHUB_STEP_SUMMARY
+            echo "- PR title must be [ID] Title with ID matching branch" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.duplicates.outcome }}" == "success" ]; then
+            echo "✅ **No Duplicates**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Duplicate Check**: Failed" >> $GITHUB_STEP_SUMMARY
+            echo "- Only one open branch/PR per ID allowed" >> $GITHUB_STEP_SUMMARY
           fi
