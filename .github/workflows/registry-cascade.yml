@@ -1,0 +1,36 @@
+name: Registry Cascade
+on:
+  push:
+    paths: ["docs/_registry.yaml"]
+
+jobs:
+  cascade:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cascade next owner based on registry
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            const reg = yaml.load(fs.readFileSync('docs/_registry.yaml','utf8'));
+            if (!reg || !reg.items) { 
+              core.warning('Registry missing items - skipping cascade');
+              return;
+            }
+            for (const item of reg.items) {
+              if (!item.id || !item.next_owner || !item.next_lane) continue;
+              const title = `ADR Intake: ${item.id}`;
+              const { data: issues } = await github.rest.search.issuesAndPullRequests({ q: `repo:${context.repo.owner}/${context.repo.repo} "${title}" in:title type:issue` });
+              if (!(issues.items && issues.items.length)) continue;
+              const issue = issues.items[0];
+              await github.rest.issues.addLabels({ owner: context.repo.owner, repo: context.repo.repo, issue_number: issue.number, labels: [`lane:${item.next_lane}`] });
+              const handle = item.next_owner.replace(/^@/,'').trim();
+              await github.rest.issues.addAssignees({ owner: context.repo.owner, repo: context.repo.repo, issue_number: issue.number, assignees: [handle] });
+              core.info(`✅ Cascaded ${item.id} to ${item.next_owner} in lane ${item.next_lane}`);
+            }

@@ -1,0 +1,45 @@
+name: D Accept Gate
+on:
+  workflow_dispatch: {}
+  push:
+    paths: ["docs/_registry.yaml"]
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag items ready for D acceptance
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            const reg = yaml.load(fs.readFileSync('docs/_registry.yaml','utf8'));
+            if (!reg || !reg.items) { 
+              core.warning('Registry missing items - skipping label update');
+              return;
+            }
+            for (const item of reg.items) {
+              if (!item.id) continue;
+              const okA = item?.evidence?.A?.storybook_run && item?.evidence?.A?.readme_diff && item?.evidence?.A?.pr_url;
+              const okB = item?.evidence?.B?.playbook_page && item?.evidence?.B?.asset_note;
+              const okC = item?.evidence?.C?.gate_comment && item?.evidence?.C?.metrics_note;
+              if (okA && okB && okC) {
+                const title = `ADR Intake: ${item.id}`;
+                const { data: issues } = await github.rest.search.issuesAndPullRequests({ q: `repo:${context.repo.owner}/${context.repo.repo} "${title}" in:title type:issue` });
+                if (issues.items && issues.items.length) {
+                  const issue = issues.items[0];
+                  await github.rest.issues.addLabels({ owner: context.repo.owner, repo: context.repo.repo, issue_number: issue.number, labels: ['ready-for-d-accept'] });
+                  core.info(`✅ ${item.id} ready for D acceptance - labeled`);
+                } else {
+                  core.info(`⚠️  ${item.id} has evidence but no Intake Card found`);
+                }
+              }
+            }
+      - name: Log ready items
+        run: echo "✅ Tagged items ready for D acceptance (see labels)."
