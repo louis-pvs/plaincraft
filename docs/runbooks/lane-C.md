@@ -1,32 +1,27 @@
 ---
 id: runbook-lane-c
-owner: "@lane-c"
+owner: @lane-c
 lane: C
-version: 1.0.0
+version: 1.1.0
 created: 2025-11-02
 ttl_days: 60
 last_verified: 2025-11-02
-prev: /runbooks/lane-B
-next: /runbooks/lane-D
 ---
 
 # Lane C Runbook (DevOps & Enforcement)
 
-**Related:** [Lane A](/runbooks/lane-A) · [Lane B](/runbooks/lane-B) · [Lane D](/runbooks/lane-D) · [Observer](/runbooks/observer) · [Operator SOP](/runbooks/operator-registry-sop) · [Artifact Lifecycle](/runbooks/artifact-manual-lifecycle)
+**Trigger**: Pilot PR opened  
+**Inputs required**: Pilot branch, baseline metrics, artifact caps, commit rules  
+**Owner**: Lane C  
+**Time box**: 30 minutes to set gates; 2 runs to confirm baseline  
+**Stop rule**: edits to projections or p95 exceeds budget for 2 runs
 
-## Before
+**Steps**
 
-- Baseline p50/p95 and artifact sizes recorded.
-- Backout path ready.
+1. Enforce commit/PR title checks on pilot branch.
+2. Set CI p95 and artifact size tripwires.
+3. Post metrics after first two runs; gate status accordingly.
 
-## During
-
-- Change one variable at a time.
-- Watch first two runs; +90s p95 tripwire.
-
-## After
-
-- Post metrics deltas; block non-compliant PRs.
-- Log exceptions with expiry.
-
-**Success:** equal/faster CI, stable artifacts, compliance >95%.
+**Outputs**: Green dashboard entry or blocked PR with reason  
+**Hand-off**: Back to Lane D for rollout decision  
+**Evidence**: Metrics screenshot, gate config note, PR comment link

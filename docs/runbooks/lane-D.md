@@ -1,32 +1,29 @@
 ---
-id: runbook-lane-d
+id: runbook-lane-d-zero-talk
 owner: "@lane-d"
 lane: D
-version: 1.0.0
+version: 1.0.1
 created: 2025-11-02
-ttl_days: 60
 last_verified: 2025-11-02
-prev: /runbooks/lane-C
-next: /runbooks/observer
+ttl_days: 120
 ---
 
-# Lane D Runbook (Ideas & Product Ops)
+# Lane D — Zero-Talk Intake Mode
 
-**Related:** [Lane A](/runbooks/lane-A) · [Lane B](/runbooks/lane-B) · [Lane C](/runbooks/lane-C) · [Observer](/runbooks/observer) · [Operator SOP](/runbooks/operator-registry-sop) · [Artifact Lifecycle](/runbooks/artifact-manual-lifecycle)
+**Trigger** ADR file with an **Intake Hand-off** block appears or updates to `status: Accepted`.
 
-## Before
+**Inputs required** ADR link, hand-off block content.
 
-- Idea has ID, owner, lane, type, priority, acceptance.
-- No duplicate ID in Project.
+**Owner** Lane D. **Time box** 30 minutes. **Stop rule** No pilot by T+60m → freeze.
 
-## During
+**Steps**
 
-- Advance one state only; note blockers.
-- Reconcile idea frontmatter to Project status.
+1. New issue from `ADR Intake Card` template; paste block; assign A/B/C/D.
+2. Update `docs/_registry.yaml`: mark dependents Stale; `last_verified` timestamps.
+3. Comment URLs on ADR and Project; move Project status to Ticketed.
 
-## After
+**Outputs** Intake Card URL; registry diff committed.
 
-- Links verified (Idea ↔ Project ↔ Branch ↔ PR).
-- Archive on closeout.
+**Hand-off** Lane A starts pilot stories.
 
-**Success:** single source of truth preserved; zero duplicate truth.
+**Evidence** Project item link; ADR comment link; commit SHA.

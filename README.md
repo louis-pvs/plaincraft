@@ -1,17 +1,8 @@
-# Plaincraft — Docs Index
+# Zero-Talk ADR Add-on
 
-## Workflow & Docs
+Drop these files into your repo to eliminate verbal handoff to Lane D.
 
-- Canonical: [/docs/workflows/idea-lifecycle.md](/docs/workflows/idea-lifecycle.md)
-- Enforcement: [/docs/policy/workflow-enforcement.md](/docs/policy/workflow-enforcement.md)
-- Project schema: [/docs/reference/project-schema.md](/docs/reference/project-schema.md)
-- Runbooks:
-  - Lane A: [/docs/runbooks/lane-A.md](/docs/runbooks/lane-A.md)
-  - Lane B: [/docs/runbooks/lane-B.md](/docs/runbooks/lane-B.md)
-  - Lane C: [/docs/runbooks/lane-C.md](/docs/runbooks/lane-C.md)
-  - Lane D: [/docs/runbooks/lane-D.md](/docs/runbooks/lane-D.md)
-  - Observer: [/docs/runbooks/observer.md](/docs/runbooks/observer.md)
-  - Operator SOP: [/docs/runbooks/operator-registry-sop.md](/docs/runbooks/operator-registry-sop.md)
-- ADRs:
-  - [/docs/adr/2025-10-idea-lifecycle.md](/docs/adr/2025-10-idea-lifecycle.md)
-  - [/docs/adr/2025-11-registry-driven-docs.md](/docs/adr/2025-11-registry-driven-docs.md)
+- `docs/adr/_TEMPLATE_ADR_ZERO_TALK.md` — ADR template with Intake Hand-off block.
+- `docs/workflows/adr-intake-zero-talk.md` — Addendum stating D’s 30-minute SLA and defaults.
+- `docs/runbooks/lane-D-zero-talk.md` — D’s checklist to start immediately.
+- `.github/ISSUE_TEMPLATE/adr-intake-card.md` — Issue template with a paste area for the block.
