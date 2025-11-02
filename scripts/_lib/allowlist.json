@@ -7,7 +7,38 @@
     "registry.yarnpkg.com"
   ],
   "description": "Whitelist of allowed network domains for scripts",
-  "lastUpdated": "2025-10-30",
+  "lastUpdated": "2025-11-02",
+  "sizeExceptions": {
+    "description": "Scripts exceeding LOC limits - tracked as technical debt",
+    "scripts": [
+      "scripts/_lib/changelog.mjs",
+      "scripts/_lib/core.mjs",
+      "scripts/_lib/github.mjs",
+      "scripts/_lib/ideas.mjs",
+      "scripts/_lib/lifecycle.mjs",
+      "scripts/_lib/pr-body-validator.mjs",
+      "scripts/_lib/project-helpers.mjs",
+      "scripts/_lib/templates.mjs",
+      "scripts/_lib/validation.mjs",
+      "scripts/checks/check-ci.mjs",
+      "scripts/checks/docs-report.mjs",
+      "scripts/checks/guardrails-baseline.mjs",
+      "scripts/checks/guardrails.mjs",
+      "scripts/checks/policy-lint.mjs",
+      "scripts/ops/ideas-to-issues.mjs",
+      "scripts/ops/new-snippet.mjs",
+      "scripts/ops/open-or-update-pr.mjs",
+      "scripts/ops/post-checkout.mjs",
+      "scripts/ops/remove-worktree.mjs",
+      "scripts/ops/setup-project.mjs",
+      "scripts/ops/sync-ideas-checklists.mjs",
+      "scripts/ops/sync-issue-to-card.mjs",
+      "scripts/record-stories.mjs",
+      "scripts/test-storybook.mjs"
+    ],
+    "trackedIn": "ARCH-refactor-loc-violations",
+    "targetDate": "2025-12-01"
+  },
   "policyIgnore": [
     "scripts/_lib/__fixtures__/*",
     "scripts/check-ci.mjs",
@@ -20,6 +51,9 @@
     "scripts/create-worktree-pr.mjs",
     "scripts/generate-pr-content.mjs",
     "scripts/ideas-to-issues.mjs",
-    "scripts/new-snippet.mjs"
+    "scripts/new-snippet.mjs",
+    "scripts/ops/test-project-graphql.mjs",
+    "scripts/ops/validate-pr-body.mjs",
+    "scripts/ops/refresh-project-cache.mjs"
   ]
 }

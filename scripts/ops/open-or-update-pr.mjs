@@ -37,6 +37,7 @@ import {
   loadProjectCache,
   findProjectItemByFieldValue,
   ensureProjectStatus,
+  verifyGhTokenScopes,
 } from "../_lib/github.mjs";
 
 const ID_REGEX = /^[A-Z]+-[A-Za-z0-9]+$/;
@@ -275,12 +276,48 @@ Options:
         };
       }
 
-      const projectResult = await ensureProjectStatus({
-        cwd: root,
-        cacheInfo: projectCacheInfo,
-        id: flags.id,
-        status: plan.projectStatus.to,
-      });
+      // Update project status to PR Open
+      const scopeCheck = await verifyGhTokenScopes(
+        ["read:project", "project"],
+        root,
+      );
+
+      let projectResult = {
+        updated: false,
+        message: "Skipped - token scopes not verified",
+      };
+
+      if (scopeCheck.valid) {
+        // Validate branch name contains the ID
+        const branchIdMatch = branchName.match(/\/([^-/]+)-/);
+        const branchId = branchIdMatch ? branchIdMatch[1] : null;
+
+        if (branchId !== flags.id) {
+          console.log(
+            `[WARN] Branch validation failed: branch contains '${branchId}' but ID is '${flags.id}'. Skipping project status update.`,
+          );
+          projectResult.message = `Branch ID mismatch: ${branchId} !== ${flags.id}`;
+        } else {
+          projectResult = await ensureProjectStatus({
+            cwd: root,
+            cacheInfo: projectCacheInfo,
+            id: flags.id,
+            status: plan.projectStatus.to,
+          });
+
+          if (projectResult.updated) {
+            console.log(
+              `[INFO] Project status updated: ${projectResult.previous || "none"} → ${plan.projectStatus.to}`,
+            );
+          } else {
+            console.log(
+              `[WARN] Project status not updated: ${projectResult.message}`,
+            );
+          }
+        }
+      } else {
+        console.log(`[WARN] ${scopeCheck.message}`);
+      }
 
       plan.projectStatus.note = projectResult.message;
       plan.pr = {

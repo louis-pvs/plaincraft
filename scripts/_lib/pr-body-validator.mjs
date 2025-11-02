@@ -1,6 +1,7 @@
 /**
  * pr-body-validator.mjs
  * @since 2025-11-01
+ * @version 0.1.0
  * Pure validation logic for PR bodies (no CLI dependencies)
  */
 

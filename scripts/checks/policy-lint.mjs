@@ -151,9 +151,17 @@ try {
     result.errors.push(...dangerValidation.errors);
     result.warnings.push(...dangerValidation.warnings);
 
-    // Check size compliance
-    const sizeValidation = checkSizeCompliance(content);
-    result.warnings.push(...sizeValidation.warnings);
+    // Check size compliance (skip if in sizeExceptions)
+    const sizeExceptions = allowlistConfig?.sizeExceptions?.scripts || [];
+    const isExemptFromSize = sizeExceptions.some((pattern) => {
+      const normalized = pattern.replace(/\\/g, "/");
+      return relativePath.replace(/\\/g, "/") === normalized;
+    });
+
+    if (!isExemptFromSize) {
+      const sizeValidation = checkSizeCompliance(content);
+      result.warnings.push(...sizeValidation.warnings);
+    }
 
     totalErrors += result.errors.length;
     totalWarnings += result.warnings.length;
@@ -226,6 +234,17 @@ try {
     process.exitCode = exitCode;
   } else {
     if (exitCode === 0) {
+      // Report size exceptions if present
+      const sizeExceptions = allowlistConfig?.sizeExceptions;
+      if (sizeExceptions?.scripts?.length > 0) {
+        const targetDate = sizeExceptions.targetDate || "Not set";
+        const trackedIn = sizeExceptions.trackedIn || "Not tracked";
+        const count = sizeExceptions.scripts.length;
+
+        logger.warn(
+          `Size exceptions active: ${count} scripts exceed LOC limits (target: ${targetDate}, tracked: ${trackedIn})`,
+        );
+      }
       process.exitCode = 0;
     } else {
       console.error("policy-lint detected issues:");

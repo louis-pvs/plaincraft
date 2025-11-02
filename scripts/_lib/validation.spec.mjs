@@ -34,6 +34,7 @@ describe("loadAllowlist", () => {
     expect(result).toEqual({
       domains: ["github.com", "npmjs.com", "nodejs.org"],
       policyIgnore: ["scripts/_lib/__fixtures__/*"],
+      sizeExceptions: null,
     });
   });
 
@@ -42,7 +43,11 @@ describe("loadAllowlist", () => {
 
     const result = await loadAllowlist();
 
-    expect(result).toEqual({ domains: [], policyIgnore: [] });
+    expect(result).toEqual({
+      domains: [],
+      policyIgnore: [],
+      sizeExceptions: null,
+    });
   });
 
   it("should return empty array when domains field missing", async () => {
@@ -50,7 +55,11 @@ describe("loadAllowlist", () => {
 
     const result = await loadAllowlist();
 
-    expect(result).toEqual({ domains: [], policyIgnore: [] });
+    expect(result).toEqual({
+      domains: [],
+      policyIgnore: [],
+      sizeExceptions: null,
+    });
   });
 
   it("should handle invalid JSON gracefully", async () => {
@@ -58,7 +67,11 @@ describe("loadAllowlist", () => {
 
     const result = await loadAllowlist();
 
-    expect(result).toEqual({ domains: [], policyIgnore: [] });
+    expect(result).toEqual({
+      domains: [],
+      policyIgnore: [],
+      sizeExceptions: null,
+    });
   });
 });
 
