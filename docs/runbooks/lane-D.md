@@ -30,7 +30,3 @@ next: /runbooks/observer
 - Archive on closeout.
 
 **Success:** single source of truth preserved; zero duplicate truth.
-
----
-
-**Navigation:** [← Lane C](/runbooks/lane-C) · [Next: Observer →](/runbooks/observer)

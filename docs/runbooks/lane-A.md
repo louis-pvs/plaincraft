@@ -31,7 +31,3 @@ next: /runbooks/lane-B
 - Status advanced by one step; notes updated.
 
 **Success:** one unit/composition shipped; no CI p95 regression; README under cap.
-
----
-
-**Navigation:** [Next: Lane B →](/runbooks/lane-B)

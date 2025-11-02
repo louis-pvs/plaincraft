@@ -66,7 +66,3 @@ Stop rule: pilot missing → block refactor PR.
 - Edit generated projections by hand.
 - Approve PR that changes contracts without Doc Impact.
 - Let a page sit Stale past expiry.
-
----
-
-**Navigation:** [← Observer](/runbooks/observer) · [Next: Artifact Lifecycle →](/runbooks/artifact-manual-lifecycle)

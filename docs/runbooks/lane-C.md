@@ -30,7 +30,3 @@ next: /runbooks/lane-D
 - Log exceptions with expiry.
 
 **Success:** equal/faster CI, stable artifacts, compliance >95%.
-
----
-
-**Navigation:** [← Lane B](/runbooks/lane-B) · [Next: Lane D →](/runbooks/lane-D)

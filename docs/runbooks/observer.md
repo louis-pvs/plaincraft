@@ -20,7 +20,3 @@ Use when things hiccup. Quick verdicts, clear stop rules.
 - Commit failures: PR title ID ≠ commit ID or slug in header. If ≥3 bad commits → squash.
 - Status drift: human UI edits without reconcile. If persists after one reconcile → lock and escalate.
 - CI flake/slow: +90s p95, asset bloat, browser bump. Two days in a row → freeze non-critical jobs.
-
----
-
-**Navigation:** [← Lane D](/runbooks/lane-D) · [Next: Operator SOP →](/runbooks/operator-registry-sop)

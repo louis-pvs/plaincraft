@@ -226,7 +226,3 @@ node scripts/ops/reconcile-status.mjs --id ARCH-123 --yes
 | Date       | Change                                   | Author  |
 | ---------- | ---------------------------------------- | ------- |
 | 2025-11-02 | Initial unified manual lifecycle runbook | @lane-d |
-
----
-
-**Navigation:** [← Operator SOP](/runbooks/operator-registry-sop)

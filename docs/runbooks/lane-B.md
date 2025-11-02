@@ -30,7 +30,3 @@ next: /runbooks/lane-C
 - TTL and owner set; metric to watch named.
 
 **Success:** page changes a decision; media traceable to unit + template.
-
----
-
-**Navigation:** [← Lane A](/runbooks/lane-A) · [Next: Lane C →](/runbooks/lane-C)
