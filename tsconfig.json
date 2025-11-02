@@ -20,7 +20,9 @@
       "@templates": ["templates"],
       "@templates/*": ["templates/*"],
       "@scripts": ["scripts"],
-      "@scripts/*": ["scripts/*"]
+      "@scripts/*": ["scripts/*"],
+      "@shared": ["shared"],
+      "@shared/*": ["shared/*"]
     }
   },
   "include": [
