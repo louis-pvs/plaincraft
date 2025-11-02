@@ -23,7 +23,7 @@ Faster intake, fewer stale docs, CI enforcement on projections.
 
 ## Intake Hand-off (Zero-Talk)
 
-- ADR ID: ARCH-registry-driven-docs
+- ADR ID: adr-2025-11-pilot-registry-driven-docs
 - Delta type: Docs
 - Pilot unit/pattern: U-inline-edit (first end-to-end pattern)
 - Owners: A:@lane-a B:@lane-b C:@lane-c D:@lane-d

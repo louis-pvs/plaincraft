@@ -1,0 +1,16 @@
+# Auto-request reviews to the right lane on path change
+# Lane A (Developer UI)
+storybook/**            @lane-a
+src/**                  @lane-a
+
+# Lane B (Playbook)
+playbook/**             @lane-b
+
+# Lane C (DevOps & Policy)
+docs/policy/**          @lane-c
+.github/**              @lane-c
+
+# Lane D (Workflows, ADR, Registry)
+docs/workflows/**       @lane-d
+docs/adr/**             @lane-d
+docs/_registry.yaml     @lane-d

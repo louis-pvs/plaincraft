@@ -1,0 +1,227 @@
+name: Registry Enforcement
+on:
+  pull_request:
+    paths:
+      - "docs/adr/**"
+      - "docs/_registry.yaml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/adr/**"
+      - "docs/_registry.yaml"
+
+jobs:
+  enforce:
+    name: Registry Enforcement Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Enforce registry compliance
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            const path = require('path');
+
+            core.info('🔍 Registry Enforcement Check');
+            const errors = [];
+            const warnings = [];
+
+            // Load registry
+            let registry;
+            try {
+              registry = yaml.load(fs.readFileSync('docs/_registry.yaml', 'utf8'));
+            } catch (e) {
+              core.setFailed(`Failed to load registry: ${e.message}`);
+              return;
+            }
+
+            if (!registry || !registry.items) {
+              core.setFailed('Registry missing items array');
+              return;
+            }
+
+            // Build registry ID map
+            const registryIds = new Set(registry.items.map(item => item.id));
+            core.info(`📋 Registry contains ${registryIds.size} items`);
+
+            // Check all ADR files
+            const adrFiles = fs.readdirSync('docs/adr')
+              .filter(f => f.endsWith('.md') && !f.startsWith('_'))
+              .map(f => path.join('docs/adr', f));
+
+            core.info(`📄 Found ${adrFiles.length} ADR files`);
+
+            for (const file of adrFiles) {
+              const content = fs.readFileSync(file, 'utf8');
+              
+              // Extract ADR ID from frontmatter
+              const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+              if (!frontmatterMatch) {
+                warnings.push(`${file}: No frontmatter found`);
+                continue;
+              }
+
+              const frontmatter = frontmatterMatch[1];
+              const idMatch = frontmatter.match(/^id:\s*["']?([^"'\n]+)["']?/m);
+              
+              if (!idMatch) {
+                warnings.push(`${file}: No 'id' field in frontmatter`);
+                continue;
+              }
+
+              const adrId = idMatch[1].trim();
+              
+              // Check if ADR ID exists in registry
+              if (!registryIds.has(adrId)) {
+                errors.push(`❌ ADR ID '${adrId}' from ${file} not found in registry`);
+              } else {
+                core.info(`✅ ${adrId} found in registry`);
+              }
+
+              // Also check for ADR ID in Intake Hand-off section
+              const intakeMatch = content.match(/^-\s*ADR ID:\s*([A-Z]+-[a-z0-9-]+)/mi);
+              if (intakeMatch) {
+                const intakeId = intakeMatch[1];
+                if (intakeId !== adrId) {
+                  warnings.push(`${file}: Intake ADR ID '${intakeId}' differs from frontmatter id '${adrId}'`);
+                }
+              }
+            }
+
+            // Check registry items for required baton fields
+            for (const item of registry.items) {
+              if (!item.id) {
+                errors.push(`❌ Registry item missing 'id' field`);
+                continue;
+              }
+
+              const itemId = item.id;
+
+              // Check baton fields
+              if (!item.current_owner) {
+                errors.push(`❌ ${itemId}: missing 'current_owner' field`);
+              }
+              if (!item.next_owner) {
+                errors.push(`❌ ${itemId}: missing 'next_owner' field`);
+              }
+              if (!item.next_lane) {
+                errors.push(`❌ ${itemId}: missing 'next_lane' field`);
+              }
+
+              // Check evidence structure exists
+              if (!item.evidence) {
+                warnings.push(`⚠️  ${itemId}: missing 'evidence' structure`);
+                continue;
+              }
+
+              // If status is past certain stages, enforce evidence
+              const statusRequiringEvidence = ['In Review', 'Merged'];
+              if (statusRequiringEvidence.includes(item.status)) {
+                const lanes = ['A', 'B', 'C', 'D'];
+                for (const lane of lanes) {
+                  if (!item.evidence[lane]) {
+                    warnings.push(`⚠️  ${itemId}: missing evidence.${lane} object`);
+                    continue;
+                  }
+                  
+                  // Lane-specific evidence checks
+                  if (lane === 'A' && item.next_lane !== 'A') {
+                    if (!item.evidence.A.storybook_run && !item.evidence.A.readme_diff && !item.evidence.A.pr_url) {
+                      warnings.push(`⚠️  ${itemId}: Lane A passed but no evidence links`);
+                    }
+                  }
+                  if (lane === 'B' && ['C', 'D'].includes(item.next_lane)) {
+                    if (!item.evidence.B.playbook_page && !item.evidence.B.asset_note) {
+                      warnings.push(`⚠️  ${itemId}: Lane B passed but no evidence links`);
+                    }
+                  }
+                  if (lane === 'C' && item.next_lane === 'D') {
+                    if (!item.evidence.C.gate_comment && !item.evidence.C.metrics_note) {
+                      warnings.push(`⚠️  ${itemId}: Lane C passed but no evidence links`);
+                    }
+                  }
+                }
+              }
+
+              // D cannot accept without A/B/C evidence
+              if (item.status === 'Merged' || item.next_lane === 'D') {
+                const requiredLanes = ['A', 'B', 'C'];
+                for (const lane of requiredLanes) {
+                  if (!item.evidence[lane]) {
+                    errors.push(`❌ ${itemId}: Lane D acceptance requires evidence.${lane} object`);
+                    continue;
+                  }
+                  
+                  const ev = item.evidence[lane];
+                  const hasEvidence = Object.values(ev).some(v => v && v.trim() !== '');
+                  if (!hasEvidence) {
+                    errors.push(`❌ ${itemId}: Lane D acceptance requires at least one evidence link from lane ${lane}`);
+                  }
+                }
+              }
+            }
+
+            // Report results
+            if (warnings.length > 0) {
+              core.info('\n⚠️  WARNINGS:');
+              warnings.forEach(w => core.warning(w));
+            }
+
+            if (errors.length > 0) {
+              core.info('\n❌ ERRORS:');
+              errors.forEach(e => core.error(e));
+              core.setFailed(`Registry enforcement failed with ${errors.length} error(s)`);
+            } else {
+              core.info('\n✅ Registry enforcement passed');
+            }
+
+            // Post PR comment if in PR context
+            if (context.eventName === 'pull_request' && (errors.length > 0 || warnings.length > 0)) {
+              const body = [
+                '## 📋 Registry Enforcement Report',
+                '',
+                errors.length > 0 ? '### ❌ Errors' : '',
+                ...errors.map(e => `- ${e}`),
+                '',
+                warnings.length > 0 ? '### ⚠️  Warnings' : '',
+                ...warnings.map(w => `- ${w}`),
+                '',
+                '---',
+                '*Registry enforcement checks ADR IDs, baton fields, and evidence links per the [auto-intake ADR](../blob/main/docs/adr/auto-intake.md)*'
+              ].filter(l => l !== undefined).join('\n');
+
+              try {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.payload.pull_request.number,
+                  body
+                });
+              } catch (e) {
+                core.warning(`Failed to post PR comment: ${e.message}`);
+              }
+            }

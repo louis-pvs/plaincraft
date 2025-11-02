@@ -8,8 +8,6 @@ assignees: ""
 
 ## Paste the Intake Hand-off block below
 
-<!-- Paste from ADR: Intake Hand-off (Zero-Talk) -->
-
 ## Routing
 
 - Delta type:

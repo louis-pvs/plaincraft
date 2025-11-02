@@ -1,8 +1,7 @@
-# Zero-Talk ADR Add-on
+## START HERE
 
-Drop these files into your repo to eliminate verbal handoff to Lane D.
+Workflows included
 
-- `docs/adr/_TEMPLATE_ADR_ZERO_TALK.md` — ADR template with Intake Hand-off block.
-- `docs/workflows/adr-intake-zero-talk.md` — Addendum stating D’s 30-minute SLA and defaults.
-- `docs/runbooks/lane-D-zero-talk.md` — D’s checklist to start immediately.
-- `.github/ISSUE_TEMPLATE/adr-intake-card.md` — Issue template with a paste area for the block.
+- `.github/workflows/adr-intake-auto.yml` — parses ADR → creates/updates Intake Card, assigns A.
+- `.github/workflows/registry-cascade.yml` — on registry push, assigns `next_owner` and labels the lane.
+- `.github/workflows/registry-enforcement.yml` — CI check for missing ADR IDs, baton fields, evidence links.

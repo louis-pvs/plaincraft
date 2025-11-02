@@ -1,71 +1,145 @@
-- id: WORKFLOW-idea-lifecycle
-  type: workflow
-  lane: D
-  owner: "@lane-d"
-  nav: { section: "Workflows", order: 1 }
-  refs:
-    canonical_doc: "/docs/workflows/idea-lifecycle.md"
-  ttl_days: 180
-  last_verified: "2025-11-02"
+# Registry — single editable source for cross-surface facts
+# Do not edit projections. Edit this file and unit READMEs only.
 
-- id: WORKFLOW-adr-intake
-  type: workflow
-  lane: D
-  owner: "@lane-d"
-  nav: { section: "Workflows", order: 2 }
-  refs:
-    canonical_doc: "/docs/workflows/adr-intake.md"
-  ttl_days: 180
-  last_verified: "2025-11-02"
+schema:
+  id: string            # ARCH-*, U-*, C-*, B-*, PB-*
+  title: string
+  type: enum            # unit|composition|arch|playbook|bug
+  lane: enum            # A|B|C|D
+  current_owner: string # @handle
+  next_owner: string    # @handle
+  next_lane: string     # A|B|C|D
+  project_item: string  # URL
+  status: enum          # Draft|Ticketed|Branched|PR Open|In Review|Merged|Archived
+  surfaces:             # file paths that represent projections
+    storybook: string
+    playbook: string
+    readme: string
+  evidence:             # lane evidence links
+    A:
+      storybook_run: string
+      readme_diff: string
+      pr_url: string
+    B:
+      playbook_page: string
+      asset_note: string
+    C:
+      gate_comment: string
+      metrics_note: string
+    D:
+      decision_log: string
+      registry_commit: string
+  ttl_days: number
+  last_verified: date
 
-- id: PATTERN-inline-edit-label
-  type: pattern
-  lane: A
-  owner: "@lane-a"
-  nav: { section: "Patterns", order: 1 }
-  refs:
-    canonical_doc: "/playbook/patterns/inline-edit-label.md"
-    template_ref: "/templates/snippet-inline-edit-label@v0.1"
-    storybook_doc: "/storybook/?path=/docs/snippets-inlineeditlabel--docs"
-  ttl_days: 90
-  last_verified: "2025-11-02"
-  deps:
-    - snippets/InlineEditLabel/README.md
-    - templates/snippet-inline-edit-label/README.md
-    - templates/snippet-inline-edit-label/USAGE.md
-  waivers: []
+items:
+  - id: adr-2025-10-idea-lifecycle
+    title: Idea Lifecycle, Sources of Truth, and Enforcement Split
+    type: arch
+    lane: D
+    current_owner: "@lane-d"
+    next_owner: "@lane-d"
+    next_lane: "D"
+    project_item: ""
+    status: "Merged"
+    surfaces:
+      storybook: ""
+      playbook: "playbook/workflows/idea-lifecycle.md"
+      readme: ""
+    evidence:
+      A:
+        storybook_run: "N/A - no storybook component"
+        readme_diff: "N/A - no unit README"
+        pr_url: "https://github.com/louis-pvs/plaincraft/pull/TBD"
+      B:
+        playbook_page: "https://github.com/louis-pvs/plaincraft/blob/main/docs/workflows/idea-lifecycle.md"
+        asset_note: "Workflow documented in docs/workflows/"
+      C:
+        gate_comment: "Pre-registry ADR - merged before gate process"
+        metrics_note: "N/A - pre-registry"
+      D:
+        decision_log: "https://github.com/louis-pvs/plaincraft/blob/main/docs/adr/2025-10-idea-lifecycle.md"
+        registry_commit: "https://github.com/louis-pvs/plaincraft/pull/150"
+    ttl_days: 365
+    last_verified: "2025-11-02"
 
-- id: RUNBOOK-lane-D-zero-talk
-  type: runbook
-  lane: D
-  owner: "@lane-d"
-  nav: { section: "Runbooks", order: 1 }
-  refs:
-    canonical_doc: "/docs/runbooks/lane-D-zero-talk.md"
-    workflow: WORKFLOW-adr-intake
-  ttl_days: 120
-  last_verified: "2025-11-02"
-  deps:
-    - docs/adr/2025-11-registry-driven-docs.md
-    - docs/workflows/adr-intake.md
-  waivers: []
+  - id: adr-2025-11-pilot-registry-driven-docs
+    title: Registry-Driven Docs Pilot
+    type: arch
+    lane: D
+    current_owner: "@lane-a"
+    next_owner: "@lane-b"
+    next_lane: "B"
+    project_item: ""
+    status: "Accepted"
+    surfaces:
+      storybook: "storybook/docs/Patterns/inline-edit.mdx"
+      playbook: "playbook/pages/inline-edit.md"
+      readme: "src/components/inline-edit/README.md"
+    evidence:
+      A:
+        storybook_run: ""
+        readme_diff: ""
+        pr_url: ""
+      B:
+        playbook_page: ""
+        asset_note: ""
+      C:
+        gate_comment: ""
+        metrics_note: ""
+      D:
+        decision_log: "https://github.com/louis-pvs/plaincraft/blob/main/docs/adr/2025-11-registry-driven-docs.md"
+        registry_commit: ""
+    ttl_days: 180
+    last_verified: "2025-11-02"
 
-- id: CONTRACT-docs-registry
-  type: contract
-  lane: D
-  owner: "@lane-d"
-  nav: { section: "Contracts", order: 1 }
-  refs:
-    canonical_doc: "/docs/reference/contracts.md"
-    adr: adr-2025-11-pilot-registry-driven-docs
-  ttl_days: 90
-  last_verified: "2025-11-02"
-  deps:
-    - docs/_registry.yaml
-    - playbook/patterns/inline-edit-label.md
-    - docs/runbooks/lane-D-zero-talk.md
-  waivers:
-    - script: scripts/checks/doc-gates.mjs
-      reason: "Pilot phase - defer CLI flags/LOC refactor to post-validation iteration"
-      expires: "2025-11-16"
-      approved_by: "@lane-d"
+  - id: adr-2025-11-auto-intake-and-cascade
+    title: Auto Intake & Registry-Driven Cascade
+    type: arch
+    lane: D
+    current_owner: "@lane-d"
+    next_owner: "@lane-a"
+    next_lane: "A"
+    project_item: "https://github.com/orgs/<org>/projects/<id>/views/<view>"
+    status: "Accepted"
+    surfaces:
+      storybook: "storybook/docs/Patterns/registry-docs.mdx"
+      playbook: "playbook/pages/patterns/registry-docs.md"
+      readme: "src/registry-docs/README.md"
+    evidence:
+      A:
+        storybook_run: ""
+        readme_diff: ""
+        pr_url: ""
+      B:
+        playbook_page: ""
+        asset_note: ""
+      C:
+        gate_comment: ""
+        metrics_note: ""
+      D:
+        decision_log: "https://github.com/louis-pvs/plaincraft/blob/main/docs/adr/auto-intake.md"
+        registry_commit: ""
+    ttl_days: 180
+    last_verified: "2025-11-02"
+
+  - id: ARCH-registry-driven-docs
+    title: Registry-driven docs pilot (legacy ID)
+    type: arch
+    lane: D
+    current_owner: "@lane-a"
+    next_owner: "@lane-b"
+    next_lane: "B"
+    project_item: "https://github.com/orgs/<org>/projects/<id>/views/<view>"
+    status: "Archived"
+    surfaces:
+      storybook: "storybook/docs/Patterns/registry-docs.mdx"
+      playbook: "playbook/pages/patterns/registry-docs.md"
+      readme: "src/registry-docs/README.md"
+    evidence:
+      A: {}
+      B: {}
+      C: {}
+      D: {}
+    ttl_days: 180
+    last_verified: "2025-11-02"
