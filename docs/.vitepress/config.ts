@@ -64,6 +64,10 @@ export default defineConfig({
         {
           text: "Runbooks",
           items: [
+            {
+              text: "Artifact Manual Lifecycle",
+              link: "/runbooks/artifact-manual-lifecycle",
+            },
             { text: "Lane A", link: "/runbooks/lane-A" },
             { text: "Lane B", link: "/runbooks/lane-B" },
             { text: "Lane C", link: "/runbooks/lane-C" },
