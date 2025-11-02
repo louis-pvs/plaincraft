@@ -1,0 +1,15 @@
+{
+  "generated_at": "2025-11-02T00:00:00Z",
+  "runs": [
+    { "id": "run-1", "p95_total_sec": 540, "p95_build_sec": 320 },
+    { "id": "run-2", "p95_total_sec": 548, "p95_build_sec": 325 },
+    { "id": "run-3", "p95_total_sec": 552, "p95_build_sec": 322 },
+    { "id": "run-4", "p95_total_sec": 545, "p95_build_sec": 319 },
+    { "id": "run-5", "p95_total_sec": 550, "p95_build_sec": 321 }
+  ],
+  "baseline": {
+    "p95_total_sec_avg": 547.0,
+    "p95_build_sec_avg": 321.4,
+    "tripwire_delta_sec": 90
+  }
+}
