@@ -8,6 +8,7 @@
 
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
+import { load as yamlLoad } from "js-yaml";
 import {
   parseFlags,
   resolveLogLevel,
@@ -67,6 +68,42 @@ logger.debug("Policy lint started", {
     "Every script header should include @since YYYY-MM-DD and @version x.y.z",
 });
 
+// Load waivers from registry
+async function loadWaivers(root) {
+  const registryPath = path.join(root, "docs", "_registry.yaml");
+  try {
+    const content = await readFile(registryPath, "utf-8");
+    const entries = yamlLoad(content);
+    const waivers = [];
+
+    if (Array.isArray(entries)) {
+      for (const entry of entries) {
+        if (entry.waivers && Array.isArray(entry.waivers)) {
+          waivers.push(...entry.waivers);
+        }
+      }
+    }
+
+    return waivers;
+  } catch (e) {
+    logger.debug("Could not load waivers from registry", { error: e.message });
+    return [];
+  }
+}
+function isWaiverValid(waivers, scriptPath) {
+  const waiver = waivers.find((w) => w.script === scriptPath);
+  if (!waiver) return null;
+
+  const expires = new Date(waiver.expires);
+  const now = new Date();
+
+  if (expires < now) {
+    return { valid: false, reason: `Waiver expired on ${waiver.expires}` };
+  }
+
+  return { valid: true, waiver };
+}
+
 try {
   const root = await repoRoot(args.cwd);
   const scriptsDir = path.join(root, "scripts");
@@ -117,12 +154,33 @@ try {
     example: "Example script: scripts/ops/create-worktree-pr.mjs",
   });
 
+  // Load waivers before validation
+  const waivers = await loadWaivers(root);
+  logger.debug("Loaded waivers from registry", { count: waivers.length });
+
   const results = [];
   let totalErrors = 0;
   let totalWarnings = 0;
 
   for (const scriptPath of scriptFiles) {
     const relativePath = path.relative(root, scriptPath);
+
+    // Check for valid waiver
+    const waiverCheck = isWaiverValid(waivers, relativePath);
+    if (waiverCheck?.valid) {
+      logger.debug("Script has valid waiver, skipping validation", {
+        file: relativePath,
+        reason: waiverCheck.waiver.reason,
+        expires: waiverCheck.waiver.expires,
+      });
+      continue;
+    } else if (waiverCheck && !waiverCheck.valid) {
+      logger.warn("Script has expired waiver", {
+        file: relativePath,
+        reason: waiverCheck.reason,
+      });
+    }
+
     logger.debug("Validating script", {
       file: relativePath,
       example: "Header should include @since and CLI must support --dry-run",

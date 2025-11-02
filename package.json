@@ -76,6 +76,7 @@
     "scripts:deprecation": "node scripts/checks/deprecation-sweeper.mjs",
     "docs:lint": "node scripts/checks/readme-lint.mjs && node scripts/checks/template-coverage.mjs",
     "docs:coverage": "node scripts/checks/template-coverage.mjs",
+    "docs:frontmatter": "node scripts/checks/frontmatter-lint.mjs",
     "docs:views": "node scripts/checks/view-dedupe.mjs",
     "docs:playbook": "node scripts/checks/playbook-link-guard.mjs",
     "docs:check": "pnpm docs:lint && pnpm docs:views && pnpm docs:playbook",

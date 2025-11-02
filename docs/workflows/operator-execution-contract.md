@@ -1,10 +1,10 @@
 ---
-id: workflow-operator-execution-contract
-owner: @lane-d
-lane: D
-version: 1.0.0
-created: 2025-11-02
-last_verified: 2025-11-02
+id: "workflow-operator-execution-contract"
+owner: "@lane-d"
+lane: "D"
+version: "1.0.0"
+created: "2025-11-02"
+last_verified: "2025-11-02"
 ttl_days: 180
 ---
 
@@ -14,10 +14,10 @@ Single-page contract defining triggers, outputs, and the no-philosophy rule.
 
 ## Triggers (type these in requests)
 
-- ADR NOW <title>
-- DOC ROUTE <id>
-- PLAYBOOK PAGE <id>
-- STORYBOOK DOC <id>
+- ADR NOW `title`
+- DOC ROUTE `id`
+- PLAYBOOK PAGE `id`
+- STORYBOOK DOC `id`
 - POLICY ENFORCE
 
 ## What you receive per trigger

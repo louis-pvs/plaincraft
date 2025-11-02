@@ -1,11 +1,11 @@
 ---
-id: workflow-adr-intake
-owner: @lane-d
-lane: D
-version: 1.0.0
-created: 2025-11-02
+id: "workflow-adr-intake"
+owner: "@lane-d"
+lane: "D"
+version: "1.0.0"
+created: "2025-11-02"
 ttl_days: 180
-last_verified: 2025-11-02
+last_verified: "2025-11-02"
 ---
 
 # ADR → Action Workflow

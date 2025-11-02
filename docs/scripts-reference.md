@@ -30,11 +30,11 @@ pnpm scripts:test     # unit tests
 pnpm yaml:lint        # validate YAML workflows/configs parse
 ```
 
-`pnpm guardrails` now drives build, lint, typecheck, and test alongside the script/doc guardrails, fanning out up to three jobs at a time to stay inside the +90s budget. Watch the `[progress]` bar for dot updates, pass `--concurrency <n>` to tune throughput, or `--sequential` to match the legacy single-file order during incident response. Need an extra safety net? Run the manual smoke probe (`pnpm scripts:smoke`) whenever you want to double-check `--help`/`--dry-run` responses.
+`pnpm guardrails` now drives build, lint, typecheck, and test alongside the script/doc guardrails, fanning out up to three jobs at a time to stay inside the +90s budget. Watch the `[progress]` bar for dot updates, pass `--concurrency `n``to tune throughput, or`--sequential` to match the legacy single-file order during incident response. Need an extra safety net? Run the manual smoke probe (`pnpm scripts:smoke`) whenever you want to double-check `--help`/`--dry-run` responses.
 
 All scripts honour the shared CLI contract:
 
-`--dry-run` (default true for ops) · `--yes` to execute · `--output json|text` · `--log-level trace|debug|info|warn|error` · `--cwd <path>` · zero interactive prompts.
+`--dry-run` (default true for ops) · `--yes` to execute · `--output json|text` · `--log-level trace|debug|info|warn|error` · `--cwd `path`` · zero interactive prompts.
 
 ## Script Catalog
 
@@ -60,23 +60,23 @@ All scripts honour the shared CLI contract:
 
 | Command                                                 | Snapshot                                                                        |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `node scripts/ops/ideas-to-issues.mjs <idea>`           | Converts idea cards to GitHub Issues, replaces/maintains the Sub-Issues section |
+| `node scripts/ops/ideas-to-issues.mjs `idea``           | Converts idea cards to GitHub Issues, replaces/maintains the Sub-Issues section |
 | `node scripts/ops/sync-ideas-checklists.mjs`            | Mirrors checklist state between idea files and live issues                      |
-| `node scripts/ops/merge-subissue-to-parent.mjs <issue>` | Merges sub-issue branch, marks parent checklist, refreshes parent PR progress   |
-| `node scripts/ops/sync-issue-to-card.mjs <issue>`       | Pulls updated Issue content back into the originating idea file                 |
+| `node scripts/ops/merge-subissue-to-parent.mjs `issue`` | Merges sub-issue branch, marks parent checklist, refreshes parent PR progress   |
+| `node scripts/ops/sync-issue-to-card.mjs `issue``       | Pulls updated Issue content back into the originating idea file                 |
 | `node scripts/ops/archive-closed-ideas.mjs`             | Batch-archives idea cards whose Issues are already closed                       |
 
 Or use the pnpm shortcuts:
 
 ```bash
-pnpm ideas:create <idea>    # ideas-to-issues
+pnpm ideas:create `idea`    # ideas-to-issues
 pnpm ideas:sync             # sync-ideas-checklists
 pnpm ideas:validate         # validate-ideas
 ```
 
 ### `create-worktree-pr.mjs` notes
 
-- Accepts `--base <branch>` to specify the base branch for worktree creation (defaults to `main`)
+- Accepts `--base `branch``to specify the base branch for worktree creation (defaults to`main`)
 - The script runs git commands from the repository root, eliminating `spawn git ENOENT` errors in sandboxed environments
 - Terminal output includes a confirmation log showing the resolved base branch for debugging
 
@@ -85,14 +85,14 @@ pnpm ideas:validate         # validate-ideas
 - Supports Unit (`U-`), Composition (`C-`), Architecture (`ARCH-`), Playbook (`PB-`), Bug (`B-`), and brief (lowercase) idea cards.
 - Enforces section requirements per type (e.g., Purpose/Problem/Proposal/Acceptance Checklist for ARCH).
 - Warns on thin acceptance checklists and titles missing ticket prefixes to help guardrail compliance.
-- Run with `--filter <prefix>` for focused audits (e.g., `node scripts/checks/validate-ideas.mjs --filter ARCH-`).
+- Run with `--filter `prefix``for focused audits (e.g.,`node scripts/checks/validate-ideas.mjs --filter ARCH-`).
 
 ### Sub-issue pipeline helpers
 
 - `ideas-to-issues.mjs` replaces (rather than appends) the `## Sub-Issues` section in parent Issues and preserves existing checkbox state when re-run.
-- `create-worktree-pr.mjs` automatically adds `Part of #<parent>` context to child PRs when `Parent: #N` metadata exists on the idea card.
+- `create-worktree-pr.mjs` automatically adds `Part of #`parent``context to child PRs when`Parent: #N` metadata exists on the idea card.
 - `merge-subissue-to-parent.mjs` merges the branch, flips the matching parent Issue checklist item to `[x]`, and injects/updates a `## Sub-Issues Progress` section in the parent PR body.
-- `archive-closed-ideas.mjs` performs one-off cleanups to move lingering idea cards for closed Issues into `/ideas/_archive/<year>/`.
+- `archive-closed-ideas.mjs` performs one-off cleanups to move lingering idea cards for closed Issues into `/ideas/_archive/`year`/`.
 
 ## Supporting Libraries
 

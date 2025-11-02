@@ -1,9 +1,9 @@
 ---
-id: runbook-lanes-quickstart
-owner: @lane-d
-version: 1.0.0
-created: 2025-11-02
-last_verified: 2025-11-02
+id: "runbook-lanes-quickstart"
+owner: "@lane-d"
+version: "1.0.0"
+created: "2025-11-02"
+last_verified: "2025-11-02"
 ttl_days: 120
 ---
 

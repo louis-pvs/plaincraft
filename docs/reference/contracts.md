@@ -1,11 +1,11 @@
 ---
-id: ref-contracts
+id: "ref-contracts"
 owner: "@lane-d"
-lane: D
-version: 1.0.0
-created: 2025-11-02
+lane: "D"
+version: "1.0.0"
+created: "2025-11-02"
 ttl_days: 90
-last_verified: 2025-11-02
+last_verified: "2025-11-02"
 prev: /reference/project-schema
 next: /reference/coverage-map
 ---
