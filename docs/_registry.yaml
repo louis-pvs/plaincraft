@@ -41,25 +41,25 @@ items:
     next_owner: "@lane-d"
     next_lane: "D"
     project_item: ""
-    status: "Accepted"
+    status: "Merged"
     surfaces:
       storybook: ""
       playbook: "playbook/workflows/idea-lifecycle.md"
       readme: ""
     evidence:
       A:
-        storybook_run: ""
-        readme_diff: ""
-        pr_url: ""
+        storybook_run: "N/A - no storybook component"
+        readme_diff: "N/A - no unit README"
+        pr_url: "https://github.com/louis-pvs/plaincraft/pull/TBD"
       B:
-        playbook_page: ""
-        asset_note: ""
+        playbook_page: "https://github.com/louis-pvs/plaincraft/blob/main/docs/workflows/idea-lifecycle.md"
+        asset_note: "Workflow documented in docs/workflows/"
       C:
-        gate_comment: ""
-        metrics_note: ""
+        gate_comment: "Pre-registry ADR - merged before gate process"
+        metrics_note: "N/A - pre-registry"
       D:
         decision_log: "https://github.com/louis-pvs/plaincraft/blob/main/docs/adr/2025-10-idea-lifecycle.md"
-        registry_commit: ""
+        registry_commit: "https://github.com/louis-pvs/plaincraft/pull/150"
     ttl_days: 365
     last_verified: "2025-11-02"
 
