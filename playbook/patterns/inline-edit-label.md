@@ -1,3 +1,15 @@
+---
+id: pattern-inline-edit-label
+owner: "@lane-a"
+lane: A
+version: 1.0.0
+created: 2025-11-02
+ttl_days: 180
+last_verified: 2025-11-02
+prev: /patterns/
+next: /patterns/ideas-source-of-truth
+---
+
 # Inline Edit Label Pattern
 
 ::: tip View Interactive Demo

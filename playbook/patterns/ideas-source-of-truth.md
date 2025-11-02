@@ -6,7 +6,7 @@ version: 1.0.0
 created: 2025-11-02
 ttl_days: 180
 last_verified: 2025-11-02
-prev: /patterns/
+prev: /patterns/inline-edit-label
 next: /patterns/scripts-first-lifecycle-overview
 ---
 
