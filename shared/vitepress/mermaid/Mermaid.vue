@@ -35,7 +35,13 @@ const renderMermaid = async () => {
   }
 
   if (!initialized && mermaidApi?.initialize) {
-    mermaidApi.initialize({ startOnLoad: false });
+    mermaidApi.initialize({
+      startOnLoad: false,
+      theme: "default",
+      securityLevel: "loose",
+      fontFamily: "inherit",
+      fontSize: 16,
+    });
     initialized = true;
   }
 
