@@ -1,26 +1,26 @@
-# ADR 2025-10 Idea Lifecycle, Sources of Truth, and Enforcement Split
+---
+id: adr-2025-10-idea-lifecycle
+owner: @lane-d
+status: Accepted
+version: 1.0.0
+created: 2025-10-28
+amended_by: [adr-2025-11-registry-driven-docs]
+---
 
-## Status
-
-Accepted — 2025-10-28
+# ADR: Idea Lifecycle, Sources of Truth, and Enforcement Split
 
 ## Context
 
-Guides bloat and process drift made status untrustworthy. We needed one canonical workflow, one status source, and automated enforcement.
+We experienced drift between Issues, Project status, and documentation. A single canonical workflow and clear sources of truth are required.
 
 ## Decision
 
-- **Content SoT:** Issues/idea files.
-- **Status SoT:** GitHub Projects (custom fields).
-- **Docs split:** Canonical in `/docs/workflows`, unit steps in READMEs, Storybook for behavior, Playbook for narrative.
-- **Enforcement:** Lane C via commit/PR checks and dashboards.
+Content source of truth is the idea Issue or idea file. Status source of truth is GitHub Projects. The canonical workflow lives in /docs/workflows/idea-lifecycle.md and defines states, transitions, and RACI. Enforcement is handled by CI and commit/PR rules referenced from policy docs.
 
 ## Consequences
 
-- Clear ownership (D/B/A/C).
-- Faster onboarding and smaller docs.
-- Policy changes require D approval; C cannot silently alter rules.
+One place for policy, one place for status, and reduced ambiguity in ownership. Policy changes happen here; implementation details can evolve elsewhere without reopening this ADR.
 
 ## Review
 
-Revisit in 6 months or if >3 exceptions are granted in a quarter.
+Revisit in 6 months or upon significant process change.

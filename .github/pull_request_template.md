@@ -1,4 +1,4 @@
-# Overview
+# Summary
 
 - Purpose:
 - Scope / decisions touched:
@@ -31,7 +31,13 @@
 - [ ]
 ```
 
-# Rollout / Comms
+# Doc Impact (required if components/stories/contracts/templates changed)
 
-- Docs / Playbook updates:
-- Release or feature flag notes:
+- Contracts changed (IDs): …
+- Stories/components changed (names/paths): …
+- Affected docs by ID (from registry): …
+- Action taken: [ ] Updated now [ ] Marked Stale with expiry [ ] No impact (explain)
+
+# Risk & Rollback
+
+How to revert if this backfires.

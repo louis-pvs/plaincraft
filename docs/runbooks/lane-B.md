@@ -1,11 +1,11 @@
 ---
 id: runbook-lane-b
-owner: "@lane-b"
+owner: @lane-b
 lane: B
 version: 1.0.0
-created: 2025-11-01
+created: 2025-11-02
 ttl_days: 60
-last_verified: 2025-11-01
+last_verified: 2025-11-02
 ---
 
 # Lane B Runbook (Playbook)

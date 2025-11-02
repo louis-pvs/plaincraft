@@ -1,0 +1,9 @@
+/docs/_registry.yaml                          @lane-d
+/docs/adr/2025-10-idea-lifecycle.md             @lane-d
+/docs/adr/2025-11-registry-driven-docs.md       @lane-d
+/storybook/docs/**                               @lane-a @lane-b
+/playbook/pages/**                               @lane-b
+/docs/runbooks/**                                 @lane-d
+/docs/workflows/**                                @lane-d
+/docs/policy/**                                   @lane-c
+/docs/reference/**                                @lane-d
