@@ -1,0 +1,71 @@
+- id: WORKFLOW-idea-lifecycle
+  type: workflow
+  lane: D
+  owner: "@lane-d"
+  nav: { section: "Workflows", order: 1 }
+  refs:
+    canonical_doc: "/docs/workflows/idea-lifecycle.md"
+  ttl_days: 180
+  last_verified: "2025-11-02"
+
+- id: WORKFLOW-adr-intake
+  type: workflow
+  lane: D
+  owner: "@lane-d"
+  nav: { section: "Workflows", order: 2 }
+  refs:
+    canonical_doc: "/docs/workflows/adr-intake.md"
+  ttl_days: 180
+  last_verified: "2025-11-02"
+
+- id: PATTERN-inline-edit-label
+  type: pattern
+  lane: A
+  owner: "@lane-a"
+  nav: { section: "Patterns", order: 1 }
+  refs:
+    canonical_doc: "/playbook/patterns/inline-edit-label.md"
+    template_ref: "/templates/snippet-inline-edit-label@v0.1"
+    storybook_doc: "/storybook/?path=/docs/snippets-inlineeditlabel--docs"
+  ttl_days: 90
+  last_verified: "2025-11-02"
+  deps:
+    - snippets/InlineEditLabel/README.md
+    - templates/snippet-inline-edit-label/README.md
+    - templates/snippet-inline-edit-label/USAGE.md
+  waivers: []
+
+- id: RUNBOOK-lane-D-zero-talk
+  type: runbook
+  lane: D
+  owner: "@lane-d"
+  nav: { section: "Runbooks", order: 1 }
+  refs:
+    canonical_doc: "/docs/runbooks/lane-D-zero-talk.md"
+    workflow: WORKFLOW-adr-intake
+  ttl_days: 120
+  last_verified: "2025-11-02"
+  deps:
+    - docs/adr/2025-11-registry-driven-docs.md
+    - docs/workflows/adr-intake.md
+  waivers: []
+
+- id: CONTRACT-docs-registry
+  type: contract
+  lane: D
+  owner: "@lane-d"
+  nav: { section: "Contracts", order: 1 }
+  refs:
+    canonical_doc: "/docs/reference/contracts.md"
+    adr: adr-2025-11-pilot-registry-driven-docs
+  ttl_days: 90
+  last_verified: "2025-11-02"
+  deps:
+    - docs/_registry.yaml
+    - playbook/patterns/inline-edit-label.md
+    - docs/runbooks/lane-D-zero-talk.md
+  waivers:
+    - script: scripts/checks/doc-gates.mjs
+      reason: "Pilot phase - defer CLI flags/LOC refactor to post-validation iteration"
+      expires: "2025-11-16"
+      approved_by: "@lane-d"

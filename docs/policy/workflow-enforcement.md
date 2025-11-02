@@ -1,32 +1,30 @@
 ---
 id: policy-workflow-enforcement
-owner: "@lane-c"
+owner: @lane-c
 lane: C
 version: 1.0.0
 created: 2025-11-02
 ttl_days: 90
 last_verified: 2025-11-02
-prev: /workflows/project-board-integration
 ---
 
 # Workflow Enforcement Contract
 
-## What is enforced
+## Enforced
 
-1. Commit headers must match this pattern:
-   ^\[([A-Z]+-\d+)\]\s+(feat|fix|perf|refactor|chore|docs|test|build|ci)(\([a-z0-9-]+\))?:\s.+$
-2. No slugs in commit headers (slugs belong in PR titles only).
-3. Branch format must be: type/ID-slug
-4. PR title must start with [ID] and match branch ID.
+1. Commit header pattern: ^\[([A-Z]+-[a-z0-9-]+)\]\s+.+$
+2. No slugs in commit headers.
+3. Branch format: type/ID-slug
+4. PR title starts with [ID] and matches branch ID.
 5. One open branch and one open PR per ID at any time.
 
-## What is reported (dashboards)
+## Reported
 
-- Commit compliance rate per team.
-- Project status lag (items >1 step behind).
-- CI p50/p95 deltas vs baseline (+/− 90s tripwire).
-- Orphaned templates and stale READMEs.
+- Commit compliance rate
+- Project status lag
+- CI p95 delta vs baseline (+/− 90s tripwire)
+- Orphaned templates and stale READMEs
 
 ## Exceptions
 
-- Lane D approves waivers. Lane C logs and time-limits them (≤14 days).
+Lane D approves waivers; Lane C records and time-limits them (≤14 days).

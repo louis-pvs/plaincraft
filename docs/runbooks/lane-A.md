@@ -1,33 +1,33 @@
 ---
 id: runbook-lane-a
-owner: "@lane-a"
+owner: @lane-a
 lane: A
-version: 1.0.0
+version: 1.1.0
 created: 2025-11-02
 ttl_days: 60
 last_verified: 2025-11-02
-next: /runbooks/lane-B
 ---
 
 # Lane A Runbook (Developer UI)
 
-**Related:** [Lane B](/runbooks/lane-B) · [Lane C](/runbooks/lane-C) · [Lane D](/runbooks/lane-D) · [Observer](/runbooks/observer) · [Operator SOP](/runbooks/operator-registry-sop) · [Artifact Lifecycle](/runbooks/artifact-manual-lifecycle)
+**Trigger**: Ticket assigned and pilot named  
+**Inputs required**: Pilot ID, acceptance, component paths, a11y rules  
+**Owner**: Lane A  
+**Time box**: 1 working day  
+**Stop rule**: a11y criticals or CI p95 drift > +90s during pilot
 
-## Before
+**Steps**
 
-- Ticket has ID, acceptance, template link.
-- Stories planned: success, failure, empty.
-- a11y expectations clear.
+1. Create success, error, empty stories for the pilot.
+2. Update unit README snippet only; link template and Storybook.
+3. Open PR with Doc Impact filled.
 
-## During
+**Outputs**: Passing stories, updated README snippet, PR link  
+**Hand-off**: Lane B writes playbook narrative  
+**Evidence**: Storybook test result, PR checks, README diff
 
-- Deterministic stories; no silent refactors.
-- Keep README thin; link to template and Storybook.
+---
 
-## After
+## ADR Mode (do this when an ADR appears)
 
-- Stories pass CI; a11y criticals = 0.
-- Snapshot deltas explained.
-- Status advanced by one step; notes updated.
-
-**Success:** one unit/composition shipped; no CI p95 regression; README under cap.
+Same as above, but restricted to the pilot blast radius. No refactors outside the pilot.

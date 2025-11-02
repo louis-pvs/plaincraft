@@ -1,5 +1,6 @@
 ---
 id: pattern-script-automation-guardrails
+type: automation
 owner: "@lane-b"
 lane: B
 version: 1.0.0

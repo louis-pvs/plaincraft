@@ -1,11 +1,13 @@
 ---
 id: pattern-inline-edit-label
+type: ui-component
 owner: "@lane-a"
 lane: A
 version: 1.0.0
 created: 2025-11-02
 ttl_days: 180
 last_verified: 2025-11-02
+storybook_path: /docs/snippets-inlineeditlabel--docs
 prev: /patterns/
 next: /patterns/ideas-source-of-truth
 ---
@@ -36,6 +38,10 @@ Inline edits reduce friction for tiny tasks. This component gives users a quick,
 - Single-file drop-in, no deps beyond React
 - Accessibility-first: keyboard, focus, and ARIA support
 - Safe rollout: caller controls network and validation
+
+## Pilot Rationale (Lane B)
+
+This pattern was selected as the first registry-driven docs pilot because it is a self-contained UI unit with full asset coverage already in place: implementation source, a rich Storybook suite (success, error, empty, interaction, cancel, retry flows), and a Playbook entry that stays lightweight. Risk is low: no external dependencies, a narrow surface area, and clear keyboard/ARIA behaviors make correctness easy to validate. It provides measurable signals for the governance experiment—storybook render time, build inclusion cost, and doc gate pass/fail—without conflating with complex data flows. The recent headless refactor gives us a clean separation of controller logic and view layer, ideal for demonstrating projection integrity (do not hand-edit generated docs) while letting teams explore alternative presentations safely. Its small footprint means any CI performance regression beyond the +90s tripwire is almost certainly systemic (registry/gates) rather than domain noise. Success here establishes the handoff rhythm (ADR → Lane A assets → Lane B narrative → Lane C enforcement) and produces a repeatable template for subsequent patterns.
 
 ## Architecture
 

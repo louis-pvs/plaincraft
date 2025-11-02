@@ -1,5 +1,6 @@
 ---
 id: pattern-scripts-first-lifecycle-overview
+type: workflow
 owner: "@lane-d"
 lane: D
 version: 1.0.0
