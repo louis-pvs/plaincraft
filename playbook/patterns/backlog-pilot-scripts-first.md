@@ -1,5 +1,6 @@
 ---
 id: pattern-backlog-pilot-scripts-first
+type: automation
 owner: "@lane-d"
 lane: D
 version: 1.0.0

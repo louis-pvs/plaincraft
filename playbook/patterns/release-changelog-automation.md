@@ -1,5 +1,6 @@
 ---
 id: pattern-release-changelog-automation
+type: automation
 owner: "@lane-b"
 lane: B
 version: 1.0.0

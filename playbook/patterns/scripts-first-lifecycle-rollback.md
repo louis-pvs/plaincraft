@@ -1,7 +1,8 @@
 ---
 id: pattern-scripts-first-lifecycle-rollback
-owner: "@lane-b"
-lane: B
+type: workflow
+owner: "@lane-d"
+lane: D
 version: 1.0.0
 created: 2025-11-02
 ttl_days: 180

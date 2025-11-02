@@ -37,10 +37,15 @@ export default defineConfig({
         ],
       },
       {
-        text: "Patterns",
+        text: "UI Component Patterns",
         items: [
           { text: "Overview", link: "/patterns/" },
           { text: "Inline Edit Label", link: "/patterns/inline-edit-label" },
+        ],
+      },
+      {
+        text: "Workflow Patterns",
+        items: [
           {
             text: "Ideas Source of Truth",
             link: "/patterns/ideas-source-of-truth",
@@ -57,6 +62,11 @@ export default defineConfig({
             text: "Scripts-First Lifecycle Rollback",
             link: "/patterns/scripts-first-lifecycle-rollback",
           },
+        ],
+      },
+      {
+        text: "Automation & Governance",
+        items: [
           {
             text: "Script Automation Guardrails",
             link: "/patterns/script-automation-guardrails",

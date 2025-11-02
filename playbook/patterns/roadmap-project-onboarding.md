@@ -1,5 +1,6 @@
 ---
 id: pattern-roadmap-project-onboarding
+type: automation
 owner: "@lane-b"
 lane: B
 version: 1.0.0

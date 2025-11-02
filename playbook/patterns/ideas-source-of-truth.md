@@ -1,5 +1,6 @@
 ---
 id: pattern-ideas-source-of-truth
+type: workflow
 owner: "@lane-b"
 lane: B
 version: 1.0.0
