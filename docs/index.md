@@ -33,7 +33,6 @@ features:
   - [Lane D (Ideas & Product Ops)](/runbooks/lane-D)
   - [Observer (Situational Checks)](/runbooks/observer)
   - [Operator Registry SOP](/runbooks/operator-registry-sop)
-  - [Artifact Manual Lifecycle](/runbooks/artifact-manual-lifecycle)
 - [ADR 2025-10 Idea Lifecycle](/adr/2025-10-idea-lifecycle)
 
 ### External Destinations

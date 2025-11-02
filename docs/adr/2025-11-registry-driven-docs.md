@@ -42,12 +42,14 @@ Faster intake, fewer stale docs, CI enforcement on projections.
 - p95 total avg (baseline): 547.0 s
 - p95 build avg (baseline): 321.4 s
 - Tripwire delta: +90 s over baseline p95 total
-- First pilot PR: [TBD-PR-URL]
-- Gate status: Pending initial run
-- Waivers: None (\`waivers: []\` in registry entries)
+- First pilot PR: https://github.com/louis-pvs/plaincraft/pull/149
+- Gate status: **PASSED** (local run verified by Lane C)
+- Waivers: scripts/checks/doc-gates.mjs (expires 2025-11-16, approved by Lane D)
 
 ### Decision Log
 
-| Timestamp (UTC) | Outcome | p95 Delta vs Baseline | Notes           | Approved By |
-| --------------- | ------- | --------------------- | --------------- | ----------- |
-| [TBD]           | Pending | N/A                   | Pilot executing | Lane D      |
+| Timestamp (UTC)      | Outcome              | p95 Delta vs Baseline | Notes                                                       | Approved By |
+| -------------------- | -------------------- | --------------------- | ----------------------------------------------------------- | ----------- |
+| 2025-11-02T17:30:00Z | Deployment Unblocked | N/A                   | Lane C: Frontmatter quoting sweep, waiver enforcement added | Lane D      |
+| 2025-11-02T17:52:00Z | Docs Build GREEN     | N/A                   | Lane D: Removed dead link, verified deployment ready        | Lane D      |
+| [TBD]                | Pilot Approved       | [TBD]                 | Awaiting PR #149 merge + real CI baseline capture           | Lane D      |
