@@ -11,6 +11,11 @@ schema:
   next_lane: string     # A|B|C|D
   project_item: string  # URL
   status: enum          # Draft|Ticketed|Branched|PR Open|In Review|Merged|Archived
+  raci:                 # RACI matrix for work item
+    responsible: string # @handle - doing the work
+    accountable: string # @handle - owns the outcome
+    consulted: array    # @handle[] - input providers
+    informed: array     # @handle[] - kept updated
   surfaces:             # file paths that represent projections
     storybook: string
     playbook: string
@@ -42,6 +47,11 @@ items:
     next_lane: "D"
     project_item: ""
     status: "Merged"
+    raci:
+      responsible: "@lane-d"
+      accountable: "@lane-d"
+      consulted: ["@lane-a", "@lane-b", "@lane-c"]
+      informed: []
     surfaces:
       storybook: ""
       playbook: "playbook/workflows/idea-lifecycle.md"
@@ -72,6 +82,11 @@ items:
     next_lane: "B"
     project_item: ""
     status: "Accepted"
+    raci:
+      responsible: "@lane-a"
+      accountable: "@lane-d"
+      consulted: ["@lane-b", "@lane-c"]
+      informed: []
     surfaces:
       storybook: "storybook/docs/Patterns/inline-edit.mdx"
       playbook: "playbook/pages/inline-edit.md"
@@ -102,6 +117,11 @@ items:
     next_lane: "A"
     project_item: "https://github.com/orgs/<org>/projects/<id>/views/<view>"
     status: "Accepted"
+    raci:
+      responsible: "@lane-d"
+      accountable: "@lane-d"
+      consulted: ["@lane-a", "@lane-b", "@lane-c"]
+      informed: []
     surfaces:
       storybook: "storybook/docs/Patterns/registry-docs.mdx"
       playbook: "playbook/pages/patterns/registry-docs.md"
@@ -132,6 +152,11 @@ items:
     next_lane: "B"
     project_item: "https://github.com/orgs/<org>/projects/<id>/views/<view>"
     status: "Archived"
+    raci:
+      responsible: "@lane-a"
+      accountable: "@lane-d"
+      consulted: []
+      informed: []
     surfaces:
       storybook: "storybook/docs/Patterns/registry-docs.mdx"
       playbook: "playbook/pages/patterns/registry-docs.md"
@@ -141,5 +166,40 @@ items:
       B: {}
       C: {}
       D: {}
+    ttl_days: 180
+    last_verified: "2025-11-02"
+
+  - id: adr-2025-11-registry-project-raci-sync
+    title: Registry Enforcement + GitHub Project RACI View Sync
+    type: arch
+    lane: D
+    current_owner: "@lane-d"
+    next_owner: "@lane-a"
+    next_lane: "A"
+    project_item: ""
+    status: "Ticketed"
+    raci:
+      responsible: "@lane-d"
+      accountable: "@lane-d"
+      consulted: ["@lane-a", "@lane-b", "@lane-c"]
+      informed: []
+    surfaces:
+      storybook: ""
+      playbook: "playbook/workflows/raci-sync.md"
+      readme: ""
+    evidence:
+      A:
+        storybook_run: ""
+        readme_diff: ""
+        pr_url: ""
+      B:
+        playbook_page: ""
+        asset_note: ""
+      C:
+        gate_comment: ""
+        metrics_note: ""
+      D:
+        decision_log: "https://github.com/louis-pvs/plaincraft/blob/main/docs/adr/2025-11-registry-project-raci-sync.md"
+        registry_commit: ""
     ttl_days: 180
     last_verified: "2025-11-02"

@@ -132,6 +132,27 @@ jobs:
                 errors.push(`❌ ${itemId}: missing 'next_lane' field`);
               }
 
+              // Check RACI fields for Ticketed+ items
+              const statusRequiringRaci = ['Ticketed', 'Branched', 'PR Open', 'In Review', 'Merged'];
+              if (statusRequiringRaci.includes(item.status)) {
+                if (!item.raci) {
+                  errors.push(`❌ ${itemId}: missing 'raci' object (required for status '${item.status}')`);
+                } else {
+                  if (!item.raci.responsible) {
+                    errors.push(`❌ ${itemId}: missing 'raci.responsible' field`);
+                  }
+                  if (!item.raci.accountable) {
+                    errors.push(`❌ ${itemId}: missing 'raci.accountable' field`);
+                  }
+                  if (!Array.isArray(item.raci.consulted)) {
+                    errors.push(`❌ ${itemId}: 'raci.consulted' must be an array`);
+                  }
+                  if (!Array.isArray(item.raci.informed)) {
+                    errors.push(`❌ ${itemId}: 'raci.informed' must be an array`);
+                  }
+                }
+              }
+
               // Check evidence structure exists
               if (!item.evidence) {
                 warnings.push(`⚠️  ${itemId}: missing 'evidence' structure`);

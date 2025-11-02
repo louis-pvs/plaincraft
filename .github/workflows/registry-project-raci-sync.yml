@@ -1,0 +1,140 @@
+name: Registry Project RACI Sync
+
+on:
+  push:
+    paths: ["docs/_registry.yaml"]
+  workflow_dispatch: {}
+
+jobs:
+  sync-raci:
+    name: Sync RACI to Project
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Sync RACI fields to Project
+        uses: actions/github-script@v7
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+
+            core.info('🔄 Syncing RACI fields from registry to GitHub Project');
+
+            // Load registry
+            const registry = yaml.load(fs.readFileSync('docs/_registry.yaml', 'utf8'));
+            if (!registry || !registry.items) {
+              core.warning('Registry missing items - skipping sync');
+              return;
+            }
+
+            core.info(`📋 Found ${registry.items.length} items in registry`);
+
+            // Load project config
+            let projectConfig;
+            try {
+              projectConfig = JSON.parse(fs.readFileSync('.github/pipeline-config.json', 'utf8'));
+            } catch (e) {
+              core.warning('No pipeline-config.json found - skipping Project sync');
+              return;
+            }
+
+            if (!projectConfig.project || !projectConfig.project.number) {
+              core.warning('No project number in config - skipping sync');
+              return;
+            }
+
+            const projectNumber = projectConfig.project.number;
+            core.info(`📊 Using Project #${projectNumber}`);
+
+            for (const item of registry.items) {
+              if (!item.id || !item.raci) {
+                core.info(`⏭️  Skipping ${item.id || 'unknown'} - missing ID or RACI`);
+                continue;
+              }
+              
+              // Only sync items that are Ticketed or beyond
+              const syncStatuses = ['Ticketed', 'Branched', 'PR Open', 'In Review', 'Merged'];
+              if (!syncStatuses.includes(item.status)) {
+                core.info(`⏭️  Skipping ${item.id} - status '${item.status}' not in sync list`);
+                continue;
+              }
+              
+              core.info(`🔄 Processing ${item.id}`);
+              core.info(`   Responsible: ${item.raci.responsible}`);
+              core.info(`   Accountable: ${item.raci.accountable}`);
+              core.info(`   Next Owner: ${item.next_owner} (Lane ${item.next_lane})`);
+              
+              // Find or create Intake Card
+              const title = `ADR Intake: ${item.id}`;
+              const { data: issues } = await github.rest.search.issuesAndPullRequests({
+                q: `repo:${context.repo.owner}/${context.repo.repo} "${title}" in:title type:issue`
+              });
+              
+              let issue;
+              if (issues.items && issues.items.length) {
+                issue = issues.items[0];
+                core.info(`   ✅ Found Intake Card #${issue.number}`);
+              } else {
+                core.info(`   ⚠️  No Intake Card found for ${item.id} - create via ADR commit`);
+                continue;
+              }
+              
+              // Update issue body with RACI info
+              const raciSection = [
+                '## RACI Matrix',
+                `**Responsible:** ${item.raci.responsible} _(doing the work)_`,
+                `**Accountable:** ${item.raci.accountable} _(owns the outcome)_`,
+                `**Consulted:** ${item.raci.consulted.length > 0 ? item.raci.consulted.join(', ') : 'None'}`,
+                `**Informed:** ${item.raci.informed.length > 0 ? item.raci.informed.join(', ') : 'None'}`,
+                '',
+                `**Next Owner:** ${item.next_owner}`,
+                `**Next Lane:** ${item.next_lane}`,
+                `**Status:** ${item.status}`
+              ].join('\n');
+              
+              // Get current body and replace/append RACI section
+              let body = issue.body || '';
+              const raciStart = body.indexOf('## RACI Matrix');
+              
+              if (raciStart !== -1) {
+                // Find next ## or end of string
+                const nextSection = body.indexOf('##', raciStart + 1);
+                const beforeRaci = body.substring(0, raciStart);
+                const afterRaci = nextSection !== -1 ? body.substring(nextSection) : '';
+                body = beforeRaci + raciSection + '\n\n' + afterRaci;
+              } else {
+                body = body + '\n\n' + raciSection;
+              }
+              
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: body.trim()
+              });
+              
+              core.info(`   ✅ Updated RACI info for ${item.id}`);
+            }
+
+            core.info('✅ RACI sync complete');
