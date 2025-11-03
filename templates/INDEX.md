@@ -141,10 +141,11 @@ cp ./changelog/CHANGELOG.md .
 **Quick Start:**
 
 ```bash
-cp ./ideas/idea-unit-template.md .
+# DEPRECATED: Ideas workflow removed as of 2025-11-03
+# See /_archive/ideas-2025-11-03-deprecated/ for historical reference
 ```
 
-📁 [View in repo](./ideas) | 📖 [README](./ideas/README.md) | 🚀 [USAGE](./ideas/USAGE.md)
+⚠️ **DEPRECATED** - Ideas workflow no longer in use | � [Archive](../_archive/ideas-2025-11-03-deprecated/)
 
 ---
 

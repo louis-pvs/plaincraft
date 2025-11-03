@@ -70,48 +70,41 @@ Each step needed:
 2. Executable command in bash code block
 3. Brief context if needed
 
-````markdown
+```markdown
 # Steps (all executable)
 
-1. **Create idea file:**
-   ```bash
-   cp templates/ideas/idea-unit-template.md ideas/U-your-feature.md
-   ```
-````
+1. **[DEPRECATED]** ~~Create idea file~~ (Ideas workflow removed 2025-11-03)
 
-2. **Validate structure:**
+2. **[DEPRECATED]** ~~Validate structure~~ (Ideas workflow removed 2025-11-03)
 
-   ```bash
-   pnpm run ideas:validate
-   ```
+3. **[DEPRECATED]** ~~Create GitHub Issue~~ (Ideas workflow removed 2025-11-03)
 
-3. **Create GitHub Issue:**
-   ```bash
-   node scripts/ideas-to-issues.mjs U-your-feature.md
-   ```
-
-````
+> **Note:** The idea-based workflow has been deprecated. See `/_archive/ideas-2025-11-03-deprecated/` for historical reference.
+```
 
 ### 7. Add Rollback Section
 
 ```markdown
 # Rollback
 
-- Delete idea file: `rm ideas/U-your-feature.md`
+- [DEPRECATED] ~~Delete idea file~~ (Ideas workflow removed 2025-11-03)
 - Close GitHub Issue manually
 - Remove worktree: `git worktree remove <path>`
-````
+```
 
+### 8. List Requirements
+
+````markdown
 ### 8. List Requirements
 
 ```markdown
 # Requirements
 
-- Idea file must exist before creating Issue
-- File naming: `U-<slug>.md`, `C-<slug>.md`, etc.
-- Required sections: Purpose, Problem, Proposal, Acceptance Checklist
-- Lane metadata (A/B/C/D) specified
+- [DEPRECATED] ~~Idea file must exist before creating Issue~~ (Ideas workflow removed 2025-11-03)
 ```
+````
+
+`````
 
 ### 9. Add Links Section
 
@@ -130,8 +123,9 @@ wc -w guides/guide-your-topic.md
 
 # Legacy README maintenance
 # Add entry to /guides/README.md Active Guides list
-```
-````
+`````
+
+`````
 
 ## Word Count Tips
 
@@ -172,7 +166,7 @@ Target: 200-400 words (max 600)
    ```bash
    cp templates/ideas/idea-unit-template.md ideas/U-feature.md
    ```
-````
+`````
 
 ````
 
@@ -184,12 +178,9 @@ then consider the user needs, and after that...
 
 ### ✅ Executable instructions
 
-````markdown
-1. **Validate structure:**
-   ```bash
-   pnpm run ideas:validate
-   ```
-````
+```markdown
+1. **[DEPRECATED]** ~~Validate structure~~ (Ideas workflow removed 2025-11-03)
+```
 
 ```
 

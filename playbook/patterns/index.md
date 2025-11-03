@@ -64,7 +64,7 @@ Plays that wrap automation or workflow scripts around template-first docs:
 
 - **Scripts-First Lifecycle Overview** — Coordinates intake through closeout using the sanctioned commands.
 - **Release Changelog Automation** — Script + template handshake to publish post-merge highlights.
-- **Ideas Source of Truth** — Keeps `/ideas` authoritative for automation and storytelling.
+- ~~**Ideas Source of Truth**~~ — **[DEPRECATED 2025-11-03]** Ideas workflow removed.
 - **Script Automation Guardrails** — Standardizes ops scripts around the shared CLI contract.
 - **Scripts-First Lifecycle Rollout** — Bootstraps branches and draft PRs directly from the idea file.
 - **Scripts-First Lifecycle Rollback** — Rewinds branches and PRs while preserving audit transcripts.
