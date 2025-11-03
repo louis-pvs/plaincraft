@@ -67,7 +67,7 @@ jobs:
         continue-on-error: true
 
       - name: Build docs site
-        run: pnpm run docs:build
+        run: pnpm run build:docs
 
       - name: Copy docs build
         run: |
