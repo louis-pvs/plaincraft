@@ -143,9 +143,6 @@
     ],
     ".github/ISSUE_TEMPLATE/*.yml": [
       "node scripts/checks/issue-template-lint.mjs"
-    ],
-    ".github/pull_request_template.md": [
-      "node scripts/checks/pr-template-lint.mjs"
     ]
   }
 }

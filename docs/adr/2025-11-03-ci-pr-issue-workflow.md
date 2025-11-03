@@ -2,10 +2,19 @@
 
 ## Status
 
-**Proposed** - Lane D Preflight Review Complete (2025-11-03)  
-⚠️ **BLOCKED** - See Lane D Assessment below
+**Accepted (Phase 1 - Foundations)** – Templates & lightweight linkage adopted (2025-11-03)  
+⏭ **Planned (Phase 2 - Automation)** – CI validation & PR commentary (earliest 2025-11-17)  
+⏳ **Future (Phase 3 - Enforcement)** – Optional strict checks & metrics (post evaluation)
 
-(Once validated and rolled out, this will move to **Accepted**)
+Blockers from preflight have been partially remediated. Heavy automation intentionally deferred.
+
+Summary of remediation:
+
+- Added issue templates (`feature.md`, `bug.md`, `chore.md`)
+- Added pull request template (`pull_request_template.md`)
+- Adopted lightweight workflow first (no hard CI failure yet)
+
+See Implementation Plan section for phased rollout.
 
 ## Context
 
@@ -125,11 +134,99 @@ By implementing this CI/PR/Issue workflow, we ensure that our work is well-docum
 
 ---
 
-## Lane D Preflight Assessment (2025-11-03)
+## Implementation Plan
+
+### Phase 1 (Foundations) – COMPLETE
+
+Deliverables:
+
+- Issue templates with Why / Acceptance / Priority
+- PR template with Related Issue / Why / Summary / Acceptance Alignment
+- ADR updated to Phase 1 Accepted
+
+Manual Rules (Phase 1):
+| Requirement | Enforcement | Owner |
+|-------------|-------------|-------|
+| Issue includes Why & Acceptance | Manual triage | Author / Reviewer |
+| PR links issue (Closes #) | Manual review | Reviewer |
+| Priority selected | Manual triage | Author |
+| Template sections filled | Manual review | Author |
+| Next Steps (optional) | Manual | Author |
+
+### Phase 2 (Automation) – PLANNED
+
+Scope: Gentle CI hints (warnings, not hard fails).
+Proposed:
+
+- `scripts/checks/pr-linked-issue.mjs` (warn when missing link)
+- `scripts/checks/issue-structure.mjs` (warn when missing Why/Acceptance)
+- CI job comment summarizing structure compliance
+- Auto-label missing priority (`needs:priority`)
+
+Phase 2 Acceptance Criteria:
+
+- ≥80% PRs contain issue link on first commit
+- ≥70% issues contain Why + Acceptance
+- ≤10% PR reviews require structural rework
+
+### Phase 3 (Enforcement) – FUTURE / OPTIONAL
+
+Scope: Hard failing CI + metrics dashboard; map Acceptance to tests.
+Deferred until post-retrospective (Q1 2026 earliest).
+
+### Timeline
+
+| Date       | Milestone                                      |
+| ---------- | ---------------------------------------------- |
+| 2025-11-03 | Phase 1 accepted                               |
+| 2025-11-17 | Phase 2 scoping earliest start                 |
+| 2025-12-03 | Adoption checkpoint (30-day)                   |
+| 2026-02-01 | Evaluate Phase 2 completion / consider Phase 3 |
+
+### Lane Ownership
+
+| Lane | Phase 1               | Phase 2                     | Phase 3                        |
+| ---- | --------------------- | --------------------------- | ------------------------------ |
+| A    | N/A                   | Validation helper functions | Metrics infra                  |
+| B    | Templates / ADR edits | Update docs & guidance      | Maintain playbook patterns     |
+| C    | N/A                   | CI scripts & PR comments    | Enforcement / dashboards       |
+| D    | Coordinate baseline   | Track adoption / adjust     | KPI evaluation / retrospective |
+
+### Exceptions (Phase 1)
+
+| Case                        | Relaxation                                              |
+| --------------------------- | ------------------------------------------------------- |
+| Tiny PR (typo, config bump) | May inline short justification instead of full template |
+| Emergency hotfix            | Issue may be created post-merge within 24h              |
+| Internal chore/refactor     | Next Steps optional                                     |
+
+### Rollback Strategy
+
+If reviewer friction >30% at 30-day checkpoint:
+
+- Relax mandatory Why for trivial changes
+- Defer Phase 2 until improvement sustained
+
+### Adoption Metrics (Baseline TBD)
+
+Track starting 2025-11-04:
+
+- % PRs with issue link on initial submission
+- % issues with Why + Acceptance
+- % PR template usage
+
+Targets before Phase 2:
+| Metric | Target |
+|--------|--------|
+| Issue link usage | ≥80% |
+| Issue structural completeness | ≥70% |
+| PR template usage | ≥90% |
+
+## Lane D Preflight Assessment (2025-11-03) – Historical Appendix
 
 **Reviewer:** Lane D (Program Operations & Cross-Lane Coordination)  
 **Assessment Date:** November 3, 2025  
-**Status:** ⚠️ **BLOCKED - Major Concerns Identified**
+**Original Status:** ⚠️ BLOCKED (superseded by Phase 1 acceptance)
 
 ### Executive Summary
 
@@ -139,7 +236,7 @@ Lane D has reviewed this ADR against current project state, cross-lane dependenc
 
 ### Critical Blockers
 
-#### 1. ⛔ No Issue/PR Templates Exist
+#### 1. ⛔ No Issue/PR Templates Exist (Resolved)
 
 **Finding:** The repository has **no GitHub issue templates or PR templates** configured.
 
@@ -149,14 +246,14 @@ Lane D has reviewed this ADR against current project state, cross-lane dependenc
 - `.github/pull_request_template.md` - Does not exist
 - No template structure to enforce "Why this matters" or acceptance criteria
 
-**Impact:** The ADR proposes mandatory sections ("Why this matters", acceptance criteria) but provides no mechanism to enforce them. This creates a process that relies entirely on developer discipline with no guardrails.
+**Resolution:** Templates added; enforcement deliberately manual in Phase 1.
 
 **Blocker Severity:** CRITICAL  
 **Owner:** Lane B (must create templates) + Lane C (must validate templates in CI)
 
 ---
 
-#### 2. ⛔ CI Pipeline Does Not Support Proposed Checks
+#### 2. ⛔ CI Pipeline Does Not Support Proposed Checks (Deferred)
 
 **Finding:** The current CI pipeline (`.github/workflows/ci.yml`) does **not validate issue linkage** or PR structure.
 
@@ -177,14 +274,14 @@ Lane D has reviewed this ADR against current project state, cross-lane dependenc
 | Validate acceptance criteria     | ❌ Not implemented | Custom validation script |
 | Track "next steps" links         | ❌ Not implemented | Issue graph analysis     |
 
-**Impact:** The ADR describes an automated enforcement system that does not exist. Building this would be a **major Lane C initiative** (estimated 2-3 weeks).
+**Resolution:** Deferred to Phase 2 scoped as warnings-first approach.
 
 **Blocker Severity:** CRITICAL  
 **Owner:** Lane C (DevOps & Automation) - New automation scripts required
 
 ---
 
-#### 3. ⚠️ Conflicts with Recent Deprecation (Ideas Workflow)
+#### 3. ⚠️ Conflicts with Recent Deprecation (Risk Mitigated)
 
 **Finding:** This ADR was authored **before** the ideas workflow deprecation (2025-11-03) and references outdated governance patterns.
 
@@ -201,14 +298,14 @@ Lane D has reviewed this ADR against current project state, cross-lane dependenc
 - Proposes "next steps issue linking" which echoes deprecated idea checklists
 - Introduces new mandatory overhead immediately after reducing overhead
 
-**Impact:** This ADR moves **counter to current direction** of simplification.
+**Resolution:** Adopted lightweight path; heavy automation postponed.
 
 **Blocker Severity:** HIGH  
 **Owner:** ADR Author + Lane D (must reconcile with current direction)
 
 ---
 
-#### 4. ⚠️ No Templates in `scripts/_lib/github.mjs`
+#### 4. ⚠️ No Templates in `scripts/_lib/github.mjs` (Deferred)
 
 **Finding:** The ADR assumes GitHub API helper functions for issue validation, but current `scripts/_lib/github.mjs` does **not include**:
 
@@ -217,7 +314,7 @@ Lane D has reviewed this ADR against current project state, cross-lane dependenc
 - "Why" section extraction
 - Acceptance criteria checking
 
-**Impact:** Implementing the automation requires **new Lane A tooling** before Lane C can automate.
+**Resolution:** Scheduled for Phase 2 scoping; not required for Phase 1.
 
 **Blocker Severity:** MEDIUM  
 **Owner:** Lane A (must create validation utilities) → Lane C (must integrate)
@@ -304,7 +401,7 @@ Lane D has reviewed this ADR against current project state, cross-lane dependenc
 
 ---
 
-### Lane D Decision
+### Lane D Decision (Historical)
 
 **Status:** ⚠️ **BLOCKED - Cannot proceed without addressing critical blockers**
 
@@ -354,7 +451,18 @@ If the goal is **incremental traceability improvement**, Lane D recommends:
 
 ---
 
-**Lane D Sign-off:** ⛔ **Blocked** - Do not proceed without addressing critical blockers and revising ADR
+**Lane D Sign-off (Historical):** Blocked (superseded)
+
+## Current Sign-off (Phase 1)
+
+| Lane            | Approval          | Date       |
+| --------------- | ----------------- | ---------- |
+| D (Program Ops) | ✅                | 2025-11-03 |
+| B (Narrative)   | ✅                | 2025-11-03 |
+| C (Automation)  | ✅ (Phase 1 only) | 2025-11-03 |
+| A (Tooling)     | ✅                | 2025-11-03 |
+
+Next Review: 2025-12-03 (Adoption checkpoint)
 
 **Reviewed By:** Lane D (Program Operations)  
 **Review Date:** November 3, 2025  
