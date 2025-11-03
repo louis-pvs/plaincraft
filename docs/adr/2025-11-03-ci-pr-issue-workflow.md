@@ -136,6 +136,8 @@ By implementing this CI/PR/Issue workflow, we ensure that our work is well-docum
 
 ## Implementation Plan
 
+> Operational Tracking: See `docs/runbooks/adoption-ci-pr-issue-workflow-phase-1.md` for weekly sampling, metrics, escalation thresholds, and exit criteria.
+
 ### Phase 1 (Foundations) – COMPLETE
 
 Deliverables:
@@ -153,6 +155,14 @@ Manual Rules (Phase 1):
 | Template sections filled | Manual review | Author |
 | Next Steps (optional) | Manual | Author |
 
+Single-Link Invariant (Phase 1 Manual):
+| Invariant | Rationale | Remediation (Manual) |
+|-----------|-----------|----------------------|
+| One primary Issue ↔ One active PR | Preserves clear narrative & ownership | If PR spans multiple issues: split; if Issue has multiple active PRs: close or convert extras to drafts |
+| PR must not close multiple issues via multiple `Closes #` directives | Avoids hidden scope & ambiguous acceptance | Replace secondary closures with references in Links section |
+| Issue must not be marked complete until its single PR merges | Ensures acceptance tracked | Delay status change until merge |
+| Optional Next Steps: at most one follow-up Issue linked | Prevents chain sprawl | Aggregate follow-ups into one planning Issue if needed |
+
 ### Phase 2 (Automation) – PLANNED
 
 Scope: Gentle CI hints (warnings, not hard fails).
@@ -162,12 +172,14 @@ Proposed:
 - `scripts/checks/issue-structure.mjs` (warn when missing Why/Acceptance)
 - CI job comment summarizing structure compliance
 - Auto-label missing priority (`needs:priority`)
+- Single-link detector: warn if PR description contains >1 `Closes|Fixes|Resolves #` directive or if GitHub API shows >1 open PR referencing same issue
 
 Phase 2 Acceptance Criteria:
 
 - ≥80% PRs contain issue link on first commit
 - ≥70% issues contain Why + Acceptance
 - ≤10% PR reviews require structural rework
+- ≥95% Single-Link Integrity (no violations during weekly sample)
 
 ### Phase 3 (Enforcement) – FUTURE / OPTIONAL
 
@@ -207,20 +219,26 @@ If reviewer friction >30% at 30-day checkpoint:
 - Relax mandatory Why for trivial changes
 - Defer Phase 2 until improvement sustained
 
-### Adoption Metrics (Baseline TBD)
+### Adoption Metrics (Baseline Established Week 0)
 
-Track starting 2025-11-04:
+Baseline Week 0 (pre-sampling) captured in runbook table with all metrics N/A. Tracking begins Week 1 (Nov 3–Nov 9) via manual sampling (first 15 PRs & issues).
 
-- % PRs with issue link on initial submission
-- % issues with Why + Acceptance
-- % PR template usage
+Metrics recorded weekly:
+
+- % PRs with issue link on initial submission (Issue Link Usage)
+- % Issues with both Why + Acceptance sections populated (Issue Structural Completeness)
+- % PRs using and filling required template sections (PR Template Usage)
+- % Issues with exactly one priority checkbox selected (Priority Declaration)
+- % PR reviews requesting structural fixes (Reviewer Friction)
 
 Targets before Phase 2:
 | Metric | Target |
 |--------|--------|
-| Issue link usage | ≥80% |
-| Issue structural completeness | ≥70% |
-| PR template usage | ≥90% |
+| Issue Link Usage | ≥80% |
+| Issue Structural Completeness | ≥70% |
+| PR Template Usage | ≥90% |
+| Priority Declaration | ≥85% |
+| Reviewer Friction | ≤10% |
 
 ## Lane D Preflight Assessment (2025-11-03) – Historical Appendix
 

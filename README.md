@@ -89,6 +89,26 @@ Each scaffolded snippet ships with:
   - `app-checks` runs format, typecheck, lint, unit tests, and build
   - `storybook-tests` caches browsers, builds Storybook, and exercises the Storybook test runner
 
+## Phase 1: CI/PR/Issue Workflow Adoption (Nov 2025)
+
+We are in Phase 1 (foundations) of ADR `2025-11-03-ci-pr-issue-workflow.md`.
+
+Expectations for all new issues & PRs:
+
+1. Issues: Include a brief "Why this matters" rationale and concrete "Acceptance Criteria" list. Select exactly one priority checkbox (P1/P2/P3).
+2. Pull Requests: Use the template; populate "Why" and "Summary" and link an issue in either the PR body or first commit (`Closes #<num>`).
+3. Acceptance Alignment: Ensure the PR description references any acceptance criteria satisfied or still pending.
+4. Review Friction: Aim to avoid structural review comments (missing link, missing rationale) by following templates.
+
+Tracking & Metrics: Lane D samples weekly adoption (see runbook). Targets: Issue Link Usage ≥80%, Structural Completeness ≥70%, Template Usage ≥90%, Priority Declaration ≥85%, Reviewer Friction ≤10%.
+
+Resources:
+
+- ADR: `/docs/adr/2025-11-03-ci-pr-issue-workflow.md`
+- Adoption Runbook: `/docs/runbooks/adoption-ci-pr-issue-workflow-phase-1.md`
+
+Phase 2 (light automation) will only begin after stable metrics for two consecutive weeks or averaged thresholds (see runbook exit criteria).
+
 ## License
 
 MIT © 2024 Louis Phang
