@@ -1,7 +1,9 @@
-# Scripts-First Lifecycle v3
+# Scripts-First Lifecycle v3 [DEPRECATED]
 
 Lane: D (Program Operations)
 Issue: 92
+
+> **⚠️ DEPRECATED (2025-11-03):** GitHub Projects-based lifecycle management is no longer required in this repository. Project schema and lifecycle governance have been removed from scope.
 
 ## Problem
 

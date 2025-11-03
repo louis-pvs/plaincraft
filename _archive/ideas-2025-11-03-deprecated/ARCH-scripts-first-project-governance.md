@@ -4,9 +4,11 @@ owner: lane.d
 lane: D
 type: architecture
 priority: P1
-state: delivered
+state: deprecated
 next_state: archive
 issue: 99
+deprecated: 2025-11-03
+deprecated_reason: "Project governance no longer required - lifecycle management removed from Lane D responsibilities"
 acceptance:
   - Project schema created or updated to match lifecycle v3 fields, with IDs captured for automation.
   - Automation workflow (`project-sync.yml` or updated `project.yml`) listens for lifecycle events and queues status transitions.
@@ -15,10 +17,12 @@ acceptance:
   - Migration retro recorded in ADR comment with links to scripts and Project snapshots.
 ---
 
-# ARCH-scripts-first-project-governance
+# ARCH-scripts-first-project-governance [DEPRECATED]
 
 Lane: D (Backlog & Project Stewardship)
 Issue: 99
+
+> **⚠️ DEPRECATED (2025-11-03):** Project governance and lifecycle management no longer required in this repository. Lane D responsibilities have been redefined to exclude project-based workflow automation.
 
 ## Lane
 

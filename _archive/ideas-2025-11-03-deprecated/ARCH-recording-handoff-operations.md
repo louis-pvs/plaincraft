@@ -1,7 +1,9 @@
-# ARCH-recording-handoff-operations
+# ARCH-recording-handoff-operations [DEPRECATED]
 
 Lane: D (Backlog & Program Operations)
 Issue: 95
+
+> **⚠️ DEPRECATED (2025-11-03):** Project board-based tracking and backlog pilot procedures are no longer required. Recording handoff coordination has been simplified without project governance dependencies.
 
 ## Lane
 
@@ -19,10 +21,10 @@ regular backlog workflow.
 Lane A will produce assets and Lane B will curate them, but without Lane D
 procedures:
 
-- Project boards won’t reflect which decisions gained clips or need refresh.
+- ~~Project boards won't reflect which decisions gained clips or need refresh.~~ [DEPRECATED: Project boards no longer used]
 - Media can go stale when units change; no one records TTL breaches.
-- Backlog pilots lack a clear checklist for verifying hand-offs and triggering
-  replacements.
+- ~~Backlog pilots lack a clear checklist for verifying hand-offs and triggering
+  replacements.~~ [DEPRECATED: Backlog pilot role removed]
 
 ## Proposal
 

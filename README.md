@@ -34,14 +34,18 @@ pnpm dev
 
 - `guides/_archive/**` - Legacy guides (historical reference only)
 - `scripts/DEPRECATED/**` - Deprecated scripts
+- **`_archive/ideas-2025-11-03-deprecated/`** - Ideas workflow (deprecated Nov 2025)
 
-These folders exist purely for historical reference. Active documentation lives on GitHub Pages, Playbook, or in `/templates/` and `/docs/policy/`.
+These folders exist for historical reference only. Active documentation lives on GitHub Pages, Playbook, or in `/templates/` and `/docs/policy/`.
+
+> **Note on Ideas Workflow:** The `/ideas/` folder and related automation were deprecated on 2025-11-03. See ADR: `docs/adr/2025-11-03-ideas-workflow-deprecation.md` for details.
 
 ## Template-First Toolkit
 
-- `/templates/ideas/` — Machine-importable source of truth for planning and acceptance criteria
 - `/templates/script/` — Script template with full CLI contract and guardrails
 - `/templates/snippet-inline-edit-label/` — Component snippet scaffold
+
+> **Deprecated:** `/templates/ideas/` was removed on 2025-11-03. Historical reference available in `/_archive/ideas-2025-11-03-deprecated/`
 
 See individual template READMEs for usage instructions.
 
