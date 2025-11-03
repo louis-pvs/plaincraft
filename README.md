@@ -16,39 +16,38 @@ pnpm dev
 ## Workflow & Docs
 
 - GitHub Pages (canonical hub): [https://louis-pvs.github.io/plaincraft/](https://louis-pvs.github.io/plaincraft/)
-- Storybook governance views: [https://louis-pvs.github.io/plaincraft/storybook/](https://louis-pvs.github.io/plaincraft/storybook/)
+- Storybook (component stories): [https://louis-pvs.github.io/plaincraft/storybook/](https://louis-pvs.github.io/plaincraft/storybook/)
 - Playbook patterns: [https://louis-pvs.github.io/plaincraft/playbook/](https://louis-pvs.github.io/plaincraft/playbook/)
 - Repo sources:
-  - Workflow: [/docs/workflows/idea-lifecycle.md](/docs/workflows/idea-lifecycle.md)
-  - Enforcement: [/docs/policy/workflow-enforcement.md](/docs/policy/workflow-enforcement.md)
-  - Project schema: [/docs/reference/project-schema.md](/docs/reference/project-schema.md)
-  - Runbooks: [/docs/runbooks/](/docs/runbooks/)
-  - ADR: [/docs/adr/2025-10-idea-lifecycle.md](/docs/adr/2025-10-idea-lifecycle.md)
+  - Policy: [/docs/policy/](/docs/policy/)
+  - Templates: [/templates/](/templates/)
 
 ## Documentation Index
 
 - GitHub Pages portal: [https://louis-pvs.github.io/plaincraft/](https://louis-pvs.github.io/plaincraft/)
-- Storybook governance docs: [https://louis-pvs.github.io/plaincraft/storybook/](https://louis-pvs.github.io/plaincraft/storybook/)
+- Storybook (component stories): [https://louis-pvs.github.io/plaincraft/storybook/](https://louis-pvs.github.io/plaincraft/storybook/)
 - Playbook patterns: [https://louis-pvs.github.io/plaincraft/playbook/](https://louis-pvs.github.io/plaincraft/playbook/)
-- Runbooks & policies (repo): [/docs/](/docs/)
+- Policy documentation (repo): [/docs/policy/](/docs/policy/)
 - Archived guides (historical reference only): [/guides/\_archive/](guides/_archive/)
 
 ### Archived & Deprecated Directories
 
-- `guides/_archive/**`
-- `scripts/DEPRECATED/**`
+- `guides/_archive/**` - Legacy guides (historical reference only)
+- `scripts/DEPRECATED/**` - Deprecated scripts
+- **`_archive/ideas-2025-11-03-deprecated/`** - Ideas workflow (deprecated Nov 2025)
 
-These folders exist purely for historical reference. Active guidance now lives on GitHub Pages, Storybook, Playbook, or the templates and runbooks referenced above.
+These folders exist for historical reference only. Active documentation lives on GitHub Pages, Playbook, or in `/templates/` and `/docs/policy/`.
+
+> **Note on Ideas Workflow:** The `/ideas/` folder and related automation were deprecated on 2025-11-03. See ADR: `docs/adr/2025-11-03-ideas-workflow-deprecation.md` for details.
 
 ## Template-First Toolkit
 
-- `/templates/guide/guide-template.md` — Legacy scaffold retained for historical reference (do not use for new docs).
-- `/templates/issue-unit/` — Backlog-ready unit issue scaffold with CLI helpers.
-- `/templates/issue-composition/` — Cross-cutting composition issue scaffold.
-- `/templates/pull-request/` — Standardized PR body with acceptance checklist slots.
-- `/templates/ideas/USAGE.md` — Machine-importable source of truth used by idea automation.
+- `/templates/script/` — Script template with full CLI contract and guardrails
+- `/templates/snippet-inline-edit-label/` — Component snippet scaffold
 
-Run `pnpm guides:lint`, `pnpm guides:ttl`, or `pnpm guides:check` before submitting documentation PRs to confirm frontmatter, TTL, command executability, and dedupe budgets.
+> **Deprecated:** `/templates/ideas/` was removed on 2025-11-03. Historical reference available in `/_archive/ideas-2025-11-03-deprecated/`
+
+See individual template READMEs for usage instructions.
 
 ## Working With Snippets
 

@@ -13,44 +13,23 @@
     "build": "vite build",
     "build:playbook": "vitepress build playbook",
     "build:storybook": "storybook build",
-    "changelog": "node scripts/ops/consolidate-changelog.mjs",
-    "changelog:extract": "node scripts/ops/extract-pr-changelog.mjs",
+    "build:docs": "vitepress build docs",
     "ci:check": "node scripts/checks/check-ci.mjs",
     "ci:watch": "node scripts/checks/check-ci.mjs --watch",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
     "gh:prepare": "node scripts/checks/prepare-gh.mjs",
-    "gh:setup-labels": "node scripts/ops/setup-labels.mjs",
-    "gh:setup-project": "node scripts/ops/setup-project.mjs",
-    "gh:worktree": "node scripts/ops/create-worktree-pr.mjs",
-    "postcheckout": "node scripts/ops/post-checkout.mjs",
-    "ideas:create": "node scripts/ops/ideas-to-issues.mjs",
-    "ideas:init": "node scripts/ops/init-ideas.mjs",
-    "ideas:sync": "node scripts/ops/sync-ideas-checklists.mjs",
-    "ideas:validate": "node scripts/checks/validate-ideas.mjs",
-    "issues:create": "node scripts/ops/create-issues-from-changelog.mjs",
-    "ops:idea-intake": "node scripts/ops/idea-intake.mjs",
-    "ops:create-branch": "node scripts/ops/create-branch.mjs",
-    "ops:open-or-update-pr": "node scripts/ops/open-or-update-pr.mjs",
-    "ops:reconcile-status": "node scripts/ops/reconcile-status.mjs",
-    "ops:closeout": "node scripts/ops/closeout.mjs",
-    "ops:report": "node scripts/ops/report.mjs",
-    "ops:validate-pr-body": "node scripts/ops/validate-pr-body.mjs",
     "commit:guard": "node scripts/checks/commit-guard.mjs",
-    "drift:check": "node scripts/checks/drift.mjs",
     "lint:staged": "lint-staged",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "check": "pnpm format:check && pnpm typecheck && pnpm lint && pnpm test",
-    "new:snippet": "node scripts/ops/new-snippet.mjs",
     "playbook:dev": "vitepress dev playbook",
     "playbook:preview": "vitepress preview playbook",
     "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "pr:check": "node scripts/checks/pr-requirements.mjs --check-pr",
     "pr:create-issue": "node scripts/checks/pr-requirements.mjs",
-    "pr:generate": "node scripts/ops/generate-pr-content.mjs",
     "pr:verify": "node scripts/checks/pr-requirements.mjs --verify-pr",
     "pr:template": "node scripts/checks/pr-template-lint.mjs",
     "prepare": "simple-git-hooks",
@@ -60,8 +39,6 @@
     "storybook:test:json": "node scripts/test-storybook.mjs --json --outputFile=storybook-test-results.json",
     "storybook:test:rebuild": "node scripts/test-storybook.mjs --rebuild",
     "storybook": "storybook dev -p 6006",
-    "tag": "node scripts/ops/auto-tag.mjs",
-    "tag:release": "node scripts/ops/auto-tag.mjs --create-release --push",
     "test": "vitest run --reporter=dot",
     "test:json": "vitest run --reporter=json --outputFile=test-results.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -77,16 +54,7 @@
     "docs:playbook": "node scripts/checks/playbook-link-guard.mjs",
     "docs:check": "pnpm docs:lint && pnpm docs:views && pnpm docs:playbook",
     "docs:report": "node scripts/checks/docs-report.mjs",
-    "docs:dedupe": "node scripts/checks/guide-dedupe.mjs",
     "yaml:lint": "node scripts/checks/yaml-lint.mjs",
-    "new:template": "node scripts/ops/new-template.mjs",
-    "new:guide": "node scripts/ops/new-guide.mjs",
-    "issues:lint": "node scripts/checks/issue-template-lint.mjs",
-    "guides:lint": "node scripts/checks/lint-guides.mjs",
-    "guides:dedupe": "node scripts/checks/dedupe-guides.mjs",
-    "guides:ttl": "node scripts/ops/archive-expired-guides.mjs",
-    "guides:index": "node scripts/ops/index-guides.mjs",
-    "guides:check": "pnpm guides:lint && pnpm guides:dedupe && pnpm guides:ttl --dry-run",
     "guardrails": "node scripts/checks/guardrails.mjs",
     "guardrails:scripts": "node scripts/checks/guardrails.mjs --scope scripts",
     "guardrails:docs": "node scripts/checks/guardrails.mjs --scope docs",
@@ -95,7 +63,6 @@
     "guardrails:recordings": "node scripts/checks/guardrails.mjs --scope recordings",
     "guardrails:ci": "node scripts/checks/guardrails.mjs --output json --report",
     "guardrails:baseline": "node scripts/checks/guardrails-baseline.mjs",
-    "scripts:lifecycle-smoke": "node scripts/checks/lifecycle-smoke.mjs",
     "scripts:guardrails": "pnpm guardrails"
   },
   "devDependencies": {
@@ -152,8 +119,7 @@
     "npm": ">=10.0.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged",
-    "commit-msg": "node scripts/ops/commit-msg-hook.mjs $1"
+    "pre-commit": "npx lint-staged"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs}": [
@@ -168,9 +134,6 @@
     ],
     "templates/**/template.config.json": [
       "node scripts/checks/template-coverage.mjs"
-    ],
-    "storybook/docs/**/*.{md,mdx}": [
-      "node scripts/checks/view-dedupe.mjs"
     ],
     "playbook/pages/**/*.{md,mdx}": [
       "node scripts/checks/view-dedupe.mjs"

@@ -33,14 +33,6 @@ pnpm guardrails:baseline --output json
 
 Summarizes the last N (default 10) `ci.yml` runs, reporting guardrails job p50/p95 runtimes alongside artifact sizes for `guardrails-report`, `storybook-static`, `demo-dist`, and `playbook-static`. Useful before adjusting the Guardrail Suite budget.
 
-## scripts:lifecycle-smoke
-
-```bash
-pnpm scripts:lifecycle-smoke --yes --output json
-```
-
-Runs the executable lifecycle guardrails that exist today (idea metadata validation for Lanes C & D plus a dry-run of the guardrails baseline script). Defaults to `--dry-run` so CI can toggle execution via `--yes`.
-
 ## Rollback
 
 ```bash
@@ -50,8 +42,8 @@ git restore scripts/checks/my-check.mjs
 ## Links
 
 - USAGE: /templates/script/USAGE.md
-- Storybook: /storybook/?path=/docs/governance-script-automation--docs
-- Playbook: /playbook/patterns/script-automation-guardrails.html
+- Template README: /templates/script/README.md
+- Playbook architecture: [https://louis-pvs.github.io/plaincraft/playbook/architecture](https://louis-pvs.github.io/plaincraft/playbook/architecture)
 - Guardrails suite: `pnpm guardrails`
 
 _Owner: @lane-c_

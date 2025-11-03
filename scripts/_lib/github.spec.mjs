@@ -3,7 +3,6 @@
  * Unit tests for github.mjs
  */
 
-import path from "node:path";
 import { execa } from "execa";
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import {
@@ -18,10 +17,8 @@ import {
   updateIssue,
   getRepoInfo,
   graphqlRequest,
-  loadProjectCache,
   findProjectItemByFieldValue,
   updateProjectSingleSelectField,
-  ensureProjectStatus,
   convertPrToDraft,
   markPrReadyForReview,
   findPullRequestByBranch,
@@ -749,24 +746,6 @@ describe("graphqlRequest", () => {
   });
 });
 
-describe("loadProjectCache", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("should load cache from .repo/projects.json", async () => {
-    const root = process.cwd();
-    mocks.repoRoot.mockResolvedValueOnce(root);
-
-    const result = await loadProjectCache({ cwd: "/tmp" });
-
-    expect(mocks.repoRoot).toHaveBeenCalledWith("/tmp");
-    expect(result.path).toBe(path.join(root, ".repo", "projects.json"));
-    expect(result.root).toBe(root);
-    expect(result.cache).toHaveProperty("project");
-  });
-});
-
 describe("findProjectItemByFieldValue", () => {
   afterEach(() => {
     vi.clearAllMocks();
@@ -867,77 +846,6 @@ describe("updateProjectSingleSelectField", () => {
     expect(call[1]).toContain("graphql");
     expect(call[1]).toContain("-F");
     expect(call[1]).toContain("optionId=OPTION");
-  });
-});
-
-describe("ensureProjectStatus", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  const baseCache = {
-    project: {
-      id: "PROJECT",
-      fields: {
-        Status: {
-          id: "STATUS_FIELD",
-          options: [
-            { id: "OPT_BRANCHED", name: "Branched" },
-            { id: "OPT_PR_OPEN", name: "PR Open" },
-          ],
-        },
-        ID: { id: "ID_FIELD" },
-      },
-    },
-  };
-
-  it("should update project status when different", async () => {
-    const updateSpy = vi.fn().mockResolvedValue();
-
-    const item = {
-      item: { id: "ITEM_ID" },
-      fields: new Map([["STATUS_FIELD", { value: "Branched" }]]),
-    };
-
-    const result = await ensureProjectStatus({
-      id: "ARCH-123",
-      status: "PR Open",
-      cacheInfo: { cache: baseCache },
-      itemOverride: item,
-      updateFn: updateSpy,
-      cwd: "/repo",
-    });
-
-    expect(result.updated).toBe(true);
-    expect(result.previous).toBe("Branched");
-    expect(updateSpy).toHaveBeenCalledWith({
-      projectId: "PROJECT",
-      itemId: "ITEM_ID",
-      fieldId: "STATUS_FIELD",
-      optionId: "OPT_PR_OPEN",
-      cwd: "/repo",
-    });
-  });
-
-  it("should skip update when status already matches", async () => {
-    const updateSpy = vi.fn().mockResolvedValue();
-
-    const item = {
-      item: { id: "ITEM_ID" },
-      fields: new Map([["STATUS_FIELD", { value: "PR Open" }]]),
-    };
-
-    const result = await ensureProjectStatus({
-      id: "ARCH-123",
-      status: "PR Open",
-      cacheInfo: { cache: baseCache },
-      itemOverride: item,
-      updateFn: updateSpy,
-      cwd: "/repo",
-    });
-
-    expect(result.updated).toBe(false);
-    expect(updateSpy).not.toHaveBeenCalled();
   });
 });
 

@@ -3,23 +3,21 @@
  * ideas-to-issues.mjs
  * @since 2025-09-01
  * @version 1.0.0
+ * @deprecated since=2025-11-03 reason="Ideas workflow completely removed"
  * @deprecated since=2025-10-28 replace=scripts/ops/ideas-to-issues.mjs
- * Summary: DEPRECATED - use scripts/ops/ideas-to-issues.mjs instead
+ * Summary: DEPRECATED - Ideas workflow removed, script non-functional
  */
 
 console.error(`
 ⚠️  DEPRECATED: scripts/ideas-to-issues.mjs
 
-This script has been moved to: scripts/ops/ideas-to-issues.mjs
+The entire ideas workflow has been removed as of 2025-11-03.
 
-Please update your commands:
-  OLD: node scripts/ideas-to-issues.mjs
-  NEW: node scripts/ops/ideas-to-issues.mjs
+This script is NO LONGER FUNCTIONAL.
 
-Or use the package.json shortcut:
-  pnpm ideas:create
+Historical reference: /_archive/ideas-2025-11-03-deprecated/
 
-This shim will be removed after: 2026-01-26 (90 days)
+For current workflows, consult updated Lane documentation.
 `);
 
-process.exit(2);
+process.exit(1);

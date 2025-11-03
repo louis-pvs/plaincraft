@@ -18,85 +18,25 @@ A pragmatic inline-edit component with optimistic save, keyboard navigation, and
 
 ---
 
-### [Release Changelog Automation](/patterns/release-changelog-automation)
+## Deprecated Patterns
 
-Keeps `_tmp/` release summaries flowing into `CHANGELOG.md` while Playbook stories stay focused on business outcomes.
+The following patterns are no longer actively maintained and will be archived by 2025-12-31:
 
-**Key Features:**
+- **Release Changelog Automation** - Deprecated lifecycle automation workflow
+- **Ideas Source of Truth** - Superseded by current backlog management
+- **Script Automation Guardrails** - Consolidated into unified guardrails system
+- **Scripts-First Lifecycle Overview** - Deprecated lifecycle automation workflow
+- **Scripts-First Lifecycle Rollout** - Deprecated lifecycle automation workflow
+- **Scripts-First Lifecycle Rollback** - Deprecated lifecycle automation workflow
+- **Roadmap Project Onboarding** - Deprecated lifecycle automation workflow
 
-- Guardrailed consolidation script with dry-run mode
-- Template-enforced narrative structure for release notes
-- Automatic cleanup of processed `_tmp/` entries
-- Links directly to Playbook status updates for stakeholders
-
----
-
-### [Ideas Source of Truth](/patterns/ideas-source-of-truth)
-
-Makes `/ideas` the authoritative contract between backlog automation, roadmap views, and Playbook storytelling.
-
-**Key Features:**
-
-- Aligns Purpose/Problem/Proposal/Acceptance metadata across automation
-- Preserves parent/child hierarchy for sub-issue pipelines
-- Keeps roadmap, changelog, and PR narratives in sync
-- Anchors governance metrics for lane health
+For current automation patterns, refer to the `/scripts` directory documentation.
 
 ---
 
-### [Script Automation Guardrails](/patterns/script-automation-guardrails)
+## Future Patterns
 
-Ensures every ops script ships with the template contract so guardrails stay predictable for dry-runs and CI.
-
-**Key Features:**
-
-- Standard CLI header and exit-code semantics
-- Preview-first execution with `--yes` gates for writes
-- Shared `_lib/` helpers for composability
-- Guardrail test suite coverage (policy, smoke, size)
-
----
-
-### [Scripts-First Lifecycle Overview](/patterns/scripts-first-lifecycle-overview)
-
-Tracks every lifecycle transition through the sanctioned scripts so ideas, branches, PRs, and releases stay in sync.
-
-**Key Features:**
-
-- Maps intake → branch → PR → closeout to existing automation
-- Requires dry-run transcripts for audit-ready status notes
-- Enforces idea frontmatter as the narrative source of truth
-- Links to Storybook governance docs for each command
-
----
-
-### [Scripts-First Lifecycle Rollout](/patterns/scripts-first-lifecycle-rollout)
-
-Keeps idea metadata, branches, and draft PRs aligned the moment work begins so lifecycle reporting never drifts.
-
-**Key Features:**
-
-- `pnpm gh:worktree` stamps `Issue`/`Status` directly on the idea file
-- Bootstrap commit + draft PR give stakeholders an immediate artifact
-- Dry-run logs capture the contract diff before anything is written
-- Links back to the script template so new lifecycle commands stay consistent
-
----
-
-### [Scripts-First Lifecycle Rollback](/patterns/scripts-first-lifecycle-rollback)
-
-Walks the lifecycle backward with the same commands used to advance it so rollback events leave a complete audit trail.
-
-**Key Features:**
-
-- Uses `remove-worktree.mjs` to unwind bootstrap artifacts safely
-- Replays branch + PR scripts in dry-run mode to confirm state
-- Requires updated transcripts in Playbook status updates
-- Calls out changelog follow-ups when releases already shipped
-
----
-
-### [Roadmap Project Onboarding](/patterns/roadmap-project-onboarding)
+Additional component patterns will be documented here as they are developed
 
 Codifies the GitHub Projects setup so roadmap automation, lane views, and stakeholders stay aligned.
 
@@ -124,7 +64,7 @@ Plays that wrap automation or workflow scripts around template-first docs:
 
 - **Scripts-First Lifecycle Overview** — Coordinates intake through closeout using the sanctioned commands.
 - **Release Changelog Automation** — Script + template handshake to publish post-merge highlights.
-- **Ideas Source of Truth** — Keeps `/ideas` authoritative for automation and storytelling.
+- ~~**Ideas Source of Truth**~~ — **[DEPRECATED 2025-11-03]** Ideas workflow removed.
 - **Script Automation Guardrails** — Standardizes ops scripts around the shared CLI contract.
 - **Scripts-First Lifecycle Rollout** — Bootstraps branches and draft PRs directly from the idea file.
 - **Scripts-First Lifecycle Rollback** — Rewinds branches and PRs while preserving audit transcripts.

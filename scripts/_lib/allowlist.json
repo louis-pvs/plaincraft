@@ -15,11 +15,11 @@
     "scripts/pr-requirements.mjs",
     "scripts/prepare-gh.mjs",
     "scripts/setup-labels.mjs",
-    "scripts/sync-ideas-checklists.mjs",
-    "scripts/validate-ideas.mjs",
     "scripts/create-worktree-pr.mjs",
     "scripts/generate-pr-content.mjs",
+    "scripts/new-snippet.mjs",
     "scripts/ideas-to-issues.mjs",
-    "scripts/new-snippet.mjs"
+    "scripts/sync-ideas-checklists.mjs",
+    "scripts/validate-ideas.mjs"
   ]
 }

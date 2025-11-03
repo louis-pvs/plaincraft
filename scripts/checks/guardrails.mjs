@@ -45,9 +45,9 @@ Options:
   --report               Emit structured JSON results for pipeline reporting
 
 Description:
-  Runs the Plaincraft build/lint/test bundle plus guardrail suites (scripts, docs,
-  PR template lint, issue template lint, recording smoke tests) and emits a single
-  structured summary for developers and CI.
+  Runs the Plaincraft lint/test guardrail suites (scripts, docs, PR template lint,
+  issue template lint, recording smoke tests) to detect drift and policy violations.
+  Emits a structured summary for developers and CI. Builds are handled by CI separately.
 
 Exit codes:
   0  - All guardrails passed
@@ -89,21 +89,9 @@ const SCOPE_COMMANDS = {
       cmd: ["pnpm", "run", "scripts:deprecation"],
     },
     { id: "yaml:lint", idea: IDEA_ID, cmd: ["pnpm", "run", "yaml:lint"] },
-    {
-      id: "drift:check",
-      idea: IDEA_ID,
-      cmd: ["pnpm", "run", "drift:check"],
-    },
   ],
   docs: [
     { id: "docs:check", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:check"] },
-    { id: "docs:build", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:build"] },
-  ],
-  pr: [
-    { id: "pr:template", idea: IDEA_ID, cmd: ["pnpm", "run", "pr:template"] },
-  ],
-  issues: [
-    { id: "issues:lint", idea: IDEA_ID, cmd: ["pnpm", "run", "issues:lint"] },
   ],
   recordings: [
     // Lightweight smoke – ensures recording command is available without triggering full run
@@ -117,7 +105,7 @@ const SCOPE_COMMANDS = {
 };
 
 const SCOPE_ALIASES = {
-  ideas: "issues",
+  // Removed 'ideas' alias - ideas workflow deprecated 2025-11-03
   issue: "issues",
 };
 const DEFAULT_SCOPE_ORDER = [
