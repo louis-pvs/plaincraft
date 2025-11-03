@@ -7,19 +7,26 @@
  * Summary: DEPRECATED - use scripts/checks/validate-ideas.mjs instead
  */
 
-console.error(`
+/**
+ * validate-ideas.mjs
+ *
+ * @deprecated since=2025-11-03 reason="Ideas workflow completely removed"
+ * @deprecated since=2025-10-28 replace=scripts/checks/validate-ideas.mjs
+ * Summary: DEPRECATED - Ideas workflow removed, script non-functional
+ */
+
+console.log(`
 ⚠️  DEPRECATED: scripts/validate-ideas.mjs
 
-This script has been moved to: scripts/checks/validate-ideas.mjs
+The entire ideas workflow has been removed as of 2025-11-03.
 
-Please update your commands:
-  OLD: node scripts/validate-ideas.mjs
-  NEW: node scripts/checks/validate-ideas.mjs
+This script is NO LONGER FUNCTIONAL.
 
-Or use the package.json shortcut:
-  pnpm ideas:validate
+Historical reference: /_archive/ideas-2025-11-03-deprecated/
 
-This shim will be removed after: 2026-01-26 (90 days)
+For current workflows, consult updated Lane documentation.
 `);
+
+process.exit(1);
 
 process.exit(2);

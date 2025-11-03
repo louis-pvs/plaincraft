@@ -7,19 +7,26 @@
  * Summary: DEPRECATED - use scripts/ops/sync-ideas-checklists.mjs instead
  */
 
-console.error(`
+/**
+ * sync-ideas-checklists.mjs
+ *
+ * @deprecated since=2025-11-03 reason="Ideas workflow completely removed"
+ * @deprecated since=2025-10-28 replace=scripts/ops/sync-ideas-checklists.mjs
+ * Summary: DEPRECATED - Ideas workflow removed, script non-functional
+ */
+
+console.log(`
 ⚠️  DEPRECATED: scripts/sync-ideas-checklists.mjs
 
-This script has been moved to: scripts/ops/sync-ideas-checklists.mjs
+The entire ideas workflow has been removed as of 2025-11-03.
 
-Please update your commands:
-  OLD: node scripts/sync-ideas-checklists.mjs
-  NEW: node scripts/ops/sync-ideas-checklists.mjs
+This script is NO LONGER FUNCTIONAL.
 
-Or use the package.json shortcut:
-  pnpm ideas:sync
+Historical reference: /_archive/ideas-2025-11-03-deprecated/
 
-This shim will be removed after: 2026-01-26 (90 days)
+For current workflows, consult updated Lane documentation.
 `);
+
+process.exit(1);
 
 process.exit(2);

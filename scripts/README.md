@@ -39,7 +39,9 @@ This orchestrates:
 3. **PR/Issue checks** — PR template lint, issue template lint
 4. **Recording probe** — Optional Storybook smoke (`--help`) to ensure tooling is available when you opt in
 
-Use `pnpm guardrails:<scope>` (`docs`, `scripts`, `ideas`, `pr`, `recordings`) for focused runs.
+Use `pnpm guardrails:<scope>` (`docs`, `scripts`, `pr`, `issues`, `recordings`) for focused runs.
+
+> **Note:** The `ideas` scope alias was removed (2025-11-03) - use `issues` instead.
 
 ### Create a New Script
 
@@ -374,16 +376,16 @@ All I/O operations are mocked to ensure:
 
 ### Test Modules
 
-| Module                | Tests   | Functions | Coverage |
-| --------------------- | ------- | --------- | -------- |
-| `core.spec.mjs`       | 71      | 14        | ≥80%     |
-| `validation.spec.mjs` | 45      | 6         | ≥80%     |
-| `ideas.spec.mjs`      | 52      | 6         | ≥80%     |
-| `git.spec.mjs`        | 36      | 8         | ≥80%     |
-| `github.spec.mjs`     | 41      | 9         | ≥80%     |
-| `changelog.spec.mjs`  | 74      | 13        | ≥80%     |
-| `templates.spec.mjs`  | 36      | 7         | ≥80%     |
-| **Total**             | **355** | **63**    | **≥80%** |
+| Module                | Tests   | Functions | Coverage                |
+| --------------------- | ------- | --------- | ----------------------- |
+| `core.spec.mjs`       | 71      | 14        | ≥80%                    |
+| `validation.spec.mjs` | 45      | 6         | ≥80%                    |
+| ~~`ideas.spec.mjs`~~  | ~~52~~  | ~~6~~     | _Deprecated 2025-11-03_ |
+| `git.spec.mjs`        | 36      | 8         | ≥80%                    |
+| `github.spec.mjs`     | 41      | 9         | ≥80%                    |
+| `changelog.spec.mjs`  | 74      | 13        | ≥80%                    |
+| `templates.spec.mjs`  | 36      | 7         | ≥80%                    |
+| **Total**             | **303** | **57**    | **≥80%**                |
 
 ### Manual Smoke Probe (optional)
 

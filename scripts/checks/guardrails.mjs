@@ -105,7 +105,7 @@ const SCOPE_COMMANDS = {
 };
 
 const SCOPE_ALIASES = {
-  ideas: "issues",
+  // Removed 'ideas' alias - ideas workflow deprecated 2025-11-03
   issue: "issues",
 };
 const DEFAULT_SCOPE_ORDER = [
