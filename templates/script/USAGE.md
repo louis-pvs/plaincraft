@@ -119,7 +119,9 @@ pnpm scripts:test -- --filter <script-name>  # Focused unit coverage
 # Lifecycle guardrail (required when touching gh:worktree helpers)
 pnpm scripts:test -- --filter create-worktree-pr
 
-> Governance links: Review `/storybook/?path=/docs/governance-lifecycle-overview--docs` when scripts touch intake → closeout flows.
+### When to Use
+
+> Lifecycle flows: Reference `/scripts/README.md` for current automation patterns and CLI standards.
 
 ```
 
@@ -262,7 +264,7 @@ pnpm scripts:size
 ## Related
 
 - Guardrails: `/scripts/GUARDRAILS.md`
-- Playbook: `/playbook/patterns/script-automation-guardrails.html`
-- Storybook: `/storybook/?path=/docs/governance-script-automation--docs`
+- Template README: `/templates/script/README.md`
+- Playbook architecture: [https://louis-pvs.github.io/plaincraft/playbook/architecture](https://louis-pvs.github.io/plaincraft/playbook/architecture)
 - Core library: `/scripts/_lib/core.mjs`
 - Example scripts: `/scripts/checks/*.mjs`

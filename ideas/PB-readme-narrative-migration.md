@@ -32,10 +32,10 @@ teams still have a rich "view/read" experience.
 ## Process
 
 1. Audit the archived guide set and map each narrative to an existing or new
-   Storybook doc (`storybook/docs/**`) or Playbook page (`playbook/pages/**`).
+   Playbook page (`playbook/**`).
 2. Preserve deep links by adding redirect stubs where needed and updating the
-   navigation index for Storybook and Playbook.
-3. Ensure each template README's "Links" section points to the refreshed doc/
+   navigation index for Playbook.
+3. Ensure each template README's "Links" section points to the refreshed
    page and backfills owner metadata for follow-up maintenance.
 4. Coordinate with Lane D to announce the migration and communicate the new
    entry points in the ADR and decision summary.

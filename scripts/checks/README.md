@@ -42,8 +42,8 @@ git restore scripts/checks/my-check.mjs
 ## Links
 
 - USAGE: /templates/script/USAGE.md
-- Storybook: /storybook/?path=/docs/governance-script-automation--docs
-- Playbook: /playbook/patterns/script-automation-guardrails.html
+- Template README: /templates/script/README.md
+- Playbook architecture: [https://louis-pvs.github.io/plaincraft/playbook/architecture](https://louis-pvs.github.io/plaincraft/playbook/architecture)
 - Guardrails suite: `pnpm guardrails`
 
 _Owner: @lane-c_

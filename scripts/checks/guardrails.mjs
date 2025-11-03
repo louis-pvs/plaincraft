@@ -45,9 +45,9 @@ Options:
   --report               Emit structured JSON results for pipeline reporting
 
 Description:
-  Runs the Plaincraft build/lint/test bundle plus guardrail suites (scripts, docs,
-  PR template lint, issue template lint, recording smoke tests) and emits a single
-  structured summary for developers and CI.
+  Runs the Plaincraft lint/test guardrail suites (scripts, docs, PR template lint,
+  issue template lint, recording smoke tests) to detect drift and policy violations.
+  Emits a structured summary for developers and CI. Builds are handled by CI separately.
 
 Exit codes:
   0  - All guardrails passed
@@ -92,7 +92,6 @@ const SCOPE_COMMANDS = {
   ],
   docs: [
     { id: "docs:check", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:check"] },
-    { id: "docs:build", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:build"] },
   ],
   recordings: [
     // Lightweight smoke – ensures recording command is available without triggering full run

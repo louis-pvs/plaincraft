@@ -104,10 +104,8 @@ node scripts/your-script.mjs --dry-run
 
 ## Links
 
-- Playbook narrative: `/playbook/patterns/script-automation-guardrails.html`
-- Storybook view: `/storybook/?path=/docs/governance-script-automation--docs`
-- Commit guard view: `/storybook/?path=/docs/governance-commit-guard--docs`
-- Lifecycle governance: `/storybook/?path=/docs/governance-lifecycle-overview--docs`
-- Guardrails: `/scripts/GUARDRAILS.md`
+- Storybook governance: `/storybook/?path=/docs/governance-script-automation--docs`
+- Guardrails documentation: `/scripts/GUARDRAILS.md`
 - Core library: `/scripts/_lib/core.mjs`
 - Policy lint: `/scripts/checks/policy-lint.mjs`
+- Playbook architecture: [https://louis-pvs.github.io/plaincraft/playbook/architecture](https://louis-pvs.github.io/plaincraft/playbook/architecture)

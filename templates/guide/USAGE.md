@@ -15,12 +15,11 @@ Legacy instructions for the pre-migration guide workflow. Follow the migration c
 
 ## Historical Reference
 
-If you must inspect an old guide, the original flow was:
+If you must inspect an old guide for historical context:
 
 ```bash
 cp templates/guide/guide-template.md guides/guide-your-topic.md
 wc -w guides/guide-your-topic.md  # verify < 600 words
-pnpm guides:lint                  # legacy guardrail (rarely needed now)
 ```
 
 ### 3. Fill Frontmatter

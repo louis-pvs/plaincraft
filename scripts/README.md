@@ -43,14 +43,14 @@ Use `pnpm guardrails:<scope>` (`docs`, `scripts`, `ideas`, `pr`, `recordings`) f
 
 ### Create a New Script
 
-Use the template from the guardrails document:
+Use the script template:
 
 ```bash
-# For an orchestrator
-cp scripts/_template-ops.mjs scripts/ops/my-script.mjs
+# Copy the template
+cp templates/script/template-script.mjs scripts/my-script.mjs
 
-# For a checker
-cp scripts/_template-checks.mjs scripts/checks/my-check.mjs
+# Or use for checks
+cp templates/script/template-script.mjs scripts/checks/my-check.mjs
 ```
 
 Every script must:
@@ -65,16 +65,16 @@ Every script must:
 
 ```bash
 # Show help
-node scripts/ops/bump-version.mjs --help
+node scripts/my-script.mjs --help
 
 # Dry run (preview changes)
-node scripts/ops/bump-version.mjs --dry-run
+node scripts/my-script.mjs --dry-run
 
 # Execute
-node scripts/ops/bump-version.mjs --yes
+node scripts/my-script.mjs --yes
 
 # Get JSON output
-node scripts/ops/bump-version.mjs --output json --yes
+node scripts/my-script.mjs --output json --yes
 ```
 
 ---
@@ -262,7 +262,7 @@ const start = Date.now();
 const rawArgs = parseFlags(process.argv.slice(2));
 
 if (rawArgs.help) {
-  console.log(\`Usage: node scripts/ops/my-script.mjs [options]
+  console.log(`Usage: node scripts/my-script.mjs [options]
 
 Options:
   --help              Show this help
@@ -271,7 +271,7 @@ Options:
   --output <format>   json|text (default: text)
   --log-level <level> Log level (default: info)
   --cwd <path>        Working directory
-\`);
+`);
   process.exit(0);
 }
 
@@ -292,8 +292,14 @@ try {
 
   if (args.dryRun || !args.yes) {
     succeed(
-      { runId, script: "my-script", dryRun: true, plan, durationMs: Date.now() - start },
-      args.output
+      {
+        runId,
+        script: "my-script",
+        dryRun: true,
+        plan,
+        durationMs: Date.now() - start,
+      },
+      args.output,
     );
     process.exit(2);
   }
@@ -303,7 +309,7 @@ try {
 
   succeed(
     { runId, script: "my-script", durationMs: Date.now() - start },
-    args.output
+    args.output,
   );
 } catch (error) {
   logger.error("Failed:", error.message);
@@ -399,20 +405,14 @@ pnpm scripts:lint
 
 ## Migration Status
 
-**Current:** Phase 1 complete (foundation)  
-**Next:** Phase 2 (extract common libraries)
+**Status:** Lifecycle automation deprecated as of 2025-11-03. The `scripts/ops/` directory has been removed.
 
-See [MIGRATION-PLAN.md](./MIGRATION-PLAN.md) for details.
+**Current scripts:**
 
-### Migrated Scripts
+- `/scripts/checks/` - Validation and guardrail scripts
+- `/scripts/*.mjs` - Utility scripts
 
-- ✅ `bump-version.mjs` → `ops/bump-version.mjs`
-
-### In Progress
-
-- `_lib/ideas.mjs` - Idea file parsing
-- `_lib/markdown.mjs` - Markdown utilities
-- `ops/setup-labels.mjs` - Label setup
+See `/templates/script/` for the standard script template.
 
 ---
 
@@ -438,7 +438,7 @@ When adding or modifying scripts:
 Validation error. Check input parameters and schema requirements.
 
 ```bash
-node scripts/ops/my-script.mjs --help
+node scripts/my-script.mjs --help
 ```
 
 ### Script fails with exit 13
@@ -454,7 +454,7 @@ Unsafe environment detected. Check for:
 Check `--output json` for structured plan:
 
 ```bash
-node scripts/ops/my-script.mjs --dry-run --output json
+node scripts/my-script.mjs --dry-run --output json
 ```
 
 ---
