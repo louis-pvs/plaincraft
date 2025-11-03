@@ -5,10 +5,7 @@
  * GitHub API helpers using gh CLI
  */
 
-import path from "node:path";
-import { readFile } from "node:fs/promises";
 import { execa } from "execa";
-import { repoRoot } from "./core.mjs";
 
 /**
  * Check if gh CLI is authenticated
@@ -125,19 +122,6 @@ export async function graphqlRequest(
 
   const { stdout } = await execa("gh", args, { cwd });
   return JSON.parse(stdout);
-}
-
-/**
- * Load cached project metadata from .repo/projects.json
- * @param {object} options
- * @param {string} [options.cwd] - Working directory
- * @returns {Promise<{cache: object, path: string, root: string}>}
- */
-export async function loadProjectCache(options = {}) {
-  const root = await repoRoot(options.cwd);
-  const cachePath = path.join(root, ".repo", "projects.json");
-  const contents = await readFile(cachePath, "utf-8");
-  return { cache: JSON.parse(contents), path: cachePath, root };
 }
 
 function mapFieldValues(nodes) {
@@ -291,98 +275,6 @@ export async function updateProjectSingleSelectField(options) {
   `;
 
   await graphqlRequest(mutation, { projectId, itemId, fieldId, optionId }, cwd);
-}
-
-/**
- * Ensure project status matches desired value for an item by ID
- * @param {object} options
- * @param {string} options.id - Lifecycle identifier (e.g. ARCH-123)
- * @param {string} options.status - Desired status value
- * @param {object|null} [options.cacheInfo] - Result from loadProjectCache
- * @param {string} [options.cwd] - Working directory
- * @param {object|null} [options.itemOverride] - Pre-fetched project item (optional)
- * @param {Function} [options.updateFn] - Custom updater function (primarily for testing)
- * @returns {Promise<{updated: boolean, previous: string|null, message: string}>}
- */
-export async function ensureProjectStatus({
-  id,
-  status,
-  cacheInfo = null,
-  cwd = process.cwd(),
-  itemOverride = null,
-  updateFn = updateProjectSingleSelectField,
-}) {
-  try {
-    const info = cacheInfo ?? (await loadProjectCache({ cwd }));
-    const project = info.cache.project;
-    const statusField = project.fields?.Status;
-    const idField = project.fields?.ID;
-
-    if (!statusField?.id || !idField?.id) {
-      return {
-        updated: false,
-        previous: null,
-        message: "Project cache missing ID or Status field metadata.",
-      };
-    }
-
-    const option = (statusField.options || []).find(
-      (candidate) => candidate.name === status,
-    );
-    if (!option) {
-      return {
-        updated: false,
-        previous: null,
-        message: `Status option "${status}" not found in project cache.`,
-      };
-    }
-
-    const item =
-      itemOverride ??
-      (await findProjectItemByFieldValue({
-        projectId: project.id,
-        fieldId: idField.id,
-        value: id,
-        cwd,
-      }));
-
-    if (!item) {
-      return {
-        updated: false,
-        previous: null,
-        message: `Project item for ${id} not found.`,
-      };
-    }
-
-    const currentValue = item.fields.get(statusField.id)?.value || null;
-    if (currentValue === status) {
-      return {
-        updated: false,
-        previous: currentValue,
-        message: `Project status already ${status}.`,
-      };
-    }
-
-    await updateFn({
-      projectId: project.id,
-      itemId: item.item.id,
-      fieldId: statusField.id,
-      optionId: option.id,
-      cwd,
-    });
-
-    return {
-      updated: true,
-      previous: currentValue,
-      message: `Project status updated to ${status}.`,
-    };
-  } catch (error) {
-    return {
-      updated: false,
-      previous: null,
-      message: error?.message || String(error),
-    };
-  }
 }
 
 /**

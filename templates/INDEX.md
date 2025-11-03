@@ -1,9 +1,31 @@
 # Template Catalog
 
-**Auto-generated:** 2025-11-01  
-**Total Templates:** 13
+**Last Updated:** 2025-11-02  
+**Total Templates:** 18 (5 new delivery templates)
 
 > 📖 Canonical documentation now lives on GitHub Pages: https://louis-pvs.github.io/plaincraft/
+
+---
+
+## ⭐ NEW: Delivery Flow Templates
+
+Templates for the single-operator delivery flow. See [ADR-001](../docs/adr/single-operator-delivery-flow.md).
+
+- **[Delivery Record](delivery/DELIVERY_RECORD.md)** - Single source of truth for an ID
+- **[PR Covenant](delivery/PR_COVENANT.md)** - Required PR description template
+- **[Unit README](delivery/UNIT_README.md)** - Thin unit documentation
+- **[View Docs](delivery/VIEW.md)** - Storybook behavior documentation
+- **[Playbook Page](delivery/PLAYBOOK.md)** - Decision pages with GIF guidelines
+
+**Quick Start:**
+
+```bash
+# Start a new delivery
+cp templates/delivery/DELIVERY_RECORD.md deliveries/[ID]/RECORD.md
+# Then follow: docs/policy/delivery-governance.md
+```
+
+📖 [Delivery Governance](../docs/policy/delivery-governance.md) | 🛡️ [Guardrails Policy](../docs/policy/guardrails.md)
 
 ---
 

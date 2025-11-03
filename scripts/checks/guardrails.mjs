@@ -89,21 +89,10 @@ const SCOPE_COMMANDS = {
       cmd: ["pnpm", "run", "scripts:deprecation"],
     },
     { id: "yaml:lint", idea: IDEA_ID, cmd: ["pnpm", "run", "yaml:lint"] },
-    {
-      id: "drift:check",
-      idea: IDEA_ID,
-      cmd: ["pnpm", "run", "drift:check"],
-    },
   ],
   docs: [
     { id: "docs:check", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:check"] },
     { id: "docs:build", idea: IDEA_ID, cmd: ["pnpm", "run", "docs:build"] },
-  ],
-  pr: [
-    { id: "pr:template", idea: IDEA_ID, cmd: ["pnpm", "run", "pr:template"] },
-  ],
-  issues: [
-    { id: "issues:lint", idea: IDEA_ID, cmd: ["pnpm", "run", "issues:lint"] },
   ],
   recordings: [
     // Lightweight smoke – ensures recording command is available without triggering full run
