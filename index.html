@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plaincraft Project</title>
+  <meta name="description" content="Component library, demo, and documentation for Plaincraft">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    p {
+      font-size: 1.25rem;
+      margin-bottom: 3rem;
+      opacity: 0.95;
+    }
+    .links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .link-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 2rem 1.5rem;
+      text-decoration: none;
+      color: #fff;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .link-card:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .link-card-icon {
+      font-size: 2rem;
+      opacity: 0.9;
+    }
+    .link-card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .link-card-desc {
+      font-size: 0.875rem;
+      opacity: 0.8;
+    }
+    .whats-new {
+      margin-top: 4rem;
+      text-align: left;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .whats-new h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .changelog-entry {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .changelog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .changelog-version {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .changelog-date {
+      font-size: 0.875rem;
+      opacity: 0.7;
+    }
+    .changelog-content {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+    .changelog-content p {
+      margin: 0;
+    }
+    footer {
+      margin-top: 4rem;
+      opacity: 0.7;
+      font-size: 0.875rem;
+    }
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 2rem;
+      }
+      p {
+        font-size: 1rem;
+      }
+      .links {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Plaincraft</h1>
+    <p>Accessible React components with scripts-first governance</p>
+    
+    <div class="links">
+      <a href="/plaincraft/demo/" class="link-card">
+        <div class="link-card-icon">🚀</div>
+        <div class="link-card-title">Demo</div>
+        <div class="link-card-desc">Live application demo</div>
+      </a>
+      
+      <a href="/plaincraft/storybook/" class="link-card">
+        <div class="link-card-icon">📚</div>
+        <div class="link-card-title">Storybook</div>
+        <div class="link-card-desc">Component library</div>
+      </a>
+      
+      <a href="/plaincraft/playbook/" class="link-card">
+        <div class="link-card-icon">📖</div>
+        <div class="link-card-title">Playbook</div>
+        <div class="link-card-desc">Architecture & patterns</div>
+      </a>
+      
+      <a href="/plaincraft/docs/" class="link-card">
+        <div class="link-card-icon">📋</div>
+        <div class="link-card-title">Docs</div>
+        <div class="link-card-desc">Workflows & governance</div>
+      </a>
+    </div>
+
+    
+    <div class="whats-new">
+      <h2>What's New</h2>
+      
+      <div class="changelog-entry">
+        <div class="changelog-header">
+          <span class="changelog-version">v0.22.11</span>
+          <span class="changelog-date">2025-11-01</span>
+        </div>
+        <div class="changelog-content">
+          <p>E2e Automation Gaps<br>- Fixed double-execute bug in `consolidate-changelog.mjs` by adding explicit return after dry-run succeed() call<br>- Enhanced PR body generation to include changelog-friendly "Changes" section</p>
+        </div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-header">
+          <span class="changelog-version">v0.4.0</span>
+          <span class="changelog-date">2025-10-27</span>
+        </div>
+        <div class="changelog-content">
+          <p>Changes<br>[ARCH-worktree-prep-commit] Bootstrap commit automation for worktree script<br>- Added `createBootstrapCommit()` function that creates `.worktree-bootstrap.md` with metadata</p>
+        </div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-header">
+          <span class="changelog-version">v0.3.0</span>
+          <span class="changelog-date">2025-10-26</span>
+        </div>
+        <div class="changelog-content">
+          <p>[ARCH-ideas-pipeline] Automated project creation for ideas workflow<br>- Added `ensure-project` job to `.github/workflows/ideas.yml`<br>- Auto-detects missing or invalid project configuration</p>
+        </div>
+      </div>
+      <p style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem;">
+        <a href="https://github.com/louis-pvs/plaincraft/blob/main/CHANGELOG.md" style="color: rgba(255, 255, 255, 0.9); text-decoration: underline;">View Full Changelog</a>
+      </p>
+    </div>
+    
+
+    <footer>
+      <p>
+        <strong>plaincraft v0.22.16</strong> • <code>ff34684</code>
+      </p>
+      <p style="margin-top: 0.5rem;">
+        <a href="https://github.com/louis-pvs/plaincraft" style="color: rgba(255, 255, 255, 0.9); text-decoration: underline;">GitHub</a> • 
+        <a href="https://github.com/louis-pvs/plaincraft/issues" style="color: rgba(255, 255, 255, 0.9); text-decoration: underline;">Issues</a> • 
+        <a href="https://github.com/louis-pvs/plaincraft/blob/main/CHANGELOG.md" style="color: rgba(255, 255, 255, 0.9); text-decoration: underline;">Changelog</a>
+      </p>
+      <p style="margin-top: 0.5rem; font-size: 0.75rem;">
+        Deployed: Dec 6, 2025, 3:16 AM
+      </p>
+      <p style="margin-top: 0.25rem; font-size: 0.75rem;">
+        Maintained by <a href="https://github.com/louis-pvs" style="color: rgba(255, 255, 255, 0.9); text-decoration: underline;">Louis Phang</a>
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
